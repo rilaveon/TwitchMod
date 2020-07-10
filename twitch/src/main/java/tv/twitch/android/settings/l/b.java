@@ -16,29 +16,29 @@ public abstract class b {
     /**
      * Destinations
      */
-    protected abstract d U1();
+    protected abstract d V1();
 
     /**
      * Title
      */
-    public abstract String X1();
+    public abstract String Y1();
 
 
     /**
      * Controller
      */
-    protected abstract j V1();
+    protected abstract j W1();
 
-    public final FragmentActivity R1() {
+    public final FragmentActivity S1() {
         return null;
     }
 
-    public abstract void c2();
+    public abstract void d2();
 
     /**
      * Menu items
      */
-    public final List<tv.twitch.android.shared.ui.menus.l.b> W1() {
+    public final List<tv.twitch.android.shared.ui.menus.l.b> X1() {
         return null;
     }
 }

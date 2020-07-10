@@ -1,7 +1,8 @@
 package tv.twitch.android.shared.chat.messageinput;
 
-import tv.twitch.a.k.g.d1.b;
+import tv.twitch.a.k.g.e1.b;
 import tv.twitch.android.mod.bridges.Hooks;
+
 
 /**
  * Source: ChatMessageInputViewPresenter

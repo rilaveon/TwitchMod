@@ -1,7 +1,7 @@
 package tv.twitch.android.mod.models.settings;
 
 import tv.twitch.android.mod.models.PreferenceItem;
-import tv.twitch.android.mod.settings.PrefManager;
+import tv.twitch.android.mod.settings.PreferenceManager;
 
 public enum MiniPlayerSize implements PreferenceItem {
     DEFAULT("Default", "1.0"),
@@ -13,44 +13,47 @@ public enum MiniPlayerSize implements PreferenceItem {
     SIZE6("1.85", "1.85"),
     SIZE7("2.0", "2.0");
 
-    private static final String PREFERENCE_KEY = PrefManager.PREF_KEY_MINIPLAYER_SIZE;
-
-    public final String name;
-    public final String value;
+    public final String mPreferenceName;
+    public final String mPreferenceValue;
 
 
-    MiniPlayerSize(String name, String preferenceKey) {
-        this.name = name;
-        this.value = preferenceKey;
+    MiniPlayerSize(String name, String preferenceValue) {
+        this.mPreferenceName = name;
+        this.mPreferenceValue = preferenceValue;
     }
 
     @Override
-    public String toString() {
-        return getPreferenceName();
+    public String getValue() {
+        return mPreferenceValue;
     }
 
     @Override
-    public String getPreferenceValue() {
-        return value;
+    public String getKey() {
+        return PreferenceManager.MINIPLAYER_SIZE;
     }
 
     @Override
-    public String getPreferenceKey() {
-        return PREFERENCE_KEY;
+    public String getName() {
+        return mPreferenceName;
     }
 
     @Override
-    public String getPreferenceName() {
-        return name;
-    }
-
-    @Override
-    public PreferenceItem getPreference(String value) {
+    public PreferenceItem lookup(String value) {
         for (PreferenceItem item : values()) {
-            if (item.getPreferenceValue().equals(value))
+            if (item.getValue().equals(value))
                 return item;
         }
 
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
+    public PreferenceItem getDefault() {
+        return DEFAULT;
     }
 }

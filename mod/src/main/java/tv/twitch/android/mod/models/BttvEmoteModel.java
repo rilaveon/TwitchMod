@@ -12,18 +12,23 @@ public final class BttvEmoteModel implements Emote {
 
     private final String mCode;
     private final String mId;
-    private final boolean isGif;
+    private final boolean bIsGif;
 
-    private String url1x = null;
-    private String url2x = null;
-    private String url3x = null;
+    private final String mSmallEmoteUrl;
+    private final String mMediumEmoteUrl;
+    private final String mLargeEmoteUrl;
 
-    private ChatEmoticon ce = null;
+    private final ChatEmoticon ce;
 
     public BttvEmoteModel(String code, String id, ImageType imageType) {
         this.mCode = code;
         this.mId = id;
-        this.isGif = imageType == ImageType.GIF;
+        this.bIsGif = imageType == ImageType.GIF;
+        this.mSmallEmoteUrl = getUrl("1x");
+        this.mMediumEmoteUrl = getUrl("2x");
+        this.mLargeEmoteUrl = getUrl("3x");
+
+        this.ce = ChatFactory.getEmoticon(this);
     }
 
     @Override
@@ -35,12 +40,12 @@ public final class BttvEmoteModel implements Emote {
     public String getUrl(EmoteSize size) {
         switch (size) {
             case LARGE:
-                return getUrl3x();
+                return mLargeEmoteUrl;
             default:
             case MEDIUM:
-                return getUrl2x();
+                return mMediumEmoteUrl;
             case SMALL:
-                return getUrl1x();
+                return mSmallEmoteUrl;
         }
     }
 
@@ -51,56 +56,16 @@ public final class BttvEmoteModel implements Emote {
 
     @Override
     public boolean isGif() {
-        return isGif;
+        return bIsGif;
     }
 
     @Override
     public ChatEmoticon getChatEmoticon() {
-        if (ce == null) {
-            synchronized (this) {
-                if (ce == null) {
-                    this.ce = ChatFactory.getEmoticon(getUrl(EmoteSize.LARGE), getCode());
-                }
-            }
-        }
-
         return ce;
     }
 
-    private String getUrl1x() {
-        if (url1x == null) {
-            synchronized (this) {
-                if (url1x == null) {
-                    url1x = sUrlTemplate.replace("{id}", getId()).replace("{size}", "1x");
-                }
-            }
-        }
-
-        return url1x;
-    }
-
-    private String getUrl2x() {
-        if (url2x == null) {
-            synchronized (this) {
-                if (url2x == null) {
-                    url2x = sUrlTemplate.replace("{id}", getId()).replace("{size}", "2x");
-                }
-            }
-        }
-
-        return url2x;
-    }
-
-    private String getUrl3x() {
-        if (url3x == null) {
-            synchronized (this) {
-                if (url3x == null) {
-                    url3x = sUrlTemplate.replace("{id}", getId()).replace("{size}", "3x");
-                }
-            }
-        }
-
-        return url3x;
+    private String getUrl(String size) {
+        return sUrlTemplate.replace("{id}", getId()).replace("{size}", size);
     }
 
     @Override

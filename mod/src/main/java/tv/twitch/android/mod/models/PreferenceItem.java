@@ -1,11 +1,13 @@
 package tv.twitch.android.mod.models;
 
 public interface PreferenceItem {
-    String getPreferenceValue();
+    String getValue();
 
-    String getPreferenceKey();
+    String getKey();
 
-    String getPreferenceName();
+    String getName();
 
-    PreferenceItem getPreference(String name);
+    PreferenceItem lookup(String name);
+
+    PreferenceItem getDefault();
 }

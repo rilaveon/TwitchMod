@@ -13,7 +13,7 @@ public class a {
         // "content"
         // "recentSearchSuggestionsKey"
 
-        if (!Hooks.isJumpDisRecentSearch()) {} // TODO: __JUMP
+        if (!Hooks.isJumpDisRecentSearch()) {} // TODO :__JUMP_HOOK
 
     }
 }

@@ -3,57 +3,84 @@ package tv.twitch.android.core.crashreporter;
 import android.text.TextUtils;
 import android.util.Log;
 
+
 /**
  * Source: CrashReporter
  */
 public class a {
     private void test() {
-        Log("KEKW");
-        Log("KEKW", "LULW");
-        Log(0, "KEKW", "LULW");
-        Log(new Exception());
-        Log("KEKW", true);
-
-    }
-    private static void Log(String what) {
-        if (TextUtils.isEmpty(what)) {
-            return;
-        }
-        Log.d("CRASHLYTICS", "what==" + what);
+        LogLine("method1", "KEKW");
+        LogWithKey("method2", "KEKW", "LULW");
+        LogMessage("method3", 0, "KEKW", "LULW");
+        LogThrowable("method4", new Exception());
+        LogWithKeyAndBool("method5", "KEKW", true);
     }
 
-    private static void Log(String tag, String what) {
-        if (TextUtils.isEmpty(what)) {
-            return;
-        }
-        if (TextUtils.isEmpty(tag)) {
-            Log.d("CRASHLYTICS", "tag==null");
-            return;
-        }
-        Log.d("CRASHLYTICS", "tag==" + tag + ", what==" + what);
+    private static void LogLine(String calledFrom, String what) {
+        what = format(what);
+
+        Log(calledFrom, "what==" + what);
     }
 
-    private static void Log(String what, boolean z) {
-        if (TextUtils.isEmpty(what)) {
-            return;
-        }
-        Log.d("CRASHLYTICS", "what==" + what + ", z=" + z);
+    private static void LogWithKey(String calledFrom, String key, String what) {
+        what = format(what);
+        key = format(key);
+
+        Log(calledFrom, "key==" + key + ", what==" + what);
     }
 
-    private static void Log(Throwable throwable) {
-        if (throwable == null) {
-            return;
-        }
-        Log.d("CRASHLYTICS", "th==" + throwable.toString());
+    private static void LogWithKeyAndBool(String calledFrom, String key, boolean z) {
+        key = format(key);
+
+        Log(calledFrom, "what==" + key + ", z==" + z);
     }
 
-    private static void Log(int i, String tag, String what) {
-        if (TextUtils.isEmpty(what)) {
+    private static void LogThrowable(String calledFrom, Throwable throwable) {
+        Log(calledFrom, "throwable==" + throwable != null ? getStackTraceLine(throwable.getStackTrace()) : "null");
+    }
+
+    private static void LogMessage(String calledFrom, int i, String tag, String what) {
+        what = format(what);
+        tag = format(tag);
+
+        Log(calledFrom, "i==" + i + ", tag==" + tag + ", what==" + what);
+    }
+
+    private static void Log(String calledFrom, String message) {
+        if (TextUtils.isEmpty(message)) {
+            Log.e("CRASHLYTICS", "<empty>");
             return;
         }
-        if (TextUtils.isEmpty(tag)) {
-            return;
+
+        StringBuilder sb = new StringBuilder();
+        if (!TextUtils.isEmpty(calledFrom))
+            sb.append("method==").append(calledFrom).append(", ");
+
+        sb.append(message);
+
+        Log.d("CRASHLYTICS", sb.toString());
+        new Object();
+    }
+
+    private static String format(String what) {
+        if (what == null)
+            return "null";
+        else if (what.length() == 0)
+            return "<empty>";
+
+        return what;
+    }
+
+    private static String getStackTraceLine(StackTraceElement[] stackTraceElements) {
+        StringBuilder sb = new StringBuilder();
+        if (stackTraceElements != null) {
+            for (StackTraceElement element : stackTraceElements) {
+                if (element == null)
+                    sb.append("->...");
+                else
+                    sb.append("->").append(element.toString());
+            }
         }
-        Log.d("CRASHLYTICS", "i==" + i + ", tag==" + tag + ", what==" + what);
+        return sb.append(";").toString();
     }
 }

@@ -1,5 +1,6 @@
 package tv.twitch.chat;
 
+
 public class ChatUserMode {
     public boolean administrator;
     public boolean banned;

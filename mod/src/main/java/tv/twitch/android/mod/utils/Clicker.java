@@ -1,13 +1,13 @@
 package tv.twitch.android.mod.utils;
 
 
-import android.view.View;
+import android.view.View.OnClickListener;
 
 
 public class Clicker implements Runnable {
-    private final View.OnClickListener mListener;
+    private final OnClickListener mListener;
 
-    public Clicker(View.OnClickListener listener) {
+    public Clicker(OnClickListener listener) {
         mListener = listener;
     }
 

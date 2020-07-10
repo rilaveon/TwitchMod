@@ -1,8 +1,6 @@
 package tv.twitch.android.mod.utils;
 
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,14 +9,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.Locale;
 import java.util.Random;
 
-import tv.twitch.android.api.p1.i1;
+import tv.twitch.android.api.s1.j1;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.clips.ClipModel;
-import tv.twitch.android.shared.chat.communitypoints.models.CommunityPointsModel;
 
 
 public class Helper {
@@ -28,6 +24,7 @@ public class Helper {
     private final Handler mHandler;
 
     private int mCurrentChannel = 0;
+
 
     public Helper() {
         mHandler = new Handler();
@@ -48,7 +45,7 @@ public class Helper {
         LoaderLS.getInstance().startActivity(intent);
     }
 
-    public static int getChannelId(i1 playableModelParser, Playable playable) {
+    public static int getChannelId(j1 playableModelParser, Playable playable) {
         if (playableModelParser == null) {
             Logger.error("playableModelParser is null");
             return 0;
@@ -71,33 +68,14 @@ public class Helper {
     }
 
     private static int getClickDelay() {
-        return new Random().nextInt(MAX_CLICK_DELAY-MIN_CLICK_DELAY) + MIN_CLICK_DELAY;
+        return new Random().nextInt(MAX_CLICK_DELAY - MIN_CLICK_DELAY) + MIN_CLICK_DELAY;
     }
 
     public void setClicker(View.OnClickListener listener) {
         mHandler.postDelayed(new Clicker(listener), getClickDelay());
     }
 
-    public static void saveToClipboard(String text) {
-        Context context = LoaderLS.getInstance().getApplicationContext();
-        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard == null) {
-            Logger.error("clipboard is null");
-            return;
-        }
-
-        clipboard.setPrimaryClip(ClipData.newPlainText("text", text));
-        showToast(String.format(Locale.ENGLISH, "«%s» copied to clipboard", text));
-    }
-
-    public void setCurrentChannel(int channelID) {
-        if (channelID < 0)
-            channelID = 0;
-
-        this.mCurrentChannel = channelID;
-    }
-
-    public static boolean checkStackTrace(String clazz) {
+    public static boolean isPartOfStackTrace(String clazz) {
         if (TextUtils.isEmpty(clazz)) {
             Logger.error("Empty clazz");
             return false;
@@ -121,5 +99,12 @@ public class Helper {
 
     public int getCurrentChannel() {
         return this.mCurrentChannel;
+    }
+
+    public void setCurrentChannel(int channelID) {
+        if (channelID < 0)
+            channelID = 0;
+
+        this.mCurrentChannel = channelID;
     }
 }

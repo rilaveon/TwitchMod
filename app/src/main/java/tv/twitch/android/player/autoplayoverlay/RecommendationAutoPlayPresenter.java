@@ -7,7 +7,7 @@ public class RecommendationAutoPlayPresenter<T extends Playable> {
     public final void prepareRecommendationForCurrentModel(T t) {
         // resetAutoplay();
 
-        if (!Hooks.isJumpDisableAutoplay()) // TODO: __JUMP
+        if (!Hooks.isJumpDisableAutoplay()) // TODO: __JUMP_HOOK
             // ISubscriptionHelper....
             return;
     }

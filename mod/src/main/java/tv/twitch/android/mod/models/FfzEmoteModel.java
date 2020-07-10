@@ -14,35 +14,21 @@ public class FfzEmoteModel implements Emote {
     private final String mCode;
     private final String mId;
     
-    private String url1x = null;
-    private String url2x = null;
-    private String url3x = null;
+    private final String mSmallEmoteUrl;
+    private final String mMediumEmoteUrl;
+    private final String mLargeEmoteUrl;
 
-    private ChatEmoticon ce = null;
+    private final ChatEmoticon ce;
 
     public FfzEmoteModel(String code, String id, HashMap<String, String> urls) {
         this.mCode = code;
         this.mId = id;
 
-        for (String key : urls.keySet()) {
-            String url = urls.get(key);
-            if (TextUtils.isEmpty(url))
-                continue;
+        this.mSmallEmoteUrl = getUrl("1x", urls);
+        this.mMediumEmoteUrl = getUrl("2x", urls);
+        this.mLargeEmoteUrl = getUrl("4x", urls);
 
-            if (url.startsWith("//"))
-                url = "https:" + url;
-            switch (key) {
-                case "1x":
-                    url1x = url;
-                    break;
-                case "2x":
-                    url2x = url;
-                    break;
-                case "4x":
-                    url3x = url;
-                    break;
-            }
-        }
+        this.ce = ChatFactory.getEmoticon(this);
     }
 
     @Override
@@ -54,15 +40,15 @@ public class FfzEmoteModel implements Emote {
     public String getUrl(EmoteSize size) {
         switch (size) {
             case LARGE:
-                if (url3x != null)
-                    return url3x;
+                if (mLargeEmoteUrl != null)
+                    return mLargeEmoteUrl;
             default:
             case MEDIUM:
-                if (url2x != null)
-                    return url2x;
+                if (mMediumEmoteUrl != null)
+                    return mMediumEmoteUrl;
             case SMALL:
-                if (url1x != null)
-                    return url1x;
+                if (mSmallEmoteUrl != null)
+                    return mSmallEmoteUrl;
         }
 
         return "";
@@ -80,15 +66,22 @@ public class FfzEmoteModel implements Emote {
 
     @Override
     public ChatEmoticon getChatEmoticon() {
-        if (ce == null) {
-            synchronized (this) {
-                if (ce == null) {
-                    this.ce = ChatFactory.getEmoticon(getUrl(EmoteSize.LARGE), getCode());
-                }
-            }
+        return ce;
+    }
+
+    private String getUrl(String size, HashMap<String, String> urls) {
+        if (urls.containsKey(size)) {
+            String url = urls.get(size);
+            if (TextUtils.isEmpty(url))
+                return null;
+
+            if (url.startsWith("//"))
+                url = "https:" + url;
+
+            return url;
         }
 
-        return ce;
+        return null;
     }
 
     @Override

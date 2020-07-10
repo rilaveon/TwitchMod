@@ -7,7 +7,7 @@ import tv.twitch.android.mod.bridges.Hooks;
  */
 
 public class f extends tv.twitch.a.b.i.e {
-    public final boolean x() { // TODO: __INJECT_METHOD
-        return Hooks.hookFollowerFetcher(super.x());
+    public final boolean z() { // TODO: __INJECT_METHOD
+        return Hooks.hookFollowerFetcher(super.z());
     }
 }

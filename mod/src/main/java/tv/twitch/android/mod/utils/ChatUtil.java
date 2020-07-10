@@ -12,20 +12,21 @@ import android.util.LruCache;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-import tv.twitch.android.mod.bridges.IChatMessageFactory;
-import tv.twitch.android.mod.bridges.LoaderLS;
+import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 import tv.twitch.android.mod.emotes.EmoteManager;
 import tv.twitch.android.mod.models.Emote;
-import tv.twitch.android.mod.models.settings.Gifs;
-import tv.twitch.android.mod.settings.PrefManager;
-import tv.twitch.android.models.chat.MessageToken;
+import tv.twitch.android.mod.models.settings.EmoteSize;
 
 
 public class ChatUtil {
     private static final String TIMESTAMP_DATE_FORMAT = "HH:mm ";
+
+    private static final float MIN_DARK_CHECK = .3f;
+    private static final float MIN_DARK_CHECK_FIXED = .4f;
+    private static final float MAX_WHITE_CHECK = .9f;
+    private static final float MAX_WHITE_CHECK_FIXED = .8f;
 
 
     private static final LruCache<Integer, Integer> mDarkThemeCache = new LruCache<Integer, Integer>(500) {
@@ -33,11 +34,11 @@ public class ChatUtil {
         protected Integer create(Integer color) {
             float[] hsv = new float[3];
             Color.colorToHSV(color, hsv);
-            if (hsv[2] >= .3) {
+            if (hsv[2] >= MIN_DARK_CHECK) {
                 return color;
             }
 
-            hsv[2] = (float) .4;
+            hsv[2] = MIN_DARK_CHECK_FIXED;
             return Color.HSVToColor(hsv);
         }
     };
@@ -47,11 +48,11 @@ public class ChatUtil {
         protected Integer create(Integer color) {
             float[] hsv = new float[3];
             Color.colorToHSV(color, hsv);
-            if (hsv[2] <= 0.9) {
+            if (hsv[2] <= MAX_WHITE_CHECK) {
                 return color;
             }
 
-            hsv[2] = (float) .8;
+            hsv[2] = MAX_WHITE_CHECK_FIXED;
             return Color.HSVToColor(hsv);
         }
     };
@@ -96,31 +97,11 @@ public class ChatUtil {
         return SpannableString.valueOf(formatted);
     }
 
-    public static Integer fixUsernameColor(int color) {
-        if (LoaderLS.getPrefManagerInstance().isDarkThemeEnabled()) {
-            return mDarkThemeCache.get(color);
-        } else {
-            return mWhiteThemeCache.get(color);
-        }
+    public static Integer fixUsernameColor(int color, boolean isDarkTheme) {
+        return isDarkTheme ? mDarkThemeCache.get(color) : mWhiteThemeCache.get(color);
     }
 
-    public static String getRawMessage(List<MessageToken> tokens) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (MessageToken messageToken : tokens) {
-            if (messageToken instanceof MessageToken.TextToken)
-                stringBuilder.append(((MessageToken.TextToken) messageToken).getText());
-            else if (messageToken instanceof MessageToken.EmoticonToken)
-                stringBuilder.append(((MessageToken.EmoticonToken) messageToken).getText());
-            else if (messageToken instanceof MessageToken.MentionToken)
-                stringBuilder.append(((MessageToken.MentionToken) messageToken).getText());
-            else if (messageToken instanceof MessageToken.UrlToken)
-                stringBuilder.append(((MessageToken.UrlToken) messageToken).getUrl());
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public static SpannedString injectEmotesSpan(IChatMessageFactory factory, EmoteManager emoteManager, SpannedString messageSpan, int channelID, PrefManager manager) {
+    public static SpannedString injectEmotesSpan(IChatMessageFactory factory, EmoteManager emoteManager, SpannedString messageSpan, int channelID, boolean idGifsDisabled, EmoteSize emoteSize) {
         if (TextUtils.isEmpty(messageSpan)) {
             Logger.warning("Empty messageSpan");
             return messageSpan;
@@ -155,10 +136,10 @@ public class ChatUtil {
                     String code = String.valueOf(messageSpan.subSequence(startPos, currentPos));
                     Emote emote = emoteManager.getEmote(code, channelID);
                     if (emote != null) {
-                        if (emote.isGif() && manager.getGifsStrategy() == Gifs.DISABLED)
+                        if (emote.isGif() && idGifsDisabled)
                             continue;
 
-                        SpannableString emoteSpan = (SpannableString) factory.getSpannedEmote(emote.getUrl(manager.getEmoteSize()), emote.getCode());
+                        SpannableString emoteSpan = (SpannableString) factory.getSpannedEmote(emote.getUrl(emoteSize), emote.getCode());
                         if (emoteSpan != null) {
                             if (ssb == null)
                                 ssb = new SpannableStringBuilder(messageSpan);

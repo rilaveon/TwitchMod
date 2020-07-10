@@ -3,6 +3,7 @@ package com.bumptech.glide.load.n.g;
 
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
 
@@ -22,7 +23,7 @@ public class c extends Drawable {
 
     @Override
     public int getOpacity() {
-        return 0;
+        return PixelFormat.UNKNOWN;
     }
 
     public void start() {}

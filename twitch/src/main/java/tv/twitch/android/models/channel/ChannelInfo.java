@@ -1,7 +1,10 @@
 package tv.twitch.android.models.channel;
 
 
-public interface ChannelInfo {
+import android.os.Parcelable;
+
+
+public interface ChannelInfo extends Parcelable {
     String getDisplayName();
 
     String getGame();
@@ -11,8 +14,4 @@ public interface ChannelInfo {
     String getName();
 
     boolean isPartner();
-
-    boolean isRecommendation();
-
-    void setRecommendation(boolean z);
 }

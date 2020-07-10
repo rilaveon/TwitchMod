@@ -8,7 +8,7 @@ import tv.twitch.android.mod.bridges.Hooks;
  */
 public class g {
     public g(Object gVar, Object fVar, Object sVar) {
-        if (Hooks.isInterceptorOn()) {
+        if (Hooks.isInterceptorOn()) { // TODO :__JUMP_HOOK
             ;
         }
     }

@@ -6,12 +6,12 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 
 import tv.twitch.android.mod.bridges.Hooks;
-import tv.twitch.android.mod.bridges.IMessageRecyclerItem;
+import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 /**
  * Source: MessageRecyclerItem
  */
-public class b implements IMessageRecyclerItem { // TODO: __IMPLEMENT
+public class b implements IChatMessageItem { // TODO: __IMPLEMENT
     private boolean j;
     private Spanned f;
 
@@ -22,7 +22,7 @@ public class b implements IMessageRecyclerItem { // TODO: __IMPLEMENT
         message = Hooks.addTimestampToMessage(message, messageId); // TODO: __HOOK_PARAM
     }
 
-    public void j() {
+    public void k() { // TODO: another methods
         this.j = true; // TODO: __INJECT_CODE
     }
 
@@ -31,23 +31,14 @@ public class b implements IMessageRecyclerItem { // TODO: __IMPLEMENT
         return f;
     }
 
-    public static final class a implements IMessageRecyclerItem { // TODO: __IMPLEMENT
-        public final TextView Q() {
+    public static final class a implements IChatMessageItem { // TODO: __IMPLEMENT
+        public final TextView S() {
             return null;
         }
 
         @Override
         public Spanned getSpanned() { // TODO: __INJECT_METHOD
-            return (Spanned) Q().getText();
-        }
-    }
-
-    static final class c {
-        final b c = null;
-
-        public final boolean d(MotionEvent motionEvent) {
-            Hooks.tryCopyMsg(c.l); // TODO: __INJECT_CODE
-            return true;
+            return (Spanned) S().getText();
         }
     }
 

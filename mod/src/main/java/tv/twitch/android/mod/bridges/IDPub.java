@@ -7,14 +7,25 @@ import android.util.LruCache;
 
 
 public class IDPub {
-    public static final int PLAYER_OVERLAY_ID = 0x7f0b0626;
-    public static final int DEBUG_PANEL_CONTAINER_ID = 0x7f0b02be;
-    public static final int FLOATING_CHAT_CONTAINER_ID = 0x7f0b03b2;
-    public static final int VIDEO_DEBUG_LIST_ID = 0x7f0b08d7;
-    public static final int MESSAGES_CONTAINER_ID = 0x7f0b04e3;
-
     public final PubCache mStringIdsCache = new PubCache(200, "string");
 
+    public enum Ids { // TODO: __UPDATE
+        PLAYER_OVERLAY_ID(0x7f0b0643),
+        DEBUG_PANEL_CONTAINER_ID(0x7f0b02cc),
+        FLOATING_CHAT_CONTAINER_ID(0x7f0b03c4),
+        VIDEO_DEBUG_LIST_ID(0x7f0b0906),
+        MESSAGES_CONTAINER_ID(0x7f0b04fd);
+
+        private final int mId;
+
+        Ids(int id) {
+            mId = id;
+        }
+
+        public int getId() {
+            return mId;
+        }
+    }
 
     private static class PubCache extends LruCache<String, Integer> {
         private final String mDefType;

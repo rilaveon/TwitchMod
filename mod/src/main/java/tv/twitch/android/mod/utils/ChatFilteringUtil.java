@@ -13,7 +13,7 @@ public class ChatFilteringUtil {
         MODS,
         STAFF,
         BROADCASTER,
-        ACCOUNT,
+        USER,
         SYSTEM,
         UNKNOWN;
 
@@ -35,11 +35,14 @@ public class ChatFilteringUtil {
         return str.equalsIgnoreCase(str2);
     }
 
-    public static boolean filter(ChatLiveMessage liveMessage, String accountName, UserMessagesFiltering filtering) {
+    public static boolean filter(ChatLiveMessage liveMessage, String accountName, UserMessagesFiltering filtering, boolean ignoreSystem) {
         if (liveMessage == null || liveMessage.messageInfo == null)
             return true;
 
-        ChatFilteringUtil.MessageLevel level = ChatFilteringUtil.getMessageLevel(liveMessage.messageInfo, accountName);
+        MessageLevel level = ChatFilteringUtil.getMessageLevel(liveMessage.messageInfo, accountName);
+        if (ignoreSystem && level == MessageLevel.SYSTEM)
+            return false;
+
         switch (filtering) {
             case BROADCASTER:
                 return level.isHighOrSame(MessageLevel.BROADCASTER);
@@ -58,11 +61,11 @@ public class ChatFilteringUtil {
         if (messageInfo == null)
             return MessageLevel.UNKNOWN;
 
-        if (messageInfo.userMode.system)
+        if (messageInfo.userMode.system || messageInfo.userMode.banned)
             return MessageLevel.SYSTEM;
 
         if (compare(account, messageInfo.userName))
-            return MessageLevel.ACCOUNT;
+            return MessageLevel.USER;
 
         if (messageInfo.userMode.broadcaster)
             return MessageLevel.BROADCASTER;

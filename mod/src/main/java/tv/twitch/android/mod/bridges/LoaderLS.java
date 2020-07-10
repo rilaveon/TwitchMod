@@ -3,19 +3,25 @@ package tv.twitch.android.mod.bridges;
 
 import android.content.Context;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import tv.twitch.android.app.consumer.TwitchApplication;
 import tv.twitch.android.mod.emotes.EmoteManager;
-import tv.twitch.android.mod.settings.PrefManager;
+import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 
 
 public class LoaderLS extends TwitchApplication {
-    public static final String VERSION = "TwitchMod v2.2";
-    public static final String BUILD = "TEST BUILD r9";
+    public static final String VERSION = "TwitchMod v2.3";
+    private static final String BUILD_TEMPLATE = "TEST BUILD";
+
+    public static String BUILD = BUILD_TEMPLATE;
 
     private EmoteManager sEmoteManager;
-    private PrefManager sPrefManager;
+    private PreferenceManager sPreferenceManager;
     private Helper sHelper;
     private IDPub sIDPub;
 
@@ -37,13 +43,44 @@ public class LoaderLS extends TwitchApplication {
         post();
     }
 
-    private void post() { }
+    private void post() {}
+
+    private void setBuild() {
+        try {
+            InputStream inputStream = this.getApplicationContext().getAssets().open("build.properties");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            String line;
+            int buildNum = -1;
+            while((line = bufferedReader.readLine()) != null) {
+                if (line.startsWith("build_num=")) {
+                    String[] parts = line.split("=");
+                    if (parts.length == 2) {
+                        buildNum = Integer.parseInt(parts[1]);
+                        break;
+                    }
+                }
+            }
+
+            if (buildNum != -1) {
+                BUILD = BUILD_TEMPLATE + " (" + buildNum + ")";
+            }
+
+            inputStream.close();
+            inputStreamReader.close();
+            bufferedReader.close();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
 
     private void init() {
-        Logger.debug("Init LoaderLS. " + VERSION);
         sInstance = this;
+        setBuild();
+        Logger.debug("Init LoaderLS. " + VERSION + " " + BUILD);
+        sPreferenceManager = new PreferenceManager(getApplicationContext());
         sEmoteManager = new EmoteManager();
-        sPrefManager = new PrefManager(getApplicationContext());
         sHelper = new Helper();
         sIDPub = new IDPub();
     }
@@ -52,7 +89,7 @@ public class LoaderLS extends TwitchApplication {
         return getInstance().getEmoteManager();
     }
 
-    public static PrefManager getPrefManagerInstance() {
+    public static PreferenceManager getPrefManagerInstance() {
         return getInstance().getPrefManager();
     }
 
@@ -68,7 +105,6 @@ public class LoaderLS extends TwitchApplication {
         if (sEmoteManager == null) {
             synchronized (LoaderLS.class) {
                 if (sEmoteManager == null) {
-                    Logger.warning("creating new instance");
                     sEmoteManager = new EmoteManager();
                 }
             }
@@ -76,23 +112,21 @@ public class LoaderLS extends TwitchApplication {
         return sEmoteManager;
     }
 
-    private PrefManager getPrefManager() {
-        if (sPrefManager == null) {
+    private PreferenceManager getPrefManager() {
+        if (sPreferenceManager == null) {
             synchronized (LoaderLS.class) {
-                if (sPrefManager == null) {
-                    Logger.warning("creating new instance");
-                    sPrefManager = new PrefManager(getApplicationContext());
+                if (sPreferenceManager == null) {
+                    sPreferenceManager = new PreferenceManager(getApplicationContext());
                 }
             }
         }
-        return sPrefManager;
+        return sPreferenceManager;
     }
 
     private Helper getHelper() {
         if (sHelper == null) {
             synchronized (LoaderLS.class) {
                 if (sHelper == null) {
-                    Logger.warning("creating new instance");
                     sHelper = new Helper();
                 }
             }
@@ -104,7 +138,6 @@ public class LoaderLS extends TwitchApplication {
         if (sIDPub == null) {
             synchronized (LoaderLS.class) {
                 if (sIDPub == null) {
-                    Logger.warning("creating new instance");
                     sIDPub = new IDPub();
                 }
             }

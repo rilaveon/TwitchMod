@@ -9,10 +9,10 @@ import com.bumptech.glide.load.n.g.c;
 
 import java.util.List;
 
-import tv.twitch.a.k.e0.b.r.a;
-import tv.twitch.android.core.adapters.t;
-import tv.twitch.android.mod.bridges.IDrawable;
-import tv.twitch.android.mod.bridges.IMessageRecyclerItem;
+import tv.twitch.a.k.g0.b.r.a;
+import tv.twitch.android.core.adapters.u;
+import tv.twitch.android.mod.bridges.interfaces.IDrawable;
+import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 
 public class GifHelper {
@@ -20,8 +20,8 @@ public class GifHelper {
         if (item == null)
             return;
 
-        if (item instanceof IMessageRecyclerItem) {
-            recycleGifsInText(((IMessageRecyclerItem) item).getSpanned(), force);
+        if (item instanceof IChatMessageItem) {
+            recycleGifsInText(((IChatMessageItem) item).getSpanned(), force);
         } else if (item instanceof TextView) {
             recycleGifsInText(((TextView) item).getText(), force);
         } else {
@@ -59,26 +59,24 @@ public class GifHelper {
         }
     }
 
-    public static void recycleAdapterItems(List<t> list) {
+    public static void recycleAdapterItems(List<u> list) {
         if (list == null || list.size() == 0)
             return;
 
-        for (t item : list) {
+        for (u item : list) {
             recycleObject(item, true);
         }
     }
 
-    public static void recycleAdapterItems(List<t> list, int range) {
+    public static void recycleAdapterItems(List<u> list, int range) {
         if (range == 0)
             return;
 
         if (list == null || list.size() == 0)
             return;
 
-        if (list.size() <= range) {
-            Logger.debug("Bad range: " + range + " [list size=" + list.size() + "]");
+        if (list.size() <= range)
             return;
-        }
 
         for (int i = 0; i < range; i++) {
             recycleObject(list.get(i), true);
