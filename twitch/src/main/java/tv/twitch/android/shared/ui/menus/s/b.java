@@ -4,7 +4,6 @@ package tv.twitch.android.shared.ui.menus.s;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import kotlin.jvm.c.g;
 import tv.twitch.android.shared.ui.menus.j;
 
 

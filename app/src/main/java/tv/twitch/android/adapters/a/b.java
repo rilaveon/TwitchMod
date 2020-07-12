@@ -2,7 +2,6 @@ package tv.twitch.android.adapters.a;
 
 import android.content.Context;
 import android.text.Spanned;
-import android.view.MotionEvent;
 import android.widget.TextView;
 
 import tv.twitch.android.mod.bridges.Hooks;
@@ -19,7 +18,7 @@ public class b implements IChatMessageItem { // TODO: __IMPLEMENT
 
 
     public b(Context context, String messageId, int i2, String str2, String str3, int i3, Spanned message, Object gVar, float f2, int i4, float f3, boolean z, boolean z2, String str4, Object eventDispatcher) {
-        message = Hooks.addTimestampToMessage(message, messageId); // TODO: __HOOK_PARAM
+        message = Hooks.addTimestampToMessage(message); // TODO: __HOOK_PARAM
     }
 
     public void k() { // TODO: another methods

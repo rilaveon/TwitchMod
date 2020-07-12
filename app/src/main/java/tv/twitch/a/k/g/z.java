@@ -23,4 +23,13 @@ public class z {
         //   move-result-object p2
         //   move-object v10, p2
     }
+
+    public final void S(tv.twitch.a.k.g.e1.l lVar) {
+        // if (lVar instanceof l.b) {
+        // } else if (lVar instanceof l.e) {
+        if (!Hooks.isJumpSystemIgnore()) { // TODO: __JUMP_HOOK
+            return;
+        }
+
+    }
 }

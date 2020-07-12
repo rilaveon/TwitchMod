@@ -1,7 +1,9 @@
 package tv.twitch.android.mod.utils;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
@@ -75,7 +77,7 @@ public class Helper {
         mHandler.postDelayed(new Clicker(listener), getClickDelay());
     }
 
-    public static boolean isPartOfStackTrace(String clazz) {
+    public static boolean isOnStackTrace(String clazz) {
         if (TextUtils.isEmpty(clazz)) {
             Logger.error("Empty clazz");
             return false;
@@ -95,6 +97,24 @@ public class Helper {
         }
 
         return false;
+    }
+
+    public static final Activity getActivity(Context context) {
+        while (!(context instanceof Activity)) {
+            if (!(context instanceof ContextWrapper)) {
+                context = null;
+            }
+            ContextWrapper contextWrapper = (ContextWrapper) context;
+            if (contextWrapper == null) {
+                return null;
+            }
+            context = contextWrapper.getBaseContext();
+            if (context == null) {
+                return null;
+            }
+        }
+
+        return (Activity) context;
     }
 
     public int getCurrentChannel() {

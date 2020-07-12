@@ -100,9 +100,8 @@ public class Hooks {
         if (speed == org.a)
             return org;
 
-        if (Helper.isPartOfStackTrace(VOD_PLAYER_PRESENTER_CLASS)) {
+        if (Helper.isOnStackTrace(VOD_PLAYER_PRESENTER_CLASS))
             return new PlaybackParameters(speed);
-        }
 
         return PlaybackParameters.e;
     }
@@ -111,7 +110,7 @@ public class Hooks {
      * Class: MessageRecyclerItem
      * signature:
      */
-    public final static Spanned addTimestampToMessage(Spanned message, String messageId) {
+    public final static Spanned addTimestampToMessage(Spanned message) {
         if (!LoaderLS.getPrefManagerInstance().isMessageTimestampOn())
             return message;
 
@@ -274,21 +273,16 @@ public class Hooks {
      * signature:  public final void a(int i2, List<? extends ChatLiveMessage> list...)
      */
     public final static List<? extends ChatLiveMessage> hookLiveMessages(List<? extends ChatLiveMessage> list, String accountName) {
-        UserMessagesFiltering filtering = LoaderLS.getPrefManagerInstance().getChatFiltering();
-        if (filtering == UserMessagesFiltering.DISABLED)
-            return list;
-
-        if (TextUtils.isEmpty(accountName)) {
-            Logger.error("empty accountName");
-            return list;
-        }
-
         if (list == null || list.isEmpty()) {
             Logger.warning("empty list");
             return list;
         }
 
         final boolean ignoreSystem = LoaderLS.getPrefManagerInstance().isIgnoreSystemMessages();
+        UserMessagesFiltering filtering = LoaderLS.getPrefManagerInstance().getChatFiltering();
+
+        if (filtering == UserMessagesFiltering.DISABLED && !ignoreSystem)
+            return list;
 
         ArrayList<ChatLiveMessage> filtered = new ArrayList<>();
         for (ChatLiveMessage liveMessage : list) {
@@ -297,7 +291,7 @@ public class Hooks {
                 continue;
             }
 
-            if (ChatFilteringUtil.filter(liveMessage, accountName, filtering, ignoreSystem))
+            if (ChatFilteringUtil.filter(liveMessage, accountName, filtering))
                 filtered.add(liveMessage);
         }
 
@@ -381,5 +375,12 @@ public class Hooks {
         }
 
         return orgMessage;
+    }
+
+    /**
+     * Class: LiveChatSource
+     */
+    public static boolean isJumpSystemIgnore() {
+        return LoaderLS.getPrefManagerInstance().isIgnoreSystemMessages();
     }
 }

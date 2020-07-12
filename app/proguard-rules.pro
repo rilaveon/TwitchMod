@@ -29,4 +29,4 @@
 # Libs
 -keep class com.bumptech.glide.** { *; }
 -keep class com.google.android.exoplayer2.** { *; }
--keep class androidx.appcompat.app.AppCompatActivity { *; }
+-keep class androidx.** { *; }

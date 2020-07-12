@@ -1,9 +1,17 @@
 package tv.twitch.android.mod.settings;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Process;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
+
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +27,7 @@ import tv.twitch.android.mod.models.settings.PlayerImpl;
 import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
+import tv.twitch.android.settings.SettingsActivity;
 import tv.twitch.android.shared.ui.menus.j;
 import tv.twitch.android.shared.ui.menus.l.b;
 import tv.twitch.android.shared.ui.menus.m.a;
@@ -29,6 +38,25 @@ import static tv.twitch.android.mod.settings.PreferenceManager.DEV;
 public class SettingsController {
     private static final String TELEGRAM_URL = "https://t.me/pubTw";
     private static final String GITHUB_URL = "https://github.com/nopbreak/TwitchMod";
+
+
+
+
+    public static final class ToggleMenuChangeListener implements j { // TODO: __INJECT_CLASS
+        private final FragmentActivity mFragmentActivity;
+
+        public ToggleMenuChangeListener(FragmentActivity fragmentActivity) {
+            mFragmentActivity = fragmentActivity;
+        }
+
+        @Override
+        public void a(tv.twitch.android.shared.ui.menus.s.b item, boolean isChecked) {
+            SettingsController.OnMenuItemToggled(mFragmentActivity, item, isChecked);
+        }
+
+        @Override
+        public void b(tv.twitch.android.shared.ui.menus.k.b bVar) {}
+    }
 
 
     public static final class onMenuItemSelected implements a.a1<PreferenceItem> {
@@ -48,7 +76,7 @@ public class SettingsController {
         }
     }
 
-    public static void OnMenuItemToggled(tv.twitch.android.shared.ui.menus.s.b menuItem, boolean isChecked) {
+    public static void OnMenuItemToggled(FragmentActivity fragmentActivity, tv.twitch.android.shared.ui.menus.s.b menuItem, boolean isChecked) {
         if (menuItem == null) {
             Logger.error("menuItem is null");
             return;
@@ -60,18 +88,35 @@ public class SettingsController {
             return;
         }
 
-        String preferenceKey = prefType.getPreferenceKey();
+        final String preferenceKey = prefType.getPreferenceKey();
         if (TextUtils.isEmpty(preferenceKey)) {
             Logger.warning("preferenceKey is null. Object=" + prefType.toString());
             return;
         }
 
         LoaderLS.getPrefManagerInstance().updateBoolean(preferenceKey, isChecked);
+        restartIfNeed(fragmentActivity, preferenceKey);
+    }
+
+    private static void restartIfNeed(FragmentActivity fragmentActivity, String preferenceKey) {
+        switch (preferenceKey) {
+            case PreferenceManager.HIDE_DISCOVER:
+            case PreferenceManager.HIDE_ESPORTS:
+                new AlertDialog.Builder(fragmentActivity).setMessage("Refresh and restart?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, new Intent(LoaderLS.getInstance(), SettingsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+                        ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1000, pendingIntent);
+                        Process.killProcess(Process.myPid());
+
+                    }
+                }).setNegativeButton("No", null).create().show();
+        }
     }
 
     public static class MenuFactory {
         private static tv.twitch.android.shared.ui.menus.l.b getInfoMenu(String title, String desc, View.OnClickListener listener) {
-            return new tv.twitch.android.shared.ui.menus.o.a(title, desc, null, null, null, null, listener, 0, null);
+            return new tv.twitch.android.shared.ui.menus.o.a(title, desc, null, null, null, null, listener);
         }
 
         private static tv.twitch.android.shared.ui.menus.l.b getInfoMenu(String title) {
@@ -86,6 +131,10 @@ public class SettingsController {
             ArrayAdapter<PreferenceItem> adapter = new ArrayAdapter<>(context, tv.twitch.android.settings.d.twitch_spinner_dropdown_item, items);
             return new tv.twitch.android.shared.ui.menus.m.a<>(adapter, Arrays.asList(items).indexOf(state), idPub.getString(controller.getNameKey()), idPub.getString(controller.getDescriptionKey()), null, null, new onMenuItemSelected(adapter));
         }
+    }
+
+    public static j getMenuListener(FragmentActivity activity) {
+        return new ToggleMenuChangeListener(activity);
     }
 
     public static void initialize(final Context context, List<b> items) {

@@ -16,7 +16,7 @@ import tv.twitch.android.mod.utils.Logger;
 
 public class LoaderLS extends TwitchApplication {
     public static final String VERSION = "TwitchMod v2.3";
-    private static final String BUILD_TEMPLATE = "TEST BUILD";
+    private static final String BUILD_TEMPLATE = "BUILD";
 
     public static String BUILD = BUILD_TEMPLATE;
 
@@ -64,7 +64,7 @@ public class LoaderLS extends TwitchApplication {
             }
 
             if (buildNum != -1) {
-                BUILD = BUILD_TEMPLATE + " (" + buildNum + ")";
+                BUILD = BUILD_TEMPLATE + " " + buildNum;
             }
 
             inputStream.close();
