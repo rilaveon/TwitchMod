@@ -57,37 +57,6 @@ public class ChatUtil {
         }
     };
 
-    public enum EmoteSet {
-        GLOBAL("-110", "BetterTTV Global Emotes"),
-        FFZ( "-109", "FFZ Channel Emotes"),
-        BTTV( "-108", "BetterTTV Channel Emotes");
-
-        public final String description;
-        public final String setId;
-
-        public static EmoteSet findById(String id) {
-            for (EmoteSet set : values()) {
-                if (set.getId().equals(id))
-                    return set;
-            }
-
-            return null;
-        }
-
-        EmoteSet(String id, String description) {
-            this.description = description;
-            this.setId = id;
-        }
-
-        public String getId() {
-            return setId;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
     public static Spanned addTimestamp(Spanned message, Date date) {
         final String dateFormat = new SimpleDateFormat(TIMESTAMP_DATE_FORMAT, Locale.UK).format(date);
         SpannableString dateString = SpannableString.valueOf(dateFormat);

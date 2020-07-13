@@ -1,7 +1,13 @@
 package tv.twitch.android.mod.bridges;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import tv.twitch.a.k.l.j.d;
+import tv.twitch.a.k.l.j.k.c;
+import tv.twitch.a.k.l.k.a;
 import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.chat.ChatEmoticon;
@@ -49,5 +55,22 @@ public class ChatFactory {
         }
 
         return chatEmoticons;
+    }
+
+    private static tv.twitch.a.k.l.j.k.c getEmote(Emote emote) {
+        tv.twitch.a.k.l.k.a emoteMessageInput = new a(emote.getCode(), "-1", false);
+        tv.twitch.a.k.l.k.c emotePicker = new tv.twitch.a.k.l.k.c("-1", emote.getCode(), Collections.<tv.twitch.a.k.l.k.c>emptyList());
+        tv.twitch.a.k.l.j.d.d1 clickedEmote = new d.d1.b(emotePicker, emoteMessageInput, Collections.<d.d1.b>emptyList());
+        return new EmoteUiModelWithUrl("-1", false, false, clickedEmote, emote.getUrl(EmoteSize.LARGE));
+    }
+
+    public static tv.twitch.a.k.l.j.k.d getEmoteSetUi(Collection<Emote> emoteList, Integer emoteSetId) {
+        tv.twitch.a.k.l.j.k.a header = new tv.twitch.a.k.l.j.k.a.b(emoteSetId, true, tv.twitch.a.k.l.j.k.b.d, false);
+        List<c> emotes = new ArrayList<>();
+        for (Emote emote : emoteList) {
+            emotes.add(getEmote(emote));
+        }
+
+        return new tv.twitch.a.k.l.j.k.d(header, emotes);
     }
 }

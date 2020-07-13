@@ -1,6 +1,7 @@
 package tv.twitch.android.mod.bridges;
 
 
+import android.content.Context;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import tv.twitch.a.k.g.e1.b;
 import tv.twitch.a.k.g.g;
+import tv.twitch.a.k.l.j.k.c;
 import tv.twitch.android.api.s1.j1;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 import tv.twitch.android.mod.emotes.EmoteManager;
@@ -29,11 +31,12 @@ import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.channel.ChannelInfo;
+import tv.twitch.android.util.EmoteUrlUtil;
 import tv.twitch.chat.ChatEmoticonSet;
 import tv.twitch.chat.ChatLiveMessage;
 
 
-@SuppressWarnings("FinalStaticMethod")
+@SuppressWarnings({"FinalStaticMethod", "rawtypes"})
 public class Hooks {
     private final static String VOD_PLAYER_PRESENTER_CLASS = "tv.twitch.a.k.x.j0.w"; // TODO: __UPDATE
     private final static float DEFAULT_MINIPLAYER_SIZE = 1.0f;
@@ -47,9 +50,9 @@ public class Hooks {
         if (!LoaderLS.getPrefManagerInstance().isEmotePickerOn())
             return org;
 
-        ChatUtil.EmoteSet set = ChatUtil.EmoteSet.findById(setId);
+        EmoteSet set = EmoteSet.findById(setId);
         if (set != null)
-            return set.getDescription();
+            return set.getTitle();
 
         return org;
     }
@@ -139,9 +142,9 @@ public class Hooks {
         ChatEmoticonSet[] newSet = new ChatEmoticonSet[orgSet.length+3];
         System.arraycopy(orgSet, 0, newSet, 0, orgSet.length);
 
-        newSet[newSet.length-1] = ChatFactory.getSet(ChatUtil.EmoteSet.BTTV.getId(), bttvEmotes);
-        newSet[newSet.length-2] = ChatFactory.getSet(ChatUtil.EmoteSet.FFZ.getId(), ffzEmotes);
-        newSet[newSet.length-3] = ChatFactory.getSet(ChatUtil.EmoteSet.GLOBAL.getId(), globalEmotes);
+        newSet[newSet.length-1] = ChatFactory.getSet(EmoteSet.BTTV.getId(), bttvEmotes);
+        newSet[newSet.length-2] = ChatFactory.getSet(EmoteSet.FFZ.getId(), ffzEmotes);
+        newSet[newSet.length-3] = ChatFactory.getSet(EmoteSet.GLOBAL.getId(), globalEmotes);
 
         return newSet;
     }
@@ -382,5 +385,48 @@ public class Hooks {
      */
     public static boolean isJumpSystemIgnore() {
         return LoaderLS.getPrefManagerInstance().isIgnoreSystemMessages();
+    }
+
+    /**
+     * Class: EmotePickerPresenter
+     */
+    public static Collection hookEmotePickerSet(Collection list, Integer channelId) {
+        if (!LoaderLS.getPrefManagerInstance().isEmotePickerOn())
+            return list;
+
+        if (list == null)
+            return null;
+
+        EmoteManager emoteManager = LoaderLS.getEmoteMangerInstance();
+
+        Collection<Emote> bttvGlobalEmotes = emoteManager.getGlobalEmotes();
+        if (bttvGlobalEmotes != null && !bttvGlobalEmotes.isEmpty()) {
+            Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.GLOBAL.getTitleRes());
+            list.add(ChatFactory.getEmoteSetUi(bttvGlobalEmotes, resId));
+        }
+
+        if (channelId != null && channelId != -1) {
+            Collection<Emote> bttvChannelEmotes = emoteManager.getBttvEmotes(channelId);
+            if (bttvChannelEmotes != null && !bttvChannelEmotes.isEmpty()) {
+                Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.BTTV.getTitleRes());
+                list.add(ChatFactory.getEmoteSetUi(bttvChannelEmotes, resId));
+            }
+
+            Collection<Emote> ffzChannelEmotes = emoteManager.getFfzEmotes(channelId);
+            if (ffzChannelEmotes != null && !ffzChannelEmotes.isEmpty()) {
+                Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.FFZ.getTitleRes());
+                list.add(ChatFactory.getEmoteSetUi(ffzChannelEmotes, resId));
+            }
+        }
+
+        return list;
+    }
+
+    public static String hookEmoteAdapterItem(Context context, c emoteUiModel) {
+        if (emoteUiModel instanceof EmoteUiModelWithUrl) {
+            return ((EmoteUiModelWithUrl) emoteUiModel).getUrl();
+        }
+
+        return EmoteUrlUtil.getEmoteUrl(context, emoteUiModel.b());
     }
 }

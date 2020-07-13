@@ -3,4 +3,8 @@
     <string name="mod_category_info">Инфо</string>
     <string name="mod_info_open_telegram">Телеграм</string>
     <string name="mod_info_open_github">Исходный код</string>
+
+    <string name="mod_emote_picker_bttv_global">BTTV глобальные смайлы</string>
+    <string name="mod_emote_picker_bttv_channel">BTTV смайлы канала</string>
+    <string name="mod_emote_picker_ffz_channel">FFZ смайлы канала</string>
 </resources>

@@ -43,6 +43,10 @@ public class IDPub {
         }
     }
 
+    public Integer getStringId(String name) {
+        return mStringIdsCache.get(name);
+    }
+
     public String getString(String name) {
         int resId = mStringIdsCache.get(name);
         if (resId == 0) {

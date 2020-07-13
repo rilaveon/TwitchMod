@@ -67,4 +67,8 @@
     <string name="mod_category_info">Info</string>
     <string name="mod_info_open_telegram">Open Telegram channel</string>
     <string name="mod_info_open_github">Open GitHub page</string>
+
+    <string name="mod_emote_picker_bttv_global">BTTV global emotes</string>
+    <string name="mod_emote_picker_bttv_channel">BTTV channel emotes</string>
+    <string name="mod_emote_picker_ffz_channel">FFZ channel emotes</string>
 </resources>
