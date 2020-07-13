@@ -4,7 +4,7 @@
     <string name="mod_info_open_telegram">Телеграм</string>
     <string name="mod_info_open_github">Исходный код</string>
 
-    <string name="mod_emote_picker_bttv_global">BTTV глобальные смайлы</string>
-    <string name="mod_emote_picker_bttv_channel">BTTV смайлы канала</string>
-    <string name="mod_emote_picker_ffz_channel">FFZ смайлы канала</string>
+    <string name="mod_emote_picker_bttv_global">Глобальные смайлики BTTV</string>
+    <string name="mod_emote_picker_bttv_channel">Смайлики канала BTTV</string>
+    <string name="mod_emote_picker_ffz_channel">Смайлики канала FFZ</string>
 </resources>
