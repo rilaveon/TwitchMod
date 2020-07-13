@@ -46,6 +46,11 @@ public class EmoteManager {
             return;
         }
 
+        if (channelId == -1) {
+            Logger.warning("Cannot request emotes: channelId==-1");
+            return;
+        }
+
         Logger.debug("New emote request: " + channelId);
         if (force) {
             synchronized (mRoomCache) {
