@@ -70,14 +70,9 @@ public class ChatUtil {
         return isDarkTheme ? mDarkThemeCache.get(color) : mWhiteThemeCache.get(color);
     }
 
-    public static SpannedString injectEmotesSpan(IChatMessageFactory factory, EmoteManager emoteManager, SpannedString messageSpan, int channelID, boolean idGifsDisabled, EmoteSize emoteSize) {
+    public static SpannedString injectEmotesSpan(IChatMessageFactory factory, SpannedString messageSpan, int channelID, boolean isGifsDisabled, EmoteSize emoteSize) {
         if (TextUtils.isEmpty(messageSpan)) {
             Logger.warning("Empty messageSpan");
-            return messageSpan;
-        }
-
-        if (emoteManager == null) {
-            Logger.error("emoteManager is null");
             return messageSpan;
         }
 
@@ -103,9 +98,9 @@ public class ChatUtil {
                     newWord = false;
 
                     String code = String.valueOf(messageSpan.subSequence(startPos, currentPos));
-                    Emote emote = emoteManager.getEmote(code, channelID);
+                    Emote emote = EmoteManager.INSTANCE.getEmote(code, channelID);
                     if (emote != null) {
-                        if (emote.isGif() && idGifsDisabled)
+                        if (emote.isGif() && isGifsDisabled)
                             continue;
 
                         SpannableString emoteSpan = (SpannableString) factory.getSpannedEmote(emote.getUrl(emoteSize), emote.getCode());

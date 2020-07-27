@@ -3,8 +3,6 @@ package tv.twitch.android.mod.utils;
 
 import android.util.Log;
 
-import tv.twitch.android.mod.bridges.LoaderLS;
-
 
 public class Logger {
     public static void error(String msg) {
@@ -28,18 +26,5 @@ public class Logger {
         String className = stackTraceElement.getClassName();
         String methodName = stackTraceElement.getMethodName();
         return className + "->" + methodName;
-    }
-
-    public static void showDebugToast(String msg) {
-        if (LoaderLS.getInstance() == null) {
-            Logger.error("instance is null");
-            return;
-        }
-
-        Logger.debug("Toast message: " + msg);
-        if (!LoaderLS.getPrefManagerInstance().isDevModeOn())
-            return;
-
-        Helper.showToast(msg);
     }
 }

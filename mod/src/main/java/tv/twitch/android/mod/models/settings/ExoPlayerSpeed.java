@@ -5,10 +5,13 @@ import tv.twitch.android.mod.settings.PreferenceManager;
 
 public enum ExoPlayerSpeed implements PreferenceItem {
     DEFAULT("Default", "1.0"),
-    SPEED1("1.25", "1.25"),
-    SPEED2("1.5", "1.5"),
-    SPEED3("1.75", "1.75"),
-    SPEED4("2.0", "2.0");
+    SPEED110("1.1x", "1.1"),
+    SPEED115("1.15x", "1.15"),
+    SPEED120("1.20x", "1.20"),
+    SPEED125("1.25x", "1.25"),
+    SPEED150("1.5x", "1.5"),
+    SPEED175("1.75x", "1.75"),
+    SPEED200("2.0x", "2.0");
 
     public final String mPreferenceName;
     public final String mPreferenceValue;

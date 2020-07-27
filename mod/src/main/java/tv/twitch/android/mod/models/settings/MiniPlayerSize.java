@@ -5,13 +5,13 @@ import tv.twitch.android.mod.settings.PreferenceManager;
 
 public enum MiniPlayerSize implements PreferenceItem {
     DEFAULT("Default", "1.0"),
-    SIZE1("1.25", "1.25"),
-    SIZE2("1.35", "1.35"),
-    SIZE3("1.5", "1.5"),
-    SIZE4("1.65", "1.65"),
-    SIZE5("1.75", "1.75"),
-    SIZE6("1.85", "1.85"),
-    SIZE7("2.0", "2.0");
+    SIZE1("1.25x", "1.25"),
+    SIZE2("1.35x", "1.35"),
+    SIZE3("1.5x", "1.5"),
+    SIZE4("1.65x", "1.65"),
+    SIZE5("1.75x", "1.75"),
+    SIZE6("1.85x", "1.85"),
+    SIZE7("2.0x", "2.0");
 
     public final String mPreferenceName;
     public final String mPreferenceValue;

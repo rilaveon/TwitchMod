@@ -3,31 +3,34 @@ package tv.twitch.android.mod.bridges;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import tv.twitch.android.app.consumer.TwitchApplication;
+import tv.twitch.android.mod.badges.BadgeManager;
 import tv.twitch.android.mod.emotes.EmoteManager;
 import tv.twitch.android.mod.settings.PreferenceManager;
-import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 
 
 public class LoaderLS extends TwitchApplication {
-    public static final String VERSION = "TwitchMod v2.3";
+    public static final String VERSION = "TwitchMod v2.4";
     private static final String BUILD_TEMPLATE = "BUILD";
 
     public static String BUILD = BUILD_TEMPLATE;
 
-    private EmoteManager sEmoteManager;
-    private PreferenceManager sPreferenceManager;
-    private Helper sHelper;
-    private IDPub sIDPub;
+    private static LoaderLS sInstance = null;
 
-    private static volatile LoaderLS sInstance = null;
 
+    @NonNull
     public static LoaderLS getInstance() {
+        if (sInstance == null) {
+            throw new ExceptionInInitializerError("LoaderLS instance is null");
+        }
+
         return sInstance;
     }
 
@@ -43,7 +46,17 @@ public class LoaderLS extends TwitchApplication {
         post();
     }
 
-    private void post() {}
+    private void post() {
+        fetchBttvStuff();
+    }
+
+    private void fetchBttvStuff() {
+        if (PreferenceManager.INSTANCE.isBttvOn())
+            EmoteManager.INSTANCE.fetchGlobalEmotes();
+
+        if (PreferenceManager.INSTANCE.isFfzBadgesOn())
+            BadgeManager.INSTANCE.fetchBadges();
+    }
 
     private void setBuild() {
         try {
@@ -77,71 +90,8 @@ public class LoaderLS extends TwitchApplication {
 
     private void init() {
         sInstance = this;
+        PreferenceManager.INSTANCE.initialize(this);
         setBuild();
         Logger.debug("Init LoaderLS. " + VERSION + " " + BUILD);
-        sPreferenceManager = new PreferenceManager(getApplicationContext());
-        sEmoteManager = new EmoteManager();
-        sHelper = new Helper();
-        sIDPub = new IDPub();
-    }
-
-    public static EmoteManager getEmoteMangerInstance() {
-        return getInstance().getEmoteManager();
-    }
-
-    public static PreferenceManager getPrefManagerInstance() {
-        return getInstance().getPrefManager();
-    }
-
-    public static Helper getHelperInstance() {
-        return getInstance().getHelper();
-    }
-
-    public static IDPub getIDPubInstance() {
-        return getInstance().getIDPub();
-    }
-
-    private EmoteManager getEmoteManager() {
-        if (sEmoteManager == null) {
-            synchronized (LoaderLS.class) {
-                if (sEmoteManager == null) {
-                    sEmoteManager = new EmoteManager();
-                }
-            }
-        }
-        return sEmoteManager;
-    }
-
-    private PreferenceManager getPrefManager() {
-        if (sPreferenceManager == null) {
-            synchronized (LoaderLS.class) {
-                if (sPreferenceManager == null) {
-                    sPreferenceManager = new PreferenceManager(getApplicationContext());
-                }
-            }
-        }
-        return sPreferenceManager;
-    }
-
-    private Helper getHelper() {
-        if (sHelper == null) {
-            synchronized (LoaderLS.class) {
-                if (sHelper == null) {
-                    sHelper = new Helper();
-                }
-            }
-        }
-        return sHelper;
-    }
-
-    private IDPub getIDPub() {
-        if (sIDPub == null) {
-            synchronized (LoaderLS.class) {
-                if (sIDPub == null) {
-                    sIDPub = new IDPub();
-                }
-            }
-        }
-        return sIDPub;
     }
 }

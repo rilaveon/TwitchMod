@@ -8,8 +8,7 @@ public enum PlayerImplementation {
     Core("playercore", "c"),
     Exo2("exoplayer_2", "e2");
 
-    PlayerImplementation(String str, String str2) {
-    }
+    PlayerImplementation(String str, String str2) {/* ... */}
 
     public static final class Companion {
         public final PlayerImplementation getProviderForName(String str) {

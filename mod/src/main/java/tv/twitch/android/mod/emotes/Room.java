@@ -1,49 +1,74 @@
 package tv.twitch.android.mod.emotes;
 
 
+import androidx.annotation.NonNull;
+
 import java.util.Collection;
+import java.util.Collections;
 
+import tv.twitch.android.mod.emotes.fetchers.BttvChannelFetcher;
+import tv.twitch.android.mod.emotes.fetchers.FfzChannelFetcher;
 import tv.twitch.android.mod.models.Emote;
-import tv.twitch.android.mod.utils.Logger;
 
 
-class Room {
+class Room implements BttvChannelFetcher.Callback, FfzChannelFetcher.Callback {
     private final int mChannelId;
 
-    private final BttvChannelSet mBttvSet;
-    private final FfzChannelSet mFfzSet;
+    private final BttvChannelFetcher bttvChannelFetcher;
+    private final FfzChannelFetcher ffzChannelFetcher;
+
+    private BaseEmoteSet mBttvSet;
+    private BaseEmoteSet mFfzSet;
 
 
     public Room(int channelId) {
-        Logger.debug("New room: " + channelId);
         mChannelId = channelId;
-        mBttvSet = new BttvChannelSet(getChannelId());
-        mFfzSet = new FfzChannelSet(getChannelId());
-        requestEmotes();
+        bttvChannelFetcher = new BttvChannelFetcher(mChannelId, this);
+        ffzChannelFetcher = new FfzChannelFetcher(mChannelId, this);
     }
 
     public synchronized void requestEmotes() {
-        mBttvSet.fetch();
-        mFfzSet.fetch();
+        bttvChannelFetcher.fetch();
+        ffzChannelFetcher.fetch();
     }
 
     public final Emote findEmote(String emoteName) {
-        Emote emote = mBttvSet.getEmote(emoteName);
-        if (emote != null)
-            return emote;
+        if (mBttvSet != null) {
+            Emote emote = mBttvSet.getEmote(emoteName);
+            if (emote != null)
+                return emote;
+        }
 
-        return mFfzSet.getEmote(emoteName);
+        if (mFfzSet != null) {
+            return mFfzSet.getEmote(emoteName);
+        }
+
+        return null;
     }
 
+    @NonNull
     public final Collection<Emote> getBttvEmotes() {
-        return mBttvSet.getEmotes();
+        if (mBttvSet != null)
+            return mBttvSet.getEmotes();
+
+        return Collections.emptyList();
     }
 
+    @NonNull
     public final Collection<Emote> getFfzEmotes() {
-        return mFfzSet.getEmotes();
+        if (mFfzSet != null)
+            return mFfzSet.getEmotes();
+
+        return Collections.emptyList();
     }
 
-    public int getChannelId() {
-        return mChannelId;
+    @Override
+    public void bttvParsed(BaseEmoteSet set) {
+        mBttvSet = set;
+    }
+
+    @Override
+    public void ffzParsed(BaseEmoteSet set) {
+        mFfzSet = set;
     }
 }

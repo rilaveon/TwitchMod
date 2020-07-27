@@ -13,11 +13,13 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.mod.swipper.Swipper;
 import tv.twitch.android.mod.utils.Logger;
 
+
 public class PlayerWrapper extends RelativeLayout {
-    private static final int PADDING_DEFAULT_IGNORE = 25;
+    private static final int PADDING_DEFAULT_IGNORE = 30;
 
     private ViewGroup mPlayerOverlayContainer;
     private ViewGroup mDebugPanelContainer;
@@ -25,7 +27,7 @@ public class PlayerWrapper extends RelativeLayout {
 
     private final Swipper mSwipper;
 
-    private int PADDING_DEVICE_IGNORE = 25;
+    private int PADDING_DEVICE_IGNORE = PADDING_DEFAULT_IGNORE;
 
     private int mTouchSlop;
 
@@ -60,19 +62,19 @@ public class PlayerWrapper extends RelativeLayout {
         PADDING_DEVICE_IGNORE = Math.round(PADDING_DEFAULT_IGNORE * getDensity());
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() * 2;
 
-        mPlayerOverlayContainer = findViewById(IDPub.Ids.PLAYER_OVERLAY_ID.getId());
+        mPlayerOverlayContainer = findViewById(ResourcesManager.INSTANCE.getId("player_overlay_container"));
         if (mPlayerOverlayContainer == null) {
             Logger.error("mPlayerOverlayContainer is null. Update ID?");
             return;
         }
 
-        mFloatingChatContainer = findViewById(IDPub.Ids.FLOATING_CHAT_CONTAINER_ID.getId());
+        mFloatingChatContainer = findViewById(ResourcesManager.INSTANCE.getId("floating_chat_container"));
         if (mFloatingChatContainer == null) {
             Logger.error("mFloatingChatContainer is null. Update ID?");
             return;
         }
 
-        mDebugPanelContainer = findViewById(IDPub.Ids.DEBUG_PANEL_CONTAINER_ID.getId());
+        mDebugPanelContainer = findViewById(ResourcesManager.INSTANCE.getId("debug_panel_container"));
         if (mDebugPanelContainer == null) {
             Logger.error("mDebugPanelContainer is null. Update ID?");
             return;
@@ -84,10 +86,10 @@ public class PlayerWrapper extends RelativeLayout {
     private void initializeSwipper() {
         mSwipper.setOverlay(mPlayerOverlayContainer);
 
-        if (LoaderLS.getPrefManagerInstance().isVolumeSwipeEnabled())
+        if (PreferenceManager.INSTANCE.isVolumeSwipeEnabled())
             mSwipper.enableVolumeSwipe();
 
-        if (LoaderLS.getPrefManagerInstance().isBrightnessSwipeEnabled())
+        if (PreferenceManager.INSTANCE.isBrightnessSwipeEnabled())
             mSwipper.enableBrightnessSwipe();
     }
 
@@ -177,7 +179,7 @@ public class PlayerWrapper extends RelativeLayout {
         }
 
         if (isVisible(mDebugPanelContainer)) {
-            ViewGroup list = mDebugPanelContainer.findViewById(IDPub.Ids.VIDEO_DEBUG_LIST_ID.getId());
+            ViewGroup list = mDebugPanelContainer.findViewById(ResourcesManager.INSTANCE.getId("video_debug_list"));
             if (isVisible(getFirstChild(mDebugPanelContainer)) && isVisible(list) && isHit(list, mStartPosX, mStartPosY)) {
                 Logger.debug("Ignore scrolling: Debug panel area: x=" + mStartPosX + ", y=" + mStartPosY);
                 return false;
@@ -185,7 +187,7 @@ public class PlayerWrapper extends RelativeLayout {
         }
 
         if (isVisible(mFloatingChatContainer)) {
-            ViewGroup container = mFloatingChatContainer.findViewById(IDPub.Ids.MESSAGES_CONTAINER_ID.getId());
+            ViewGroup container = mFloatingChatContainer.findViewById(ResourcesManager.INSTANCE.getId("messages_container"));
             if (isVisible(container) && isHit(container, mStartPosX, mStartPosY)) {
                 Logger.debug("Ignore scrolling: Floating chat area: x=" + mStartPosX + ", y=" + mStartPosY);
                 return false;

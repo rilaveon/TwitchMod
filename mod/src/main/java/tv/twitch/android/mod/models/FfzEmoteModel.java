@@ -86,6 +86,13 @@ public class FfzEmoteModel implements Emote {
 
     @Override
     public String toString() {
-        return "{Code: " + getCode() + ", Id: " + getId() + ", isGif: " + isGif() + "}";
+        return "FfzEmoteModel{" +
+                "mCode='" + mCode + '\'' +
+                ", mId='" + mId + '\'' +
+                ", mSmallEmoteUrl='" + mSmallEmoteUrl + '\'' +
+                ", mMediumEmoteUrl='" + mMediumEmoteUrl + '\'' +
+                ", mLargeEmoteUrl='" + mLargeEmoteUrl + '\'' +
+                ", ce=" + ce +
+                '}';
     }
 }

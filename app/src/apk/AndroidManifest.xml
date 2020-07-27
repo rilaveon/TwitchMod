@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tv.twitch.android.app">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application android:name="tv.twitch.android.mod.bridges.LoaderLS">
         <activity android:name=".run.MainActivity">
             <intent-filter>
@@ -9,5 +10,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name="tv.twitch.android.mod.utils.DownloadService" />
     </application>
 </manifest>

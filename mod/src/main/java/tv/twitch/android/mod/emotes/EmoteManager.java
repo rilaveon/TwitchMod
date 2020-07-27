@@ -4,21 +4,34 @@ package tv.twitch.android.mod.emotes;
 import android.text.TextUtils;
 import android.util.LruCache;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import androidx.annotation.NonNull;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import tv.twitch.android.mod.emotes.fetchers.BttvGlobalFetcher;
 import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.utils.Logger;
 
 
-public class EmoteManager {
+public class EmoteManager implements BttvGlobalFetcher.Callback {
     private static final int MAX_CACHE_SIZE = 20;
-    private static final BttvGlobalSet sGlobalEmotes = new BttvGlobalSet();
 
     private final RoomCache mRoomCache = new RoomCache(MAX_CACHE_SIZE);
+    private final BttvGlobalFetcher mBttvGlobalFetcher;
 
-    public EmoteManager() {
-        fetchGlobalEmotes();
+    private BaseEmoteSet mBttvGlobalSet;
+
+
+    public static final EmoteManager INSTANCE = new EmoteManager();
+
+    private EmoteManager() {
+        mBttvGlobalFetcher = new BttvGlobalFetcher(this);
+    }
+
+    @Override
+    public void globalBttvParsed(BaseEmoteSet set) {
+        mBttvGlobalSet = set;
     }
 
     private static class RoomCache extends LruCache<Integer, Room> {
@@ -35,12 +48,13 @@ public class EmoteManager {
         }
     }
 
-    private void fetchGlobalEmotes() {
-        Logger.info("Fetching global emoticons...");
-        sGlobalEmotes.fetch();
+    public void fetchGlobalEmotes() {
+        if (mBttvGlobalSet == null) {
+            mBttvGlobalFetcher.fetch();
+        }
     }
 
-    public void requestEmotes(int channelId, boolean force) {
+    public void requestEmotes(int channelId) {
         if (channelId == 0) {
             Logger.warning("Cannot request emotes: channelId==0");
             return;
@@ -52,30 +66,31 @@ public class EmoteManager {
         }
 
         Logger.debug("New emote request: " + channelId);
-        if (force) {
-            synchronized (mRoomCache) {
-                mRoomCache.put(channelId, mRoomCache.create(channelId));
-            }
-        } else {
-            mRoomCache.get(channelId);
-        }
+        mRoomCache.get(channelId);
     }
 
+    @NonNull
     public Collection<Emote> getGlobalEmotes() {
-        return sGlobalEmotes.getEmotes();
+        if (mBttvGlobalSet != null) {
+            return mBttvGlobalSet.getEmotes();
+        }
+
+        return Collections.emptyList();
     }
 
+    @NonNull
     public Collection<Emote> getBttvEmotes(int channelId) {
         if (channelId == 0) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return mRoomCache.get(channelId).getBttvEmotes();
     }
 
+    @NonNull
     public Collection<Emote> getFfzEmotes(int channelId) {
         if (channelId == 0) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return mRoomCache.get(channelId).getFfzEmotes();
@@ -91,6 +106,9 @@ public class EmoteManager {
                 return emote;
         }
 
-        return sGlobalEmotes.getEmote(code);
+        if (mBttvGlobalSet != null)
+            return mBttvGlobalSet.getEmote(code);
+
+        return null;
     }
 }

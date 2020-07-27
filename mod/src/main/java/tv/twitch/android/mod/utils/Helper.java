@@ -1,36 +1,34 @@
 package tv.twitch.android.mod.utils;
 
 
-import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
+import android.os.Environment;
+import android.os.Process;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Toast;
 
-import java.util.Random;
 
-import tv.twitch.android.api.s1.j1;
+import tv.twitch.android.api.parsers.PlayableModelParser;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.clips.ClipModel;
+import tv.twitch.android.settings.SettingsActivity;
 
 
 public class Helper {
-    private static final int MIN_CLICK_DELAY = 1000;
-    private static final int MAX_CLICK_DELAY = 5000;
-
-    private final Handler mHandler;
+    public static final Helper INSTANCE = new Helper();
 
     private int mCurrentChannel = 0;
 
+    private Helper() {}
 
-    public Helper() {
-        mHandler = new Handler();
-    }
 
     public static void openUrl(String url) {
         if (TextUtils.isEmpty(url)) {
@@ -42,12 +40,57 @@ public class Helper {
             url = "https://" + url;
 
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         LoaderLS.getInstance().startActivity(intent);
     }
 
-    public static int getChannelId(j1 playableModelParser, Playable playable) {
+    public static void showRestartDialog(Context context, String message) {
+        new AlertDialog.Builder(context).setMessage(message).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, new Intent(LoaderLS.getInstance(), SettingsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+                ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1000, pendingIntent);
+                Process.killProcess(Process.myPid());
+
+            }
+        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).create().show();
+    }
+
+    public static void downloadMP4File(final Context context, final String url, final String filename) {
+        PermissionsUtil.checkWritePermission(context, new PermissionsUtil.Result() {
+            @Override
+            public void onPermissionGranted() {
+                Uri uri = Uri.parse(url);
+                DownloadManager downloadManager = (DownloadManager) LoaderLS.getInstance().getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Request request = new DownloadManager.Request(uri);
+                request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                request.allowScanningByMediaScanner();
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + filename + ".mp4");
+                request.setMimeType("video/mp4");
+                downloadManager.enqueue(request);
+            }
+
+            @Override
+            public void onPermissionDenied() {
+                Helper.showToast("No access");
+            }
+
+            @Override
+            public void onError() {
+                Helper.showToast("error");
+            }
+        });
+    }
+
+    public static int getChannelId(PlayableModelParser playableModelParser, Playable playable) {
         if (playableModelParser == null) {
             Logger.error("playableModelParser is null");
             return 0;
@@ -61,20 +104,12 @@ public class Helper {
             return ((ClipModel) playable).getBroadcasterId();
         }
 
-        return playableModelParser.a(playable);
+        return playableModelParser.getChannelId(playable);
     }
 
     public static void showToast(String message) {
         Context context = LoaderLS.getInstance().getApplicationContext();
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-    }
-
-    private static int getClickDelay() {
-        return new Random().nextInt(MAX_CLICK_DELAY - MIN_CLICK_DELAY) + MIN_CLICK_DELAY;
-    }
-
-    public void setClicker(View.OnClickListener listener) {
-        mHandler.postDelayed(new Clicker(listener), getClickDelay());
     }
 
     public static boolean isOnStackTrace(String clazz) {
@@ -97,24 +132,6 @@ public class Helper {
         }
 
         return false;
-    }
-
-    public static final Activity getActivity(Context context) {
-        while (!(context instanceof Activity)) {
-            if (!(context instanceof ContextWrapper)) {
-                context = null;
-            }
-            ContextWrapper contextWrapper = (ContextWrapper) context;
-            if (contextWrapper == null) {
-                return null;
-            }
-            context = contextWrapper.getBaseContext();
-            if (context == null) {
-                return null;
-            }
-        }
-
-        return (Activity) context;
     }
 
     public int getCurrentChannel() {

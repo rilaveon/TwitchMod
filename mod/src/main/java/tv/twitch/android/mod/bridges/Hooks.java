@@ -2,10 +2,11 @@ package tv.twitch.android.mod.bridges;
 
 
 import android.content.Context;
+import android.net.Uri;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.google.android.exoplayer2.PlaybackParameters;
 
@@ -14,18 +15,25 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import tv.twitch.a.k.g.e1.b;
-import tv.twitch.a.k.g.g;
-import tv.twitch.a.k.l.j.k.c;
-import tv.twitch.android.api.s1.j1;
+import tv.twitch.android.mod.badges.BadgeManager;
+import tv.twitch.android.mod.models.Badge;
+import tv.twitch.android.mod.models.settings.ChatWidthPercent;
+import tv.twitch.android.shared.chat.events.ChannelSetEvent;
+import tv.twitch.android.shared.chat.ChatMessageInterface;
+import tv.twitch.android.shared.emotes.emotepicker.models.EmoteUiModel;
+import tv.twitch.android.shared.emotes.emotepicker.models.EmoteUiSet;
+import tv.twitch.android.shared.experiments.Experiment;
+import tv.twitch.android.api.parsers.PlayableModelParser;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
+import tv.twitch.android.mod.bridges.models.EmoteSet;
+import tv.twitch.android.mod.bridges.models.EmoteUiModelWithUrl;
 import tv.twitch.android.mod.emotes.EmoteManager;
 import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.Gifs;
 import tv.twitch.android.mod.models.settings.PlayerImpl;
 import tv.twitch.android.mod.settings.PreferenceManager;
-import tv.twitch.android.mod.utils.ChatFilteringUtil;
+import tv.twitch.android.mod.utils.ChatMesssageFilteringUtil;
 import tv.twitch.android.mod.utils.ChatUtil;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
@@ -36,18 +44,13 @@ import tv.twitch.chat.ChatEmoticonSet;
 import tv.twitch.chat.ChatLiveMessage;
 
 
-@SuppressWarnings({"FinalStaticMethod", "rawtypes"})
+@SuppressWarnings({"FinalStaticMethod"})
 public class Hooks {
-    private final static String VOD_PLAYER_PRESENTER_CLASS = "tv.twitch.a.k.x.j0.w"; // TODO: __UPDATE
-    private final static float DEFAULT_MINIPLAYER_SIZE = 1.0f;
+    private final static String VOD_PLAYER_PRESENTER_CLASS = "tv.twitch.android.shared.player.presenters.VodPlayerPresenter";
 
 
-    /**
-     * Class: EmoteAdapterSection
-     * signature: public void a(RecyclerView.b0 b0Var)
-     */
     public final static String hookSetName(String org, String setId) {
-        if (!LoaderLS.getPrefManagerInstance().isEmotePickerOn())
+        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
             return org;
 
         EmoteSet set = EmoteSet.findById(setId);
@@ -57,87 +60,70 @@ public class Hooks {
         return org;
     }
 
-    /**
-     * Class: ExperimentHelper
-     * signature: public boolean I(a aVar)
-     */
-    public final static boolean hookExperimental(tv.twitch.a.k.m.a experimental, boolean org) {
+    public final static boolean hookExperimental(Experiment experimental, boolean org) {
         if (experimental == null) {
             Logger.error("experimental is null");
             return org;
         }
 
         switch (experimental) {
-            case q:
-            case u:
-            case v:
-            case h0:
+            case NIELSEN:
+            case VAES_OM:
+            case SURESTREAM_OM:
+            case Nielsen_S2S:
+            case PROMOTED_STREAMS:
+            case ADS_PBYP:
+                if (PreferenceManager.INSTANCE.isAdblockEnabled())
+                    return false;
+                else
+                    return org;
+
+            case UPDATE_PROMPT_ROLLOUT:
                 return false;
 
-            case Z:
-                return LoaderLS.getPrefManagerInstance().isFloatingChatEnabled();
-            case C0:
-                return !LoaderLS.getPrefManagerInstance().isOldEmotePicker();
-            case j0:
-                return !LoaderLS.getPrefManagerInstance().isOldFollowButton();
+            case CREATOR_SETTINGS_MENU:
+                return false;
+
+            case FLOATING_CHAT:
+                return PreferenceManager.INSTANCE.isFloatingChatEnabled();
+            case NEW_EMOTE_PICKER:
+                return !PreferenceManager.INSTANCE.isOldEmotePicker();
+            case GLOBAL_FOLLOW_BUTTON_REVAMP:
+                return !PreferenceManager.INSTANCE.isOldFollowButton();
         }
 
         return org;
     }
 
-    /**
-     * Class: CommunityPointsButtonViewDelegate
-     * signature: private final void e(CommunityPointsModel communityPointsModel)
-     */
-    public final static void setClicker(View.OnClickListener listener) {
-        LoaderLS.getHelperInstance().setClicker(listener);
-    }
-
-    /**
-     * Class: StandaloneMediaClock
-     * signatute: private PlaybackParameters f = PlaybackParameters.e;
-     */
-    public final static PlaybackParameters hookVodPlayerStandaloneMediaClockInit(PlaybackParameters org) {
-        PreferenceManager preferenceManager = LoaderLS.getPrefManagerInstance();
-        float speed = Float.parseFloat(preferenceManager.getExoplayerSpeed().getValue());
-        if (speed == org.a)
-            return org;
-
-        if (Helper.isOnStackTrace(VOD_PLAYER_PRESENTER_CLASS))
+    public final static PlaybackParameters hookVodPlayerStandaloneMediaClockInit() {
+        if (Helper.isOnStackTrace(VOD_PLAYER_PRESENTER_CLASS)) {
+            PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
+            float speed = Float.parseFloat(preferenceManager.getExoplayerSpeed().getValue());
             return new PlaybackParameters(speed);
+        }
 
-        return PlaybackParameters.e;
+        return PlaybackParameters.DEFAULT;
     }
 
-    /**
-     * Class: MessageRecyclerItem
-     * signature:
-     */
+
     public final static Spanned addTimestampToMessage(Spanned message) {
-        if (!LoaderLS.getPrefManagerInstance().isMessageTimestampOn())
+        if (!PreferenceManager.INSTANCE.isMessageTimestampOn())
             return message;
 
         return ChatUtil.addTimestamp(message, new Date());
     }
 
-    /**
-     * Class: ChatController
-     * signature: ChatEmoticonSet[] b()
-     */
     public final static ChatEmoticonSet[] hookChatEmoticonSet(ChatEmoticonSet[] orgSet) {
-        if (!LoaderLS.getPrefManagerInstance().isEmotePickerOn())
-            return orgSet;
-
         if (orgSet == null)
             return null;
 
-        Helper helper = LoaderLS.getHelperInstance();
-        EmoteManager emoteManager = LoaderLS.getEmoteMangerInstance();
+        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
+            return orgSet;
 
-        final int currentChannel = helper.getCurrentChannel();
-        Collection<Emote> globalEmotes = emoteManager.getGlobalEmotes();
-        Collection<Emote> bttvEmotes = emoteManager.getBttvEmotes(currentChannel);
-        Collection<Emote> ffzEmotes = emoteManager.getFfzEmotes(currentChannel);
+        final int currentChannel = Helper.INSTANCE.getCurrentChannel();
+        Collection<Emote> globalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
+        Collection<Emote> bttvEmotes = EmoteManager.INSTANCE.getBttvEmotes(currentChannel);
+        Collection<Emote> ffzEmotes = EmoteManager.INSTANCE.getFfzEmotes(currentChannel);
 
         ChatEmoticonSet[] newSet = new ChatEmoticonSet[orgSet.length+3];
         System.arraycopy(orgSet, 0, newSet, 0, orgSet.length);
@@ -149,96 +135,64 @@ public class Hooks {
         return newSet;
     }
 
-    /**
-     * Class: ChatConnectionController
-     * signature: private final void a(ChannelInfo channelInfo)
-     */
     public final static void requestEmotes(ChannelInfo channelInfo) {
-        if (!LoaderLS.getPrefManagerInstance().isBttvOn())
+        if (!PreferenceManager.INSTANCE.isBttvOn())
             return;
 
-        LoaderLS.getEmoteMangerInstance().requestEmotes(channelInfo.getId(), false);
+        EmoteManager.INSTANCE.fetchGlobalEmotes();
+        EmoteManager.INSTANCE.requestEmotes(channelInfo.getId());
     }
 
-    /**
-     * Class: ModelTheatreModeTracker
-     * signature: public c(f1 f1Var, Playable playable, Object pageViewTracker)
-     */
-    public final static void requestEmotes(final j1 playableModelParser, final Playable playable) {
-        if (!LoaderLS.getPrefManagerInstance().isBttvOn())
+    public final static void requestEmotes(final PlayableModelParser playableModelParser, final Playable playable) {
+        if (!PreferenceManager.INSTANCE.isBttvOn())
             return;
 
-        LoaderLS.getEmoteMangerInstance().requestEmotes(Helper.getChannelId(playableModelParser, playable), true);
+        EmoteManager.INSTANCE.fetchGlobalEmotes();
+        EmoteManager.INSTANCE.requestEmotes(Helper.getChannelId(playableModelParser, playable));
     }
 
-    /**
-     * Class: FollowedGamesFetcher
-     * signature: public final boolean j()
-     */
-    public final static boolean hookFollowerFetcher(boolean org) {
-        if (!LoaderLS.getPrefManagerInstance().isDisableFollowedGames())
+    public final static boolean hookFollowedGamesFetcher(boolean org) {
+        if (!PreferenceManager.INSTANCE.isDisableFollowedGames())
             return org;
 
         return false;
     }
 
-    /**
-     * Class: RecommendedStreamsFetcher
-     * signature: public final boolean j()
-     */
-    public final static boolean hookRecommendedFetcher(boolean org) {
-        if (!LoaderLS.getPrefManagerInstance().isDisableRecommendations())
+    public final static boolean hookRecommendedStreamsFetcher(boolean org) {
+        if (!PreferenceManager.INSTANCE.isDisableRecommendations())
             return org;
 
         return false;
     }
 
-    /**
-     * Class: ResumeWatchingVideosFetcher
-     * signature: public final boolean j()
-     */
     public final static boolean hookResumeWatchingFetcher(boolean org) {
-        if (!LoaderLS.getPrefManagerInstance().isDisableRecentWatching())
+        if (!PreferenceManager.INSTANCE.isDisableRecentWatching())
             return org;
 
         return false;
     }
 
-    /**
-     * Class: VideoDebugConfig
-     * signature: public final boolean a()
-     */
     public final static boolean hookVideoDebugPanel(boolean org) {
-        if (!LoaderLS.getPrefManagerInstance().isShowVideoDebugPanel())
+        if (!PreferenceManager.INSTANCE.isShowVideoDebugPanel())
             return org;
 
         return true;
     }
 
-    /**
-     * Class: MiniPlayerSize
-     * signature: public final int b()
-     */
     public final static int hookMiniplayerSize(int size) {
-        PreferenceManager preferenceManager = LoaderLS.getPrefManagerInstance();
+        PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
         float k = Float.parseFloat(preferenceManager.getMiniPlayerSize().getValue());
-        if (k == DEFAULT_MINIPLAYER_SIZE)
-            return size;
 
         return (int) (k * size);
     }
 
-    /**
-     * Class: PlayerImplementation
-     * signature: public final PlayerImplementation getProviderForName(String str)
-     */
     public final static String hookPlayerProvider(String name) {
         if (TextUtils.isEmpty(name)) {
             Logger.warning("empty name");
             return name;
         }
 
-        PlayerImpl playerImpl = LoaderLS.getPrefManagerInstance().getPlayerImplementation();
+        PlayerImpl playerImpl = PreferenceManager.INSTANCE.getPlayerImplementation();
         switch (playerImpl) {
             default:
             case AUTO:
@@ -249,42 +203,30 @@ public class Hooks {
         }
     }
 
-    /**
-     * Class: SearchSuggestionAdapterBinder
-     * signature: public final void a(Object obj)
-     */
     public final static boolean isJumpDisRecentSearch() {
-        return LoaderLS.getPrefManagerInstance().isDisableRecentSearch();
+        return PreferenceManager.INSTANCE.isDisableRecentSearch();
     }
 
-    /**
-     * Class: *.*
-     */
     public final static boolean isDevModeOn() {
-        return LoaderLS.getPrefManagerInstance().isDevModeOn();
+        return PreferenceManager.INSTANCE.isDevModeOn();
     }
 
-    /**
-     * Class: *.*
-     */
+    public final static boolean isAdblockOn() {
+        return PreferenceManager.INSTANCE.isAdblockEnabled();
+    }
+
     public final static boolean isInterceptorOn() {
-        return LoaderLS.getPrefManagerInstance().isInterceptorOn();
+        return PreferenceManager.INSTANCE.isInterceptorOn();
     }
 
-    /**
-     * Class: tv.twitch.a.k.g.a0
-     * signature:  public final void a(int i2, List<? extends ChatLiveMessage> list...)
-     */
     public final static List<? extends ChatLiveMessage> hookLiveMessages(List<? extends ChatLiveMessage> list, String accountName) {
         if (list == null || list.isEmpty()) {
             Logger.warning("empty list");
             return list;
         }
 
-        final boolean ignoreSystem = LoaderLS.getPrefManagerInstance().isIgnoreSystemMessages();
-        UserMessagesFiltering filtering = LoaderLS.getPrefManagerInstance().getChatFiltering();
-
-        if (filtering == UserMessagesFiltering.DISABLED && !ignoreSystem)
+        UserMessagesFiltering filtering = PreferenceManager.INSTANCE.getChatFiltering();
+        if (filtering == UserMessagesFiltering.DISABLED)
             return list;
 
         ArrayList<ChatLiveMessage> filtered = new ArrayList<>();
@@ -294,74 +236,104 @@ public class Hooks {
                 continue;
             }
 
-            if (ChatFilteringUtil.filter(liveMessage, accountName, filtering))
+            if (ChatMesssageFilteringUtil.filter(liveMessage, accountName, filtering))
                 filtered.add(liveMessage);
         }
 
         return filtered;
     }
 
-    /**
-     * Class: RecommendationAutoPlayPresenter
-     * signature: public final void prepareRecommendationForCurrentModel(T t)
-     */
     public final static boolean isJumpDisableAutoplay() {
-        return LoaderLS.getPrefManagerInstance().isDisableAutoplay();
+        return PreferenceManager.INSTANCE.isDisableAutoplay();
     }
 
-    /**
-     * Class: ChatMessageInputViewPresenter
-     * signature: public final void a(b bVar)
-     */
-    public final static void setCurrentChannel(b event) {
+    public final static void setCurrentChannel(ChannelSetEvent event) {
         if (event == null) {
             Logger.error("event is null");
             return;
         }
 
-        LoaderLS.getHelperInstance().setCurrentChannel(event.a().getId());
+        Helper.INSTANCE.setCurrentChannel(event.getChannelInfo().getId());
     }
 
-    /**
-     * Class: *.*
-     */
     public final static boolean isHideDiscoverTab() {
-        return LoaderLS.getPrefManagerInstance().isHideDiscoverTab();
+        return PreferenceManager.INSTANCE.isHideDiscoverTab();
     }
 
-    /**
-     * Class: *.*
-     */
     public final static boolean isHideEsportsTab() {
-        return LoaderLS.getPrefManagerInstance().isHideEsportsTab();
+        return PreferenceManager.INSTANCE.isHideEsportsTab();
     }
 
-    /**
-     * Class: *.*
-     */
     public final static boolean isGifsEnabled() {
-        return LoaderLS.getPrefManagerInstance().getGifsStrategy() == Gifs.ANIMATED;
+        return PreferenceManager.INSTANCE.getGifsStrategy() == Gifs.ANIMATED;
     }
 
     /**
      * Some hooks
      */
     public final static void helper() {
-        Object o = hookVodPlayerStandaloneMediaClockInit(new PlaybackParameters(0.0f)); // TODO: __HOOK
+        Object o = hookVodPlayerStandaloneMediaClockInit(); // TODO: __HOOK
+        boolean ad = PreferenceManager.INSTANCE.isAdblockEnabled();
+        if (!PreferenceManager.INSTANCE.isHideGs())
+            return;
     }
 
-    /**
-     * Class: ChatMessageFactory
-     */
     public final static int hookUsernameSpanColor(int usernameColor) {
-        return ChatUtil.fixUsernameColor(usernameColor, LoaderLS.getPrefManagerInstance().isDarkThemeEnabled());
+        return ChatUtil.fixUsernameColor(usernameColor, PreferenceManager.INSTANCE.isDarkThemeEnabled());
     }
 
-    /**
-     * Class: ChatMessageFactory
-     */
-    public static SpannedString hookChatMessage(IChatMessageFactory factory, g chatMessageInterface, SpannedString orgMessage, int channelId) {
-        PreferenceManager manager = LoaderLS.getPrefManagerInstance();
+    public static SpannedString hookBadges(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString badges) {
+        if (!PreferenceManager.INSTANCE.isFfzBadgesOn())
+            return badges;
+
+        if (factory == null) {
+            Logger.error("factory is null");
+            return badges;
+        }
+        if (chatMessageInterface == null) {
+            Logger.error("chatMessageInterface is null");
+            return badges;
+        }
+        if (badges == null) {
+            Logger.error("badges is null");
+            return badges;
+        }
+
+        try {
+            List<Badge> newBadges = BadgeManager.INSTANCE.getBadgesForUser(chatMessageInterface.getUserId());
+            if (newBadges != null && !newBadges.isEmpty()) {
+                SpannableStringBuilder ssb = new SpannableStringBuilder(badges);
+                for (Badge badge : newBadges) {
+                    if (badge == null)
+                        continue;
+
+                    CharSequence spannedBadge = factory.getSpannedBadge(badge.getUrl(), badge.getName());
+                    if (TextUtils.isEmpty(spannedBadge))
+                        continue;
+
+                    if (!TextUtils.isEmpty(badge.getReplaces())) {
+                        final String replaces = badge.getReplaces() + " ";
+                        int pos = TextUtils.indexOf(ssb, replaces);
+                        if (pos != -1) {
+                            ssb.replace(pos, replaces.length(), spannedBadge);
+                        }
+                    } else {
+                        ssb.append(spannedBadge);
+                    }
+                }
+
+                return new SpannedString(ssb);
+            }
+
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+
+        return badges;
+    }
+
+    public static SpannedString hookChatMessage(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString orgMessage, int channelId) {
+        PreferenceManager manager = PreferenceManager.INSTANCE;
         if (!manager.isBttvOn())
             return orgMessage;
 
@@ -369,10 +341,10 @@ public class Hooks {
             if (TextUtils.isEmpty(orgMessage))
                 return orgMessage;
 
-            if (chatMessageInterface.a())
+            if (chatMessageInterface.isDeleted())
                 return orgMessage;
 
-            return ChatUtil.injectEmotesSpan(factory, LoaderLS.getEmoteMangerInstance(), orgMessage, channelId, manager.getGifsStrategy() == Gifs.DISABLED, manager.getEmoteSize());
+            return ChatUtil.injectEmotesSpan(factory, orgMessage, channelId, manager.getGifsStrategy() == Gifs.DISABLED, manager.getEmoteSize());
         } catch (Throwable th) {
             th.printStackTrace();
         }
@@ -380,41 +352,33 @@ public class Hooks {
         return orgMessage;
     }
 
-    /**
-     * Class: LiveChatSource
-     */
     public static boolean isJumpSystemIgnore() {
-        return LoaderLS.getPrefManagerInstance().isIgnoreSystemMessages();
+        return PreferenceManager.INSTANCE.isIgnoreSystemMessages();
     }
 
-    /**
-     * Class: EmotePickerPresenter
-     */
-    public static Collection hookEmotePickerSet(Collection list, Integer channelId) {
-        if (!LoaderLS.getPrefManagerInstance().isEmotePickerOn())
+    public static List<EmoteUiSet> hookEmotePickerSet(List<EmoteUiSet> list, Integer channelId) {
+        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
             return list;
 
         if (list == null)
             return null;
 
-        EmoteManager emoteManager = LoaderLS.getEmoteMangerInstance();
-
-        Collection<Emote> bttvGlobalEmotes = emoteManager.getGlobalEmotes();
+        Collection<Emote> bttvGlobalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
         if (bttvGlobalEmotes != null && !bttvGlobalEmotes.isEmpty()) {
-            Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.GLOBAL.getTitleRes());
+            Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.GLOBAL.getTitleRes());
             list.add(ChatFactory.getEmoteSetUi(bttvGlobalEmotes, resId));
         }
 
         if (channelId != null && channelId != -1) {
-            Collection<Emote> bttvChannelEmotes = emoteManager.getBttvEmotes(channelId);
+            Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
             if (bttvChannelEmotes != null && !bttvChannelEmotes.isEmpty()) {
-                Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.BTTV.getTitleRes());
+                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleRes());
                 list.add(ChatFactory.getEmoteSetUi(bttvChannelEmotes, resId));
             }
 
-            Collection<Emote> ffzChannelEmotes = emoteManager.getFfzEmotes(channelId);
+            Collection<Emote> ffzChannelEmotes = EmoteManager.INSTANCE.getFfzEmotes(channelId);
             if (ffzChannelEmotes != null && !ffzChannelEmotes.isEmpty()) {
-                Integer resId = LoaderLS.getIDPubInstance().getStringId(EmoteSet.FFZ.getTitleRes());
+                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.FFZ.getTitleRes());
                 list.add(ChatFactory.getEmoteSetUi(ffzChannelEmotes, resId));
             }
         }
@@ -422,11 +386,19 @@ public class Hooks {
         return list;
     }
 
-    public static String hookEmoteAdapterItem(Context context, c emoteUiModel) {
+    public static String hookEmoteAdapterItem(Context context, EmoteUiModel emoteUiModel) {
         if (emoteUiModel instanceof EmoteUiModelWithUrl) {
             return ((EmoteUiModelWithUrl) emoteUiModel).getUrl();
         }
 
-        return EmoteUrlUtil.getEmoteUrl(context, emoteUiModel.b());
+        return EmoteUrlUtil.getEmoteUrl(context, emoteUiModel.getId());
+    }
+
+    public static int hookChatWidth(int org) {
+        ChatWidthPercent percent = PreferenceManager.INSTANCE.getChatWidthPercent();
+        if (percent == ChatWidthPercent.DEFAULT)
+            return org;
+
+        return Integer.parseInt(percent.getValue());
     }
 }

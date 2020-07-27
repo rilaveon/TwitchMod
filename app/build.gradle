@@ -17,25 +17,13 @@ android {
         apk {
             applicationIdSuffix ".run"
             dimension "version"
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         module {
             applicationIdSuffix ".module"
             dimension "version"
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-module.pro'
         }
     }
 
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-        }
-        debug {
-            minifyEnabled true
-            shrinkResources true
-        }
-    }
     buildToolsVersion = '29.0.3'
 }
 
@@ -43,4 +31,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':mod')
     implementation project(path: ':twitch')
+
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 }

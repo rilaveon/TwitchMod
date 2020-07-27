@@ -5,12 +5,12 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.n.g.c;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 
 import java.util.List;
 
-import tv.twitch.a.k.g0.b.r.a;
-import tv.twitch.android.core.adapters.u;
+import tv.twitch.android.shared.ui.elements.span.CenteredImageSpan;
+import tv.twitch.android.core.adapters.RecyclerAdapterItem;
 import tv.twitch.android.mod.bridges.interfaces.IDrawable;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
@@ -35,23 +35,23 @@ public class GifHelper {
 
         Spanned message = (Spanned) sequence;
 
-        a[] imageSpans = message.getSpans(0, message.length(), a.class);
+        CenteredImageSpan[] imageSpans = message.getSpans(0, message.length(), CenteredImageSpan.class);
         if (imageSpans.length == 0)
             return;
 
-        for (a image: imageSpans) {
+        for (CenteredImageSpan image: imageSpans) {
             if (image == null)
                 continue;
 
-            Drawable drawable = image.a();
+            Drawable drawable = image.getImageDrawable();
 
             if (!(drawable instanceof IDrawable))
                 continue;
 
             IDrawable drawableContainer = (IDrawable) drawable;
 
-            if (drawableContainer.getDrawable() instanceof c) {
-                c gifDrawable = (c) drawableContainer.getDrawable();
+            if (drawableContainer.getDrawable() instanceof GifDrawable) {
+                GifDrawable gifDrawable = (GifDrawable) drawableContainer.getDrawable();
                 gifDrawable.stop();
                 if (force)
                     gifDrawable.setCallback(null);
@@ -59,16 +59,16 @@ public class GifHelper {
         }
     }
 
-    public static void recycleAdapterItems(List<u> list) {
+    public static void recycleAdapterItems(List<RecyclerAdapterItem> list) {
         if (list == null || list.size() == 0)
             return;
 
-        for (u item : list) {
+        for (RecyclerAdapterItem item : list) {
             recycleObject(item, true);
         }
     }
 
-    public static void recycleAdapterItems(List<u> list, int range) {
+    public static void recycleAdapterItems(List<RecyclerAdapterItem> list, int range) {
         if (range == 0)
             return;
 

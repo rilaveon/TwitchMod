@@ -1,12 +1,6 @@
 package tv.twitch.android.mod.settings;
 
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Process;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,8 +10,9 @@ import androidx.fragment.app.FragmentActivity;
 import java.util.Arrays;
 import java.util.List;
 
-import tv.twitch.android.mod.bridges.IDPub;
+import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
+import tv.twitch.android.mod.models.settings.ChatWidthPercent;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
@@ -27,10 +22,12 @@ import tv.twitch.android.mod.models.settings.PlayerImpl;
 import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
-import tv.twitch.android.settings.SettingsActivity;
-import tv.twitch.android.shared.ui.menus.j;
-import tv.twitch.android.shared.ui.menus.l.b;
-import tv.twitch.android.shared.ui.menus.m.a;
+import tv.twitch.android.shared.ui.menus.SettingsPreferencesController;
+import tv.twitch.android.shared.ui.menus.checkable.CheckableGroupModel;
+import tv.twitch.android.shared.ui.menus.core.MenuModel;
+import tv.twitch.android.shared.ui.menus.dropdown.DropDownMenuModel;
+import tv.twitch.android.shared.ui.menus.infomenu.InfoMenuModel;
+import tv.twitch.android.shared.ui.menus.togglemenu.ToggleMenuModel;
 
 import static tv.twitch.android.mod.settings.PreferenceManager.DEV;
 
@@ -40,26 +37,23 @@ public class SettingsController {
     private static final String GITHUB_URL = "https://github.com/nopbreak/TwitchMod";
 
 
-
-
-    public static final class ToggleMenuChangeListener implements j { // TODO: __INJECT_CLASS
+    public static final class ModSettingsPrefListener implements SettingsPreferencesController {
         private final FragmentActivity mFragmentActivity;
 
-        public ToggleMenuChangeListener(FragmentActivity fragmentActivity) {
+        public ModSettingsPrefListener(FragmentActivity fragmentActivity) {
             mFragmentActivity = fragmentActivity;
         }
 
         @Override
-        public void a(tv.twitch.android.shared.ui.menus.s.b item, boolean isChecked) {
+        public void updatePreferenceBooleanState(ToggleMenuModel item, boolean isChecked) {
             SettingsController.OnMenuItemToggled(mFragmentActivity, item, isChecked);
         }
 
         @Override
-        public void b(tv.twitch.android.shared.ui.menus.k.b bVar) {}
+        public void updatePreferenceCheckedState(CheckableGroupModel checkableGroupModel) {}
     }
 
-
-    public static final class onMenuItemSelected implements a.a1<PreferenceItem> {
+    public static final class onMenuItemSelected implements DropDownMenuModel.DropDownMenuItemSelection<PreferenceItem> {
         final ArrayAdapter<PreferenceItem> mAdapter;
 
         onMenuItemSelected(ArrayAdapter<PreferenceItem> arrayAdapter) {
@@ -67,22 +61,24 @@ public class SettingsController {
         }
 
         @Override
-        public void a(a<PreferenceItem> menuModel, int itemPos, boolean z) {
+        public void onDropDownItemSelected(DropDownMenuModel<PreferenceItem> dropDownMenuModel, int itemPos) {
             PreferenceItem preference = this.mAdapter.getItem(itemPos);
-            if (preference == null)
+            if (preference == null) {
+                Logger.error("preference is null");
                 return;
+            }
 
-            LoaderLS.getPrefManagerInstance().updateString(preference.getKey(), preference.getValue());
+            PreferenceManager.INSTANCE.updateString(preference.getKey(), preference.getValue());
         }
     }
 
-    public static void OnMenuItemToggled(FragmentActivity fragmentActivity, tv.twitch.android.shared.ui.menus.s.b menuItem, boolean isChecked) {
+    public static void OnMenuItemToggled(FragmentActivity fragmentActivity, ToggleMenuModel menuItem, boolean isChecked) {
         if (menuItem == null) {
             Logger.error("menuItem is null");
             return;
         }
 
-        j.a prefType = menuItem.s();
+        SettingsPreferencesController.SettingsPreference prefType = menuItem.getSettingsPref();
         if (prefType == null) {
             Logger.error("prefType is null");
             return;
@@ -94,7 +90,7 @@ public class SettingsController {
             return;
         }
 
-        LoaderLS.getPrefManagerInstance().updateBoolean(preferenceKey, isChecked);
+        PreferenceManager.INSTANCE.updateBoolean(preferenceKey, isChecked);
         restartIfNeed(fragmentActivity, preferenceKey);
     }
 
@@ -102,111 +98,113 @@ public class SettingsController {
         switch (preferenceKey) {
             case PreferenceManager.HIDE_DISCOVER:
             case PreferenceManager.HIDE_ESPORTS:
-                new AlertDialog.Builder(fragmentActivity).setMessage("Refresh and restart?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, new Intent(LoaderLS.getInstance(), SettingsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
-                        ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1000, pendingIntent);
-                        Process.killProcess(Process.myPid());
-
-                    }
-                }).setNegativeButton("No", null).create().show();
+            case PreferenceManager.ADBLOCK:
+            case PreferenceManager.BADGES:
+                Helper.showRestartDialog(fragmentActivity, "Refresh and restart?");
         }
     }
 
     public static class MenuFactory {
-        private static tv.twitch.android.shared.ui.menus.l.b getInfoMenu(String title, String desc, View.OnClickListener listener) {
-            return new tv.twitch.android.shared.ui.menus.o.a(title, desc, null, null, null, null, listener);
+        private static MenuModel getInfoMenu(String title, String desc, View.OnClickListener listener) {
+            return new InfoMenuModel(title, desc, null, null, null, null, listener);
         }
 
-        private static tv.twitch.android.shared.ui.menus.l.b getInfoMenu(String title) {
-            return new tv.twitch.android.shared.ui.menus.o.a(title, null, null, null, null, null, null, 0, null);
+        private static MenuModel getInfoMenu(String title) {
+            return new InfoMenuModel(title, null, null, null, null, null, null);
         }
 
-        private static tv.twitch.android.shared.ui.menus.l.b getToggleMenu(j.a controller, IDPub idPub, boolean state) {
-            return new tv.twitch.android.shared.ui.menus.s.b(idPub.getString(controller.getNameKey()), idPub.getString(controller.getDescriptionKey()), null, state, true, null, null, false, null, null, null, controller, null);
+        private static MenuModel getToggleMenu(SettingsPreferencesController.SettingsPreference controller, boolean state) {
+            ResourcesManager manager = ResourcesManager.INSTANCE;
+            return new ToggleMenuModel(manager.getString(controller.getNameKey()), manager.getString(controller.getDescriptionKey()), null, state, true, null, null, false, null, null, null, controller, null);
         }
 
-        private static tv.twitch.android.shared.ui.menus.l.b getDropDownMenu(j.a controller, Context context, IDPub idPub, PreferenceItem[] items, PreferenceItem state) {
-            ArrayAdapter<PreferenceItem> adapter = new ArrayAdapter<>(context, tv.twitch.android.settings.d.twitch_spinner_dropdown_item, items);
-            return new tv.twitch.android.shared.ui.menus.m.a<>(adapter, Arrays.asList(items).indexOf(state), idPub.getString(controller.getNameKey()), idPub.getString(controller.getDescriptionKey()), null, null, new onMenuItemSelected(adapter));
+        private static MenuModel getDropDownMenu(SettingsPreferencesController.SettingsPreference controller, Context context, ResourcesManager resourcesManager, PreferenceItem[] items, PreferenceItem state) {
+            ArrayAdapter<PreferenceItem> adapter = new ArrayAdapter<>(context, ResourcesManager.INSTANCE.getLayoutId("twitch_spinner_dropdown_item"), items);
+            return new DropDownMenuModel<>(adapter, Arrays.asList(items).indexOf(state), resourcesManager.getString(controller.getNameKey()), resourcesManager.getString(controller.getDescriptionKey()), null, null, new onMenuItemSelected(adapter));
         }
     }
 
-    public static j getMenuListener(FragmentActivity activity) {
-        return new ToggleMenuChangeListener(activity);
+    public static SettingsPreferencesController getMenuListener(FragmentActivity activity) {
+        return new ModSettingsPrefListener(activity);
     }
 
-    public static void initialize(final Context context, List<b> items) {
-        items.clear();
+    public static void initialize(final Context context, List<MenuModel> items) {
+        final PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
+        final ResourcesManager resourcesManager = ResourcesManager.INSTANCE;
 
-        final PreferenceManager preferenceManager = LoaderLS.getPrefManagerInstance();
-        IDPub idPub = LoaderLS.getIDPubInstance();
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_bttv")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotes, preferenceManager.isBttvOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FfzBadges, preferenceManager.isFfzBadgesOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotesPicker, preferenceManager.isEmotePickerOn()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.Gifs, context, resourcesManager, Gifs.values(), preferenceManager.getGifsStrategy()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.EmoteSize, context, resourcesManager, EmoteSize.values(), preferenceManager.getEmoteSize()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_settings_chat_bttv")));
-        items.add(MenuFactory.getToggleMenu(j.a.BttvEmotes, idPub, preferenceManager.isBttvOn()));
-        items.add(MenuFactory.getToggleMenu(j.a.BttvEmotesPicker, idPub, preferenceManager.isEmotePickerOn()));
-        items.add(MenuFactory.getDropDownMenu(j.a.Gifs, context, idPub, Gifs.values(), preferenceManager.getGifsStrategy()));
-        items.add(MenuFactory.getDropDownMenu(j.a.EmoteSize, context, idPub, EmoteSize.values(), preferenceManager.getEmoteSize()));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_category")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, preferenceManager.isFloatingChatEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, preferenceManager.isMessageTimestampOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, preferenceManager.isBypassChatBan()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.EmotePickerView, preferenceManager.isOldEmotePicker()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, context, resourcesManager, ChatWidthPercent.values(), preferenceManager.getChatWidthPercent()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_settings_chat_category")));
-        items.add(MenuFactory.getToggleMenu(j.a.FloatingChat, idPub, preferenceManager.isFloatingChatEnabled()));
-        items.add(MenuFactory.getToggleMenu(j.a.Timestamps, idPub, preferenceManager.isMessageTimestampOn()));
-        items.add(MenuFactory.getToggleMenu(j.a.EmotePickerView, idPub, preferenceManager.isOldEmotePicker()));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_player_category")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, preferenceManager.isAdblockEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.AutoPlay, preferenceManager.isDisableAutoplay()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VideoDebugPanel, preferenceManager.isShowVideoDebugPanel()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FollowView, preferenceManager.isOldFollowButton()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.PlayerImpl, context, resourcesManager, PlayerImpl.values(), preferenceManager.getPlayerImplementation()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MiniplayerSize, context, resourcesManager, MiniPlayerSize.values(), preferenceManager.getMiniPlayerSize()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ExoplayerSpeed, context, resourcesManager, ExoPlayerSpeed.values(), preferenceManager.getExoplayerSpeed()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_settings_player_category")));
-        items.add(MenuFactory.getToggleMenu(j.a.AutoPlay, idPub, preferenceManager.isDisableAutoplay()));
-        items.add(MenuFactory.getToggleMenu(j.a.VideoDebugPanel, idPub, preferenceManager.isShowVideoDebugPanel()));
-        items.add(MenuFactory.getToggleMenu(j.a.FollowView, idPub, preferenceManager.isOldFollowButton()));
-        items.add(MenuFactory.getDropDownMenu(j.a.PlayerImpl, context, idPub, PlayerImpl.values(), preferenceManager.getPlayerImplementation()));
-        items.add(MenuFactory.getDropDownMenu(j.a.MiniplayerSize, context, idPub, MiniPlayerSize.values(), preferenceManager.getMiniPlayerSize()));
-        items.add(MenuFactory.getDropDownMenu(j.a.ExoplayerSpeed, context, idPub, ExoPlayerSpeed.values(), preferenceManager.getExoplayerSpeed()));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_swipe")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VolumeSwipe, preferenceManager.isVolumeSwipeEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BrightnessSwipe, preferenceManager.isBrightnessSwipeEnabled()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_settings_swipe")));
-        items.add(MenuFactory.getToggleMenu(j.a.VolumeSwipe, idPub, preferenceManager.isVolumeSwipeEnabled()));
-        items.add(MenuFactory.getToggleMenu(j.a.BrightnessSwipe, idPub, preferenceManager.isBrightnessSwipeEnabled()));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_chat_filtering")));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, context, resourcesManager, UserMessagesFiltering.values(), preferenceManager.getChatFiltering()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, preferenceManager.isIgnoreSystemMessages()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_chat_filtering")));
-        items.add(MenuFactory.getDropDownMenu(j.a.FilterLevel, context, idPub, UserMessagesFiltering.values(), preferenceManager.getChatFiltering()));
-        items.add(MenuFactory.getToggleMenu(j.a.FilterSystem, idPub, preferenceManager.isIgnoreSystemMessages()));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_patch")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, preferenceManager.isDisableRecommendations()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideResumeWatchingStreams, preferenceManager.isDisableRecentWatching()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideFollowedGames, preferenceManager.isDisableFollowedGames()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideDiscoverTab, preferenceManager.isHideDiscoverTab()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideEsportsTab, preferenceManager.isHideEsportsTab()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RecentSearch,  preferenceManager.isDisableRecentSearch()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideGs,  preferenceManager.isHideGs()));
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_settings_patch")));
-        items.add(MenuFactory.getToggleMenu(j.a.HideRecommendedStreams, idPub, preferenceManager.isDisableRecommendations()));
-        items.add(MenuFactory.getToggleMenu(j.a.HideResumeWatchingStreams, idPub, preferenceManager.isDisableRecentWatching()));
-        items.add(MenuFactory.getToggleMenu(j.a.HideFollowedGames, idPub, preferenceManager.isDisableFollowedGames()));
-        items.add(MenuFactory.getToggleMenu(j.a.HideDiscoverTab, idPub, preferenceManager.isHideDiscoverTab()));
-        items.add(MenuFactory.getToggleMenu(j.a.HideEsportsTab, idPub, preferenceManager.isHideEsportsTab()));
-        items.add(MenuFactory.getToggleMenu(j.a.RecentSearch, idPub,  preferenceManager.isDisableRecentSearch()));
         if (preferenceManager.isDevModeOn()) {
-            items.add(MenuFactory.getToggleMenu(j.a.Interceptor, idPub, preferenceManager.isInterceptorOn()));
+            items.add(MenuFactory.getInfoMenu("Dev"));
+            items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Interceptor, preferenceManager.isInterceptorOn()));
         }
 
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_category_info")));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));
 
         items.add(MenuFactory.getInfoMenu(LoaderLS.VERSION, LoaderLS.BUILD, new View.OnClickListener() {
+            private static final int CLICKS = 5;
+
             private int clicked = 0;
             @Override
             public void onClick(View v) {
                 clicked++;
-                if (clicked == 5) {
+                if (clicked == CLICKS) {
                     if (preferenceManager.isDevModeOn()) {
                         preferenceManager.updateBoolean(DEV, false);
-                        Helper.showToast("Dev mode off!");
+                        Helper.showToast("Developer mode disabled!");
                     } else {
                         preferenceManager.updateBoolean(DEV, true);
-                        Helper.showToast("Dev mode on!");
+                        Helper.showToast("Developer mode enabled!");
                     }
                     clicked = 0;
                 }
             }
         }));
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_info_open_telegram"), null, new View.OnClickListener() {
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), null, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Helper.openUrl(TELEGRAM_URL);
             }
         }));
-        items.add(MenuFactory.getInfoMenu(idPub.getString("mod_info_open_github"), null, new View.OnClickListener() {
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_github"), null, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Helper.openUrl(GITHUB_URL);

@@ -9,7 +9,7 @@ import tv.twitch.android.mod.utils.Logger;
 
 
 public abstract class ApiCallback<T> implements Callback<T> {
-    private static final int MAX_RETRIES = 3;
+    private static final int MAX_RETRIES = 5;
 
     private int retryCount = 0;
 
