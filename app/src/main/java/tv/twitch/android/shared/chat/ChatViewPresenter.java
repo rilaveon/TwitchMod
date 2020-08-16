@@ -3,6 +3,7 @@ package tv.twitch.android.shared.chat;
 
 import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.settings.PreferenceManager;
+import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.models.channel.ChannelInfo;
 import tv.twitch.android.models.streams.StreamType;
 import tv.twitch.android.shared.chat.observables.ChatConnectionController;
@@ -18,7 +19,8 @@ public class ChatViewPresenter {
 
 
     public final void onUserBanStateUpdated(boolean z) { // TODO: __REPLACE_METHOD
-        if (Hooks.isBypassChatBanJump()) {
+        if (z && Hooks.isBypassChatBanJump()) {
+            z = false;
             anonConnect();
         }
     }
