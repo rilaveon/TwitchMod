@@ -2,8 +2,7 @@ package tv.twitch.android.mod.bridges;
 
 
 import android.content.Context;
-import android.net.Uri;
-import android.text.SpannableStringBuilder;
+import android.os.Parcel;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
@@ -15,6 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.badges.BadgeManager;
 import tv.twitch.android.mod.models.Badge;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
@@ -60,6 +60,10 @@ public class Hooks {
         return org;
     }
 
+    public final static boolean isForceOldClipsViewJump() {
+        return PreferenceManager.INSTANCE.isForceOldClips();
+    }
+
     public final static boolean hookExperimental(Experiment experimental, boolean org) {
         if (experimental == null) {
             Logger.error("experimental is null");
@@ -67,29 +71,19 @@ public class Hooks {
         }
 
         switch (experimental) {
-            case NIELSEN:
             case VAES_OM:
             case SURESTREAM_OM:
-            case Nielsen_S2S:
-            case PROMOTED_STREAMS:
             case ADS_PBYP:
+            case MULTIPLAYER_ADS:
                 if (PreferenceManager.INSTANCE.isAdblockEnabled())
                     return false;
                 else
                     return org;
 
-            case UPDATE_PROMPT_ROLLOUT:
-                return false;
-
-            case CREATOR_SETTINGS_MENU:
-                return false;
-
             case FLOATING_CHAT:
                 return PreferenceManager.INSTANCE.isFloatingChatEnabled();
             case NEW_EMOTE_PICKER:
                 return !PreferenceManager.INSTANCE.isOldEmotePicker();
-            case GLOBAL_FOLLOW_BUTTON_REVAMP:
-                return !PreferenceManager.INSTANCE.isOldFollowButton();
         }
 
         return org;
@@ -140,15 +134,45 @@ public class Hooks {
             return;
 
         EmoteManager.INSTANCE.fetchGlobalEmotes();
-        EmoteManager.INSTANCE.requestEmotes(channelInfo.getId());
+        EmoteManager.INSTANCE.requestRoomEmotes(channelInfo.getId());
     }
 
     public final static void requestEmotes(final PlayableModelParser playableModelParser, final Playable playable) {
-        if (!PreferenceManager.INSTANCE.isBttvOn())
-            return;
+        final int channelId = Helper.getChannelId(playableModelParser, playable);
+        requestEmotes(new ChannelInfo() {
+            @Override
+            public String getDisplayName() {
+                return null;
+            }
 
-        EmoteManager.INSTANCE.fetchGlobalEmotes();
-        EmoteManager.INSTANCE.requestEmotes(Helper.getChannelId(playableModelParser, playable));
+            @Override
+            public String getGame() {
+                return null;
+            }
+
+            @Override
+            public int getId() {
+                return channelId;
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public boolean isPartner() {
+                return false;
+            }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {}
+        });
     }
 
     public final static boolean hookFollowedGamesFetcher(boolean org) {
@@ -170,13 +194,6 @@ public class Hooks {
             return org;
 
         return false;
-    }
-
-    public final static boolean hookVideoDebugPanel(boolean org) {
-        if (!PreferenceManager.INSTANCE.isShowVideoDebugPanel())
-            return org;
-
-        return true;
     }
 
     public final static int hookMiniplayerSize(int size) {
@@ -220,10 +237,8 @@ public class Hooks {
     }
 
     public final static List<? extends ChatLiveMessage> hookLiveMessages(List<? extends ChatLiveMessage> list, String accountName) {
-        if (list == null || list.isEmpty()) {
-            Logger.warning("empty list");
+        if (list == null || list.isEmpty())
             return list;
-        }
 
         UserMessagesFiltering filtering = PreferenceManager.INSTANCE.getChatFiltering();
         if (filtering == UserMessagesFiltering.DISABLED)
@@ -268,14 +283,15 @@ public class Hooks {
         return PreferenceManager.INSTANCE.getGifsStrategy() == Gifs.ANIMATED;
     }
 
+    public final static boolean isHideGsJump() {
+        return PreferenceManager.INSTANCE.isHideGs();
+    }
+
     /**
-     * Some hooks
+     * For hooks ref
      */
     public final static void helper() {
         Object o = hookVodPlayerStandaloneMediaClockInit(); // TODO: __HOOK
-        boolean ad = PreferenceManager.INSTANCE.isAdblockEnabled();
-        if (!PreferenceManager.INSTANCE.isHideGs())
-            return;
     }
 
     public final static int hookUsernameSpanColor(int usernameColor) {
@@ -283,7 +299,7 @@ public class Hooks {
     }
 
     public static SpannedString hookBadges(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString badges) {
-        if (!PreferenceManager.INSTANCE.isFfzBadgesOn())
+        if (!PreferenceManager.INSTANCE.isThirdPartyBadgesOn())
             return badges;
 
         if (factory == null) {
@@ -300,31 +316,10 @@ public class Hooks {
         }
 
         try {
-            List<Badge> newBadges = BadgeManager.INSTANCE.getBadgesForUser(chatMessageInterface.getUserId());
-            if (newBadges != null && !newBadges.isEmpty()) {
-                SpannableStringBuilder ssb = new SpannableStringBuilder(badges);
-                for (Badge badge : newBadges) {
-                    if (badge == null)
-                        continue;
-
-                    CharSequence spannedBadge = factory.getSpannedBadge(badge.getUrl(), badge.getName());
-                    if (TextUtils.isEmpty(spannedBadge))
-                        continue;
-
-                    if (!TextUtils.isEmpty(badge.getReplaces())) {
-                        final String replaces = badge.getReplaces() + " ";
-                        int pos = TextUtils.indexOf(ssb, replaces);
-                        if (pos != -1) {
-                            ssb.replace(pos, replaces.length(), spannedBadge);
-                        }
-                    } else {
-                        ssb.append(spannedBadge);
-                    }
-                }
-
-                return new SpannedString(ssb);
+            Collection<Badge> newBadges = BadgeManager.INSTANCE.getBadgesForUser(chatMessageInterface.getUserId());
+            if (!newBadges.isEmpty()) {
+                return ChatUtil.tryAddBadges(badges, factory, newBadges);
             }
-
         } catch (Throwable th) {
             th.printStackTrace();
         }
@@ -332,19 +327,24 @@ public class Hooks {
         return badges;
     }
 
-    public static SpannedString hookChatMessage(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString orgMessage, int channelId) {
+    public static SpannedString hookChatMessage(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString orgMessage, int channelId, TwitchAccountManager accountManager) {
         PreferenceManager manager = PreferenceManager.INSTANCE;
         if (!manager.isBttvOn())
             return orgMessage;
 
+        if (TextUtils.isEmpty(orgMessage))
+            return orgMessage;
+
+        if (chatMessageInterface.isDeleted())
+            return orgMessage;
+
         try {
-            if (TextUtils.isEmpty(orgMessage))
-                return orgMessage;
+            SpannedString hooked = ChatUtil.tryAddEmotes(factory, orgMessage, channelId, manager.getGifsStrategy() == Gifs.DISABLED, manager.getEmoteSize());
+            if (manager.isRedMentionOn()) {
+                hooked = ChatUtil.tryAddRedMention(hooked, accountManager, chatMessageInterface);
+            }
 
-            if (chatMessageInterface.isDeleted())
-                return orgMessage;
-
-            return ChatUtil.injectEmotesSpan(factory, orgMessage, channelId, manager.getGifsStrategy() == Gifs.DISABLED, manager.getEmoteSize());
+            return hooked;
         } catch (Throwable th) {
             th.printStackTrace();
         }
@@ -364,20 +364,20 @@ public class Hooks {
             return null;
 
         Collection<Emote> bttvGlobalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
-        if (bttvGlobalEmotes != null && !bttvGlobalEmotes.isEmpty()) {
+        if (!bttvGlobalEmotes.isEmpty()) {
             Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.GLOBAL.getTitleRes());
             list.add(ChatFactory.getEmoteSetUi(bttvGlobalEmotes, resId));
         }
 
         if (channelId != null && channelId != -1) {
             Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
-            if (bttvChannelEmotes != null && !bttvChannelEmotes.isEmpty()) {
+            if (!bttvChannelEmotes.isEmpty()) {
                 Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleRes());
                 list.add(ChatFactory.getEmoteSetUi(bttvChannelEmotes, resId));
             }
 
             Collection<Emote> ffzChannelEmotes = EmoteManager.INSTANCE.getFfzEmotes(channelId);
-            if (ffzChannelEmotes != null && !ffzChannelEmotes.isEmpty()) {
+            if (!ffzChannelEmotes.isEmpty()) {
                 Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.FFZ.getTitleRes());
                 list.add(ChatFactory.getEmoteSetUi(ffzChannelEmotes, resId));
             }
@@ -400,5 +400,9 @@ public class Hooks {
             return org;
 
         return Integer.parseInt(percent.getValue());
+    }
+
+    public static boolean isBypassChatBanJump() {
+        return PreferenceManager.INSTANCE.isBypassChatBan();
     }
 }

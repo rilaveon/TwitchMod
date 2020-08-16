@@ -12,15 +12,11 @@ public class BuildConfigUtil {
         return Hooks.isDevModeOn();
     }
 
-    public final boolean isBeta() { // TODO: __REPLACE_METHOD
-        return Hooks.isDevModeOn();
-    }
-
     public final boolean isDebugConfigEnabled() { // TODO: __REPLACE_METHOD
         return Hooks.isDevModeOn();
     }
     
-    public final boolean shouldShowDebugOptions() { // TODO: __REPLACE_METHOD
+    public final boolean shouldShowDebugOptions(boolean z) { // TODO: __REPLACE_METHOD
         return Hooks.isDevModeOn();
     }
 }

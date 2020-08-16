@@ -31,7 +31,7 @@ public enum ChatWidthPercent implements PreferenceItem {
 
     @Override
     public String getKey() {
-        return PreferenceManager.CHAT_WIDTH_PERC;
+        return PreferenceManager.CHAT_WIDTH_SCALE;
     }
 
     @Override

@@ -7,15 +7,24 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 
+
 import java.util.List;
 
-import tv.twitch.android.shared.ui.elements.span.CenteredImageSpan;
 import tv.twitch.android.core.adapters.RecyclerAdapterItem;
+import tv.twitch.android.shared.ui.elements.span.CenteredImageSpan;
 import tv.twitch.android.mod.bridges.interfaces.IDrawable;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 
 public class GifHelper {
+    public static void forceRecycleItems(List<RecyclerAdapterItem> items) {
+        if (items == null || items.size() == 0)
+            return;
+
+        for (Object o : items)
+            recycleObject(o, true);
+    }
+
     public static void recycleObject(Object item, boolean force) {
         if (item == null)
             return;
@@ -24,8 +33,6 @@ public class GifHelper {
             recycleGifsInText(((IChatMessageItem) item).getSpanned(), force);
         } else if (item instanceof TextView) {
             recycleGifsInText(((TextView) item).getText(), force);
-        } else {
-            Logger.debug("Check item=" + item.toString() + ", " + item.getClass().toString());
         }
     }
 
@@ -44,42 +51,23 @@ public class GifHelper {
                 continue;
 
             Drawable drawable = image.getImageDrawable();
-
             if (!(drawable instanceof IDrawable))
                 continue;
 
             IDrawable drawableContainer = (IDrawable) drawable;
 
-            if (drawableContainer.getDrawable() instanceof GifDrawable) {
-                GifDrawable gifDrawable = (GifDrawable) drawableContainer.getDrawable();
-                gifDrawable.stop();
-                if (force)
-                    gifDrawable.setCallback(null);
+            Drawable gifDrawable = drawableContainer.getDrawable();
+            if (gifDrawable instanceof GifDrawable) {
+                stopGifDrawable((GifDrawable) gifDrawable, force);
             }
         }
     }
 
-    public static void recycleAdapterItems(List<RecyclerAdapterItem> list) {
-        if (list == null || list.size() == 0)
-            return;
-
-        for (RecyclerAdapterItem item : list) {
-            recycleObject(item, true);
-        }
-    }
-
-    public static void recycleAdapterItems(List<RecyclerAdapterItem> list, int range) {
-        if (range == 0)
-            return;
-
-        if (list == null || list.size() == 0)
-            return;
-
-        if (list.size() <= range)
-            return;
-
-        for (int i = 0; i < range; i++) {
-            recycleObject(list.get(i), true);
+    private static void stopGifDrawable(GifDrawable drawable, boolean force) {
+        drawable.stop();
+        if (force) {
+            drawable.setCallback(null);
+            drawable.recycle();
         }
     }
 }

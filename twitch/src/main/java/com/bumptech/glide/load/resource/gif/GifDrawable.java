@@ -30,4 +30,6 @@ public class GifDrawable extends Drawable {
     public void start() {/* ... */}
 
     public void stop() {/* ... */}
+
+    public void recycle() {/* ... */}
 }

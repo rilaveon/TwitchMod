@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 import java.util.Arrays;
 import java.util.List;
 
+import tv.twitch.android.mod.BuildConfig;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
@@ -29,7 +30,6 @@ import tv.twitch.android.shared.ui.menus.dropdown.DropDownMenuModel;
 import tv.twitch.android.shared.ui.menus.infomenu.InfoMenuModel;
 import tv.twitch.android.shared.ui.menus.togglemenu.ToggleMenuModel;
 
-import static tv.twitch.android.mod.settings.PreferenceManager.DEV;
 
 
 public class SettingsController {
@@ -37,16 +37,16 @@ public class SettingsController {
     private static final String GITHUB_URL = "https://github.com/nopbreak/TwitchMod";
 
 
-    public static final class ModSettingsPrefListener implements SettingsPreferencesController {
+    public static final class ModSettingsController implements SettingsPreferencesController {
         private final FragmentActivity mFragmentActivity;
 
-        public ModSettingsPrefListener(FragmentActivity fragmentActivity) {
+        public ModSettingsController(FragmentActivity fragmentActivity) {
             mFragmentActivity = fragmentActivity;
         }
 
         @Override
         public void updatePreferenceBooleanState(ToggleMenuModel item, boolean isChecked) {
-            SettingsController.OnMenuItemToggled(mFragmentActivity, item, isChecked);
+            SettingsController.updatePreferenceBooleanState(mFragmentActivity, item, isChecked);
         }
 
         @Override
@@ -72,7 +72,7 @@ public class SettingsController {
         }
     }
 
-    public static void OnMenuItemToggled(FragmentActivity fragmentActivity, ToggleMenuModel menuItem, boolean isChecked) {
+    public static void updatePreferenceBooleanState(FragmentActivity fragmentActivity, ToggleMenuModel menuItem, boolean isChecked) {
         if (menuItem == null) {
             Logger.error("menuItem is null");
             return;
@@ -91,16 +91,37 @@ public class SettingsController {
         }
 
         PreferenceManager.INSTANCE.updateBoolean(preferenceKey, isChecked);
-        restartIfNeed(fragmentActivity, preferenceKey);
+        maybeRestartIfNeed(fragmentActivity, preferenceKey);
     }
 
-    private static void restartIfNeed(FragmentActivity fragmentActivity, String preferenceKey) {
+    private static void maybeRestartIfNeed(FragmentActivity fragmentActivity, String preferenceKey) {
         switch (preferenceKey) {
             case PreferenceManager.HIDE_DISCOVER:
             case PreferenceManager.HIDE_ESPORTS:
             case PreferenceManager.ADBLOCK:
             case PreferenceManager.BADGES:
-                Helper.showRestartDialog(fragmentActivity, "Refresh and restart?");
+                Helper.showRestartDialog(fragmentActivity, ResourcesManager.INSTANCE.getString("restart_dialog_text"));
+        }
+    }
+
+    private static class OnBuildClickListener implements View.OnClickListener {
+        private static final int CLICKS = 5;
+
+        private int clicked = 0;
+
+        @Override
+        public void onClick(View v) {
+            clicked++;
+            if (clicked == CLICKS) {
+                if (PreferenceManager.INSTANCE.isDevModeOn()) {
+                    PreferenceManager.INSTANCE.updateBoolean(PreferenceManager.DEV, false);
+                    Helper.showToast("Developer mode disabled!");
+                } else {
+                    PreferenceManager.INSTANCE.updateBoolean(PreferenceManager.DEV, true);
+                    Helper.showToast("Developer mode enabled!");
+                }
+                clicked = 0;
+            }
         }
     }
 
@@ -125,7 +146,7 @@ public class SettingsController {
     }
 
     public static SettingsPreferencesController getMenuListener(FragmentActivity activity) {
-        return new ModSettingsPrefListener(activity);
+        return new ModSettingsController(activity);
     }
 
     public static void initialize(final Context context, List<MenuModel> items) {
@@ -134,7 +155,7 @@ public class SettingsController {
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_bttv")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotes, preferenceManager.isBttvOn()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FfzBadges, preferenceManager.isFfzBadgesOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FfzBadges, preferenceManager.isThirdPartyBadgesOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotesPicker, preferenceManager.isEmotePickerOn()));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.Gifs, context, resourcesManager, Gifs.values(), preferenceManager.getGifsStrategy()));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.EmoteSize, context, resourcesManager, EmoteSize.values(), preferenceManager.getEmoteSize()));
@@ -142,15 +163,12 @@ public class SettingsController {
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_category")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, preferenceManager.isFloatingChatEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, preferenceManager.isMessageTimestampOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RedChatMention, preferenceManager.isRedMentionOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, preferenceManager.isBypassChatBan()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.EmotePickerView, preferenceManager.isOldEmotePicker()));
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, context, resourcesManager, ChatWidthPercent.values(), preferenceManager.getChatWidthPercent()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_player_category")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, preferenceManager.isAdblockEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.AutoPlay, preferenceManager.isDisableAutoplay()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VideoDebugPanel, preferenceManager.isShowVideoDebugPanel()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FollowView, preferenceManager.isOldFollowButton()));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.PlayerImpl, context, resourcesManager, PlayerImpl.values(), preferenceManager.getPlayerImplementation()));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MiniplayerSize, context, resourcesManager, MiniPlayerSize.values(), preferenceManager.getMiniPlayerSize()));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ExoplayerSpeed, context, resourcesManager, ExoPlayerSpeed.values(), preferenceManager.getExoplayerSpeed()));
@@ -163,12 +181,17 @@ public class SettingsController {
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, context, resourcesManager, UserMessagesFiltering.values(), preferenceManager.getChatFiltering()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, preferenceManager.isIgnoreSystemMessages()));
 
-        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_patch")));
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_view")));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, context, resourcesManager, ChatWidthPercent.values(), preferenceManager.getChatWidthPercent()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.EmotePickerView, preferenceManager.isOldEmotePicker()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableNewClips, preferenceManager.isForceOldClips()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, preferenceManager.isDisableRecommendations()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideResumeWatchingStreams, preferenceManager.isDisableRecentWatching()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideFollowedGames, preferenceManager.isDisableFollowedGames()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideDiscoverTab, preferenceManager.isHideDiscoverTab()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideEsportsTab, preferenceManager.isHideEsportsTab()));
+
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_patch")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RecentSearch,  preferenceManager.isDisableRecentSearch()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideGs,  preferenceManager.isHideGs()));
 
@@ -179,25 +202,7 @@ public class SettingsController {
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));
 
-        items.add(MenuFactory.getInfoMenu(LoaderLS.VERSION, LoaderLS.BUILD, new View.OnClickListener() {
-            private static final int CLICKS = 5;
-
-            private int clicked = 0;
-            @Override
-            public void onClick(View v) {
-                clicked++;
-                if (clicked == CLICKS) {
-                    if (preferenceManager.isDevModeOn()) {
-                        preferenceManager.updateBoolean(DEV, false);
-                        Helper.showToast("Developer mode disabled!");
-                    } else {
-                        preferenceManager.updateBoolean(DEV, true);
-                        Helper.showToast("Developer mode enabled!");
-                    }
-                    clicked = 0;
-                }
-            }
-        }));
+        items.add(MenuFactory.getInfoMenu("TwitchMod v" + BuildConfig.VERSION_NAME, LoaderLS.APK_BUILD_INFO, new OnBuildClickListener()));
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), null, new View.OnClickListener() {
             @Override
             public void onClick(View v) {

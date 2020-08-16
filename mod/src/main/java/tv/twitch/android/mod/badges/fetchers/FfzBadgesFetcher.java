@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import tv.twitch.android.mod.badges.FfzBadgeSet;
@@ -19,23 +18,22 @@ import tv.twitch.android.mod.utils.Logger;
 import static tv.twitch.android.mod.net.ServiceFactory.getFfzApi;
 
 
-public class FfzBadgesFetecher extends ApiCallback<FfzBadgesResponse> {
-    private static final Map<Integer, String> sLocalBadges = new HashMap<>();
-
-    static {
-        sLocalBadges.put(1, "file:///android_asset/badges/ffz1.png");
-        sLocalBadges.put(2, "file:///android_asset/badges/ffz2.png");
-        sLocalBadges.put(3, "file:///android_asset/badges/ffz3.png");
-    }
-
+public class FfzBadgesFetcher extends ApiCallback<FfzBadgesResponse> {
     private final Callback mCallback;
 
+    private static final HashMap<Integer, String> sLocalBadges = new HashMap<>();
 
-    public interface Callback {
-        void onResult(FfzBadgeSet set);
+    static {
+        sLocalBadges.put(1, "file:///android_asset/mod/badges/ffz/1.png");
+        sLocalBadges.put(2, "file:///android_asset/mod/badges/ffz/2.png");
+        sLocalBadges.put(3, "file:///android_asset/mod/badges/ffz/3.png");
     }
 
-    public FfzBadgesFetecher(Callback mCallback) {
+    public interface Callback {
+        void onFfzBadgesParsed(FfzBadgeSet set);
+    }
+
+    public FfzBadgesFetcher(Callback mCallback) {
         this.mCallback = mCallback;
     }
 
@@ -71,13 +69,15 @@ public class FfzBadgesFetecher extends ApiCallback<FfzBadgesResponse> {
                 continue;
             }
 
-            String uri = sLocalBadges.get(badge.getId());
-            if (uri == null) {
-                uri = getUrl(badge.getUrls());
-                if (uri == null) {
-                    continue;
-                }
+            String url;
+            if (sLocalBadges.containsKey(badge.getId())) {
+                url = sLocalBadges.get(badge.getId());
+            } else {
+                url = getUrl(badge.getUrls());
             }
+
+            if (url == null)
+                continue;
 
             List<Integer> usersIds = users.get(badge.getId());
             if (usersIds == null || usersIds.isEmpty()) {
@@ -88,11 +88,11 @@ public class FfzBadgesFetecher extends ApiCallback<FfzBadgesResponse> {
                 if (id == 0)
                     continue;
 
-                set.addBadge(new Badge(badge.getName(), uri, badge.getReplaces()), id);
+                set.addBadge(new Badge(badge.getName(), url, badge.getReplaces()), id);
             }
         }
 
-        mCallback.onResult(set);
+        mCallback.onFfzBadgesParsed(set);
         Logger.debug("done!");
     }
 
@@ -117,11 +117,10 @@ public class FfzBadgesFetecher extends ApiCallback<FfzBadgesResponse> {
             url = urls.get(1);
         }
 
-        if (TextUtils.isEmpty(url)) {
+        if (TextUtils.isEmpty(url))
             return null;
-        }
 
-        if (url.startsWith("//"))
+        if (url != null && url.startsWith("//"))
             url = "https:" + url;
 
         return url;

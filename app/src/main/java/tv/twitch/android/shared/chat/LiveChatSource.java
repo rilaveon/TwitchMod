@@ -26,5 +26,10 @@ public class LiveChatSource {
         if (noticeEvents instanceof ChatNoticeEvents.FirstTimeChatterNoticeEvent && !Hooks.isJumpSystemIgnore()) { // TODO: __JUMP_HOOK
             /* ... */
         }
+
+        if (noticeEvents instanceof ChatNoticeEvents.SubscriptionNoticeEvent && !Hooks.isJumpSystemIgnore()) { // TODO: __JUMP_HOOK
+            /* ... */
+        }
+
     }
 }

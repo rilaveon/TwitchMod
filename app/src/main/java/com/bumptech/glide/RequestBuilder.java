@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 public class RequestBuilder<TranscodeType> {
     public RequestBuilder<TranscodeType> load(String str) { // TODO: __REPLACE_METHOD
-        if (!TextUtils.isEmpty(str) && str.startsWith("file:"))
+        if (!TextUtils.isEmpty(str) && str.startsWith("file:///"))
             return loadGeneric(Uri.parse(str));
         else
             return loadGeneric(str);

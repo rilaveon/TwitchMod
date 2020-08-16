@@ -2,7 +2,11 @@ package tv.twitch.android.adapters.social;
 
 import android.content.Context;
 import android.text.Spanned;
+import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import tv.twitch.android.core.mvp.viewdelegate.EventDispatcher;
 import tv.twitch.android.mod.bridges.Hooks;
@@ -31,14 +35,21 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
         return message;
     }
 
-    public static final class ChatMessageViewHolder implements IChatMessageItem { // TODO: __IMPLEMENT
+    public static final class ChatMessageViewHolder extends RecyclerView.ViewHolder implements IChatMessageItem { // TODO: __IMPLEMENT
+        public ChatMessageViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
         public final TextView getMessageTextView() {
             return null;
         }
 
         @Override
         public Spanned getSpanned() { // TODO: __INJECT_METHOD
-            return (Spanned) getMessageTextView().getText();
+            if (getMessageTextView() != null)
+                return (Spanned) getMessageTextView().getText();
+
+            return null;
         }
     }
 

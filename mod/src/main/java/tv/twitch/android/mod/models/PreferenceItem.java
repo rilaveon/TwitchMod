@@ -1,6 +1,5 @@
 package tv.twitch.android.mod.models;
 
-import androidx.annotation.NonNull;
 
 public interface PreferenceItem {
     String getValue();

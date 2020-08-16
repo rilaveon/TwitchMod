@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
 import tv.twitch.android.mod.bridges.LoaderLS;
+import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.settings.SettingsActivity;
@@ -46,15 +47,15 @@ public class Helper {
     }
 
     public static void showRestartDialog(Context context, String message) {
-        new AlertDialog.Builder(context).setMessage(message).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(context).setMessage(message).setPositiveButton(ResourcesManager.INSTANCE.getString("dialog_yes"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, new Intent(LoaderLS.getInstance(), SettingsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
-                ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1000, pendingIntent);
+                ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1500, pendingIntent);
                 Process.killProcess(Process.myPid());
 
             }
-        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+        }).setNegativeButton(ResourcesManager.INSTANCE.getString("dialog_no"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -73,9 +74,11 @@ public class Helper {
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + filename + ".mp4");
                 request.setMimeType("video/mp4");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + filename + ".mp4");
+
                 downloadManager.enqueue(request);
+                Helper.showToast("Downloading " + filename + "...");
             }
 
             @Override

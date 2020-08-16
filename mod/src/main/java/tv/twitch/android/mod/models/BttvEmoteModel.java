@@ -1,6 +1,8 @@
 package tv.twitch.android.mod.models;
 
 
+import androidx.annotation.NonNull;
+
 import tv.twitch.android.mod.bridges.ChatFactory;
 import tv.twitch.android.mod.models.api.ImageType;
 import tv.twitch.android.mod.models.settings.EmoteSize;
@@ -11,7 +13,6 @@ public final class BttvEmoteModel implements Emote {
     private static final String sUrlTemplate = "https://cdn.betterttv.net/emote/{id}/{size}";
 
     private final String mCode;
-    private final String mId;
     private final boolean bIsGif;
 
     private final String mSmallEmoteUrl;
@@ -22,15 +23,15 @@ public final class BttvEmoteModel implements Emote {
 
     public BttvEmoteModel(String code, String id, ImageType imageType) {
         this.mCode = code;
-        this.mId = id;
         this.bIsGif = imageType == ImageType.GIF;
-        this.mSmallEmoteUrl = getUrl("1x");
-        this.mMediumEmoteUrl = getUrl("2x");
-        this.mLargeEmoteUrl = getUrl("3x");
+        this.mSmallEmoteUrl = getUrl("1x", id);
+        this.mMediumEmoteUrl = getUrl("2x", id);
+        this.mLargeEmoteUrl = getUrl("3x", id);
 
         this.ce = ChatFactory.getEmoticon(this);
     }
 
+    @NonNull
     @Override
     public String getCode() {
         return mCode;
@@ -50,26 +51,30 @@ public final class BttvEmoteModel implements Emote {
     }
 
     @Override
-    public String getId() {
-        return mId;
-    }
-
-    @Override
     public boolean isGif() {
         return bIsGif;
     }
 
+    @NonNull
     @Override
     public ChatEmoticon getChatEmoticon() {
         return ce;
     }
 
-    private String getUrl(String size) {
-        return sUrlTemplate.replace("{id}", getId()).replace("{size}", size);
+    private static String getUrl(String size, String id) {
+        return sUrlTemplate.replace("{id}", id).replace("{size}", size);
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "{Code: " + getCode() + ", Id: " + getId() + ", isGif: " + isGif() + "}";
+        return "BttvEmoteModel{" +
+                "mCode='" + mCode + '\'' +
+                ", bIsGif=" + bIsGif +
+                ", mSmallEmoteUrl='" + mSmallEmoteUrl + '\'' +
+                ", mMediumEmoteUrl='" + mMediumEmoteUrl + '\'' +
+                ", mLargeEmoteUrl='" + mLargeEmoteUrl + '\'' +
+                ", ce=" + ce +
+                '}';
     }
 }

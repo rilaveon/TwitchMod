@@ -3,11 +3,10 @@ package tv.twitch.android.mod.badges;
 
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,51 +16,38 @@ import tv.twitch.android.mod.models.BadgeSet;
 
 
 public class FfzBadgeSet implements BadgeSet {
-    private final Map<Badge, HashSet<Integer>> mMap = new HashMap<>();
+    private final Map<Integer, HashSet<Badge>> mMap = new HashMap<>();
 
 
     @NonNull
     @Override
-    public List<Badge> getBadges(Integer userId) {
-        if (mMap.isEmpty())
+    public Collection<Badge> getBadges(Integer userId) {
+        HashSet<Badge> badges = mMap.get(userId);
+        if (badges == null)
             return Collections.emptyList();
 
-        List<Badge> badges = null;
-        for (Map.Entry<Badge, HashSet<Integer>> entry : mMap.entrySet()) {
-            if (entry.getValue() == null || entry.getKey() == null)
-                continue;
-
-            if (entry.getValue().contains(userId)) {
-                if (badges == null)
-                    badges = new ArrayList<>();
-
-                badges.add(entry.getKey());
-            }
-        }
-
-        if (badges != null) {
-            return badges;
-        }
-
-        return Collections.emptyList();
+        return badges;
     }
 
     @Override
     public void addBadge(Badge badge, Integer userId) {
         Objects.requireNonNull(badge);
 
-        if (userId == 0)
-            throw new IllegalArgumentException("userId == 0");
+        if (userId <= 0)
+            throw new IllegalArgumentException("userId <= 0");
 
-        if (!mMap.containsKey(badge)) {
+        if (!mMap.containsKey(userId)) {
             synchronized (this) {
-                if (!mMap.containsKey(badge)) {
-                    mMap.put(badge, new HashSet<Integer>());
+                if (!mMap.containsKey(userId)) {
+                    mMap.put(userId, new HashSet<Badge>());
                 }
             }
         }
 
-        mMap.get(badge).add(userId);
+        HashSet<Badge> set = mMap.get(userId);
+        if (set != null) {
+            set.add(badge);
+        }
     }
 
     @Override

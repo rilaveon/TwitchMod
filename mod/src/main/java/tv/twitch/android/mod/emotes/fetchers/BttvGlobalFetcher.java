@@ -19,7 +19,7 @@ public class BttvGlobalFetcher extends ApiCallback<List<BttvEmoteResponse>> {
     private final Callback mCallback;
 
     public interface Callback {
-        void globalBttvParsed(BaseEmoteSet set);
+        void onGlobalBttvEmotesParsed(BaseEmoteSet set);
     }
 
     public BttvGlobalFetcher(Callback callback) {
@@ -49,7 +49,7 @@ public class BttvGlobalFetcher extends ApiCallback<List<BttvEmoteResponse>> {
             globalSet.addEmote(new BttvEmoteModel(emoticon.getCode(), emoticon.getId(), emoticon.getImageType()));
         }
 
-        mCallback.globalBttvParsed(globalSet);
+        mCallback.onGlobalBttvEmotesParsed(globalSet);
         Logger.debug("done!");
     }
 

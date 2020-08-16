@@ -22,7 +22,7 @@ public class BttvChannelFetcher extends ApiCallback<BttvChannelResponse> {
     private final Callback mCallback;
 
     public interface Callback {
-        void bttvParsed(BaseEmoteSet set);
+        void onBttvEmotesParsed(BaseEmoteSet set);
     }
 
     public BttvChannelFetcher(int channelId, Callback callback) {
@@ -75,7 +75,7 @@ public class BttvChannelFetcher extends ApiCallback<BttvChannelResponse> {
                 bttvSet.addEmote(new BttvEmoteModel(emoticon.getCode(), emoticon.getId(), emoticon.getImageType()));
             }
         }
-        mCallback.bttvParsed(bttvSet);
+        mCallback.onBttvEmotesParsed(bttvSet);
         Logger.debug("done!");
     }
 

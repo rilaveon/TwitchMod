@@ -4,7 +4,6 @@ package tv.twitch.android.shared.experiments;
 public enum Experiment {
     ADS_PBYP,
     STREAMING_ABS,
-    GLOBAL_FOLLOW_BUTTON_REVAMP,
     FLOATING_CHAT,
     NEW_EMOTE_PICKER,
     NIELSEN,
@@ -13,5 +12,7 @@ public enum Experiment {
     UPDATE_PROMPT_ROLLOUT,
     Nielsen_S2S,
     VAES_OM,
-    CREATOR_SETTINGS_MENU
+    CREATOR_SETTINGS_MENU,
+    MULTIPLAYER_ADS,
+    CLIPFINITY
 }

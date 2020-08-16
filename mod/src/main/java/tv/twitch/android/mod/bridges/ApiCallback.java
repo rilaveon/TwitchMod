@@ -4,6 +4,7 @@ package tv.twitch.android.mod.bridges;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 import tv.twitch.android.mod.models.api.FailReason;
 import tv.twitch.android.mod.utils.Logger;
 
@@ -13,7 +14,7 @@ public abstract class ApiCallback<T> implements Callback<T> {
 
     private int retryCount = 0;
 
-
+    @EverythingIsNonNull
     public void onFailure(Call<T> call, Throwable callThrowable) {
         Logger.debug("retryCount=" + retryCount);
 
@@ -40,6 +41,7 @@ public abstract class ApiCallback<T> implements Callback<T> {
 
     public abstract void onRequestFail(Call<T> call, FailReason failReason);
 
+    @EverythingIsNonNull
     public void onResponse(Call<T> call, Response<T> response) {
         if (response.code() == 404) {
             onRequestFail(call, FailReason.NOT_FOUND);

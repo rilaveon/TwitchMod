@@ -21,7 +21,7 @@ public class FfzChannelFetcher extends ApiCallback<List<FfzEmoteResponse>> {
     private final Callback mCallback;
 
     public interface Callback {
-        void ffzParsed(BaseEmoteSet set);
+        void onFfzEmotesParsed(BaseEmoteSet set);
     }
 
     public FfzChannelFetcher(int channelId, Callback callback) {
@@ -45,11 +45,11 @@ public class FfzChannelFetcher extends ApiCallback<List<FfzEmoteResponse>> {
             if (TextUtils.isEmpty(emoteResponse.getId()))
                 continue;
 
-            FfzEmoteModel emote = new FfzEmoteModel(emoteResponse.getCode(), emoteResponse.getId(), emoteResponse.getImages());
+            FfzEmoteModel emote = new FfzEmoteModel(emoteResponse.getCode(), emoteResponse.getImages());
             ffzSet.addEmote(emote);
         }
 
-        mCallback.ffzParsed(ffzSet);
+        mCallback.onFfzEmotesParsed(ffzSet);
         Logger.debug("done!");
     }
 

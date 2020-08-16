@@ -53,19 +53,33 @@ public class ResourcesManager {
     }
 
     public Integer getId(String name) {
-        return mMap.get(IdType.ID).get(name);
+        PubCache cache = mMap.get(IdType.ID);
+        if (cache != null)
+            return cache.get(name);
+
+        return 0;
     }
 
     public Integer getLayoutId(String name) {
-        return mMap.get(IdType.LAYOUT).get(name);
+        PubCache cache = mMap.get(IdType.LAYOUT);
+        if (cache != null)
+            return cache.get(name);
+
+        return 0;
     }
 
     public Integer getStringId(String name) {
-        return mMap.get(IdType.STRING).get(name);
+        PubCache cache = mMap.get(IdType.STRING);
+        if (cache != null)
+            return cache.get(name);
+
+        return 0;
     }
 
     public String getString(String name) {
-        int resId = mMap.get(IdType.STRING).get(name);
+        PubCache cache = mMap.get(IdType.STRING);
+
+        int resId = cache != null ? cache.get(name) : 0;
         if (resId == 0) {
             return "RESOURCE ID NOT FOUND: '" + name + "'";
         } else {

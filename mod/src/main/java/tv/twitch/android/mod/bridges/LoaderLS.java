@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import tv.twitch.android.app.consumer.TwitchApplication;
+import tv.twitch.android.mod.BuildConfig;
 import tv.twitch.android.mod.badges.BadgeManager;
 import tv.twitch.android.mod.emotes.EmoteManager;
 import tv.twitch.android.mod.settings.PreferenceManager;
@@ -17,10 +18,9 @@ import tv.twitch.android.mod.utils.Logger;
 
 
 public class LoaderLS extends TwitchApplication {
-    public static final String VERSION = "TwitchMod v2.4";
-    private static final String BUILD_TEMPLATE = "BUILD";
+    private static final String APK_BUILD_INFO_TEMPLATE = "BUILD";
 
-    public static String BUILD = BUILD_TEMPLATE;
+    public static String APK_BUILD_INFO = "TEST BUILD";
 
     private static LoaderLS sInstance = null;
 
@@ -41,24 +41,20 @@ public class LoaderLS extends TwitchApplication {
 
     @Override
     public void onCreate() {
-        init();
+        initLoader();
         super.onCreate();
-        post();
+        fetchBttv();
     }
 
-    private void post() {
-        fetchBttvStuff();
-    }
-
-    private void fetchBttvStuff() {
+    private void fetchBttv() {
         if (PreferenceManager.INSTANCE.isBttvOn())
             EmoteManager.INSTANCE.fetchGlobalEmotes();
 
-        if (PreferenceManager.INSTANCE.isFfzBadgesOn())
+        if (PreferenceManager.INSTANCE.isThirdPartyBadgesOn())
             BadgeManager.INSTANCE.fetchBadges();
     }
 
-    private void setBuild() {
+    private void setBuildInfo() {
         try {
             InputStream inputStream = this.getApplicationContext().getAssets().open("build.properties");
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -77,7 +73,7 @@ public class LoaderLS extends TwitchApplication {
             }
 
             if (buildNum != -1) {
-                BUILD = BUILD_TEMPLATE + " " + buildNum;
+                APK_BUILD_INFO = APK_BUILD_INFO_TEMPLATE + " " + buildNum;
             }
 
             inputStream.close();
@@ -88,10 +84,10 @@ public class LoaderLS extends TwitchApplication {
         }
     }
 
-    private void init() {
+    private void initLoader() {
         sInstance = this;
         PreferenceManager.INSTANCE.initialize(this);
-        setBuild();
-        Logger.debug("Init LoaderLS. " + VERSION + " " + BUILD);
+        setBuildInfo();
+        Logger.debug("[" + BuildConfig.LIBRARY_PACKAGE_NAME + ":" + BuildConfig.VERSION_NAME + "] Init LoaderLS...");
     }
 }

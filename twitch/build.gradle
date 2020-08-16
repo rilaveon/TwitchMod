@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 904000
-        versionName "9.4.0"
+        versionCode 1905010
+        versionName "9.5.1"
     }
 
     buildTypes {
@@ -21,4 +21,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "androidx.appcompat:appcompat:1.2.0"
 }

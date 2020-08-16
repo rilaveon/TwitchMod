@@ -15,7 +15,7 @@ import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.shared.ui.elements.bottomsheet.InteractiveRowView;
 
 
-public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget {
+public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget { // TODO: __IMPLEMENT
     private ClipModel mClipModel;
     private SharePanelWidgetListener mSharePanelWidgetListener;
 
@@ -44,7 +44,7 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
     }
 
     private void init() {
-        initDownloadModel();
+        initDownloadModel(); // TODO: __INJECT_CODE
     }
 
     private void updateViewState() {
@@ -54,12 +54,12 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
     }
 
     @Override
-    public ClipModel getClipModel() {
+    public ClipModel getClipModel() { // TODO: __INJECT_METHOD
         return mClipModel;
     }
 
     @Override
-    public void hidePanel() {
+    public void hidePanel() { // TODO: __INJECT_METHOD
         SharePanelWidgetListener sharePanelWidgetListener = this.mSharePanelWidgetListener;
         if (sharePanelWidgetListener != null) {
             sharePanelWidgetListener.onShareClicked();
@@ -68,7 +68,7 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
     }
 
     @Override
-    public FrameLayout getLayout() {
+    public FrameLayout getLayout() { // TODO: __INJECT_METHOD
         return this;
     }
 }

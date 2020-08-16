@@ -15,6 +15,8 @@ import tv.twitch.android.mod.utils.Logger;
 
 
 public class EmoteManager implements BttvGlobalFetcher.Callback {
+    private final Object lock = new Object();
+
     private static final int MAX_CACHE_SIZE = 20;
 
     private final RoomCache mRoomCache = new RoomCache(MAX_CACHE_SIZE);
@@ -22,6 +24,7 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
 
     private BaseEmoteSet mBttvGlobalSet;
 
+    private boolean isGlobalSetRequested = false;
 
     public static final EmoteManager INSTANCE = new EmoteManager();
 
@@ -30,8 +33,14 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
     }
 
     @Override
-    public void globalBttvParsed(BaseEmoteSet set) {
+    public void onGlobalBttvEmotesParsed(BaseEmoteSet set) {
+        if (set == null) {
+            Logger.error("set is null");
+            return;
+        }
+
         mBttvGlobalSet = set;
+        isGlobalSetRequested = false;
     }
 
     private static class RoomCache extends LruCache<Integer, Room> {
@@ -48,39 +57,37 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
         }
     }
 
-    public void fetchGlobalEmotes() {
-        if (mBttvGlobalSet == null) {
-            mBttvGlobalFetcher.fetch();
+    public void requestRoomEmotes(int id) {
+        if (id <= 0) {
+            Logger.error("id <= 0");
+            return;
         }
+
+        mRoomCache.get(id);
     }
 
-    public void requestEmotes(int channelId) {
-        if (channelId == 0) {
-            Logger.warning("Cannot request emotes: channelId==0");
-            return;
+    public void fetchGlobalEmotes() {
+        if (mBttvGlobalSet == null && !isGlobalSetRequested) {
+            synchronized (lock) {
+                if (mBttvGlobalSet == null) {
+                    mBttvGlobalFetcher.fetch();
+                    isGlobalSetRequested = true;
+                }
+            }
         }
-
-        if (channelId == -1) {
-            Logger.warning("Cannot request emotes: channelId==-1");
-            return;
-        }
-
-        Logger.debug("New emote request: " + channelId);
-        mRoomCache.get(channelId);
     }
 
     @NonNull
     public Collection<Emote> getGlobalEmotes() {
-        if (mBttvGlobalSet != null) {
+        if (mBttvGlobalSet != null)
             return mBttvGlobalSet.getEmotes();
-        }
 
         return Collections.emptyList();
     }
 
     @NonNull
     public Collection<Emote> getBttvEmotes(int channelId) {
-        if (channelId == 0) {
+        if (channelId <= 0) {
             return Collections.emptyList();
         }
 
@@ -89,7 +96,7 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
 
     @NonNull
     public Collection<Emote> getFfzEmotes(int channelId) {
-        if (channelId == 0) {
+        if (channelId <= 0) {
             return Collections.emptyList();
         }
 
@@ -100,7 +107,7 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
         if (TextUtils.isEmpty(code))
             return null;
 
-        if (channelId != 0) {
+        if (channelId > 0) {
             Emote emote = mRoomCache.get(channelId).findEmote(code);
             if (emote != null)
                 return emote;

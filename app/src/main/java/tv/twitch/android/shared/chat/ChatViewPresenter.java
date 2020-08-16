@@ -1,6 +1,7 @@
 package tv.twitch.android.shared.chat;
 
 
+import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.models.channel.ChannelInfo;
 import tv.twitch.android.models.streams.StreamType;
@@ -17,17 +18,18 @@ public class ChatViewPresenter {
 
 
     public final void onUserBanStateUpdated(boolean z) { // TODO: __REPLACE_METHOD
-        anonConnect();
+        if (Hooks.isBypassChatBanJump()) {
+            anonConnect();
+        }
     }
 
-    private void anonConnect() {
-        if (!PreferenceManager.INSTANCE.isBypassChatBan())
-            return;
+    private void anonConnect() { // TODO: __INJECT_METHOD
+        ChannelInfo backupChannelInfo = this.channel;
 
         chatConnectionController.viewerId = 0;
-        ChannelInfo channelInfo = this.channel;
         this.channel = null;
-        this.setChannel(channelInfo, playbackSessionID, streamType);
+        this.setChannel(backupChannelInfo, playbackSessionID, streamType);
+        this.channel = backupChannelInfo;
     }
 
     public final void setChannel(ChannelInfo channelInfo2, String str, StreamType streamType2) {

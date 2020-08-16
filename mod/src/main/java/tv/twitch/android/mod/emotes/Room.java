@@ -9,22 +9,19 @@ import java.util.Collections;
 import tv.twitch.android.mod.emotes.fetchers.BttvChannelFetcher;
 import tv.twitch.android.mod.emotes.fetchers.FfzChannelFetcher;
 import tv.twitch.android.mod.models.Emote;
+import tv.twitch.android.mod.utils.Logger;
 
 
 class Room implements BttvChannelFetcher.Callback, FfzChannelFetcher.Callback {
-    private final int mChannelId;
-
     private final BttvChannelFetcher bttvChannelFetcher;
     private final FfzChannelFetcher ffzChannelFetcher;
 
     private BaseEmoteSet mBttvSet;
     private BaseEmoteSet mFfzSet;
 
-
     public Room(int channelId) {
-        mChannelId = channelId;
-        bttvChannelFetcher = new BttvChannelFetcher(mChannelId, this);
-        ffzChannelFetcher = new FfzChannelFetcher(mChannelId, this);
+        bttvChannelFetcher = new BttvChannelFetcher(channelId, this);
+        ffzChannelFetcher = new FfzChannelFetcher(channelId, this);
     }
 
     public synchronized void requestEmotes() {
@@ -63,12 +60,22 @@ class Room implements BttvChannelFetcher.Callback, FfzChannelFetcher.Callback {
     }
 
     @Override
-    public void bttvParsed(BaseEmoteSet set) {
+    public void onBttvEmotesParsed(BaseEmoteSet set) {
+        if (set == null) {
+            Logger.error("set is null");
+            return;
+        }
+
         mBttvSet = set;
     }
 
     @Override
-    public void ffzParsed(BaseEmoteSet set) {
+    public void onFfzEmotesParsed(BaseEmoteSet set) {
+        if (set == null) {
+            Logger.error("set is null");
+            return;
+        }
+
         mFfzSet = set;
     }
 }

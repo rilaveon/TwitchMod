@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,9 +16,9 @@ import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.utils.Logger;
 
 
-public class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceChangeListener  {
+public final class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceChangeListener  {
     private final HashMap<String, PreferenceItem> mLocalPreferences = new HashMap<>();
-    private final List<PreferenceListener> listeners = new ArrayList<>();
+    private final List<PreferenceListener> mListeners = new ArrayList<>();
 
     private final SharedPreferences mPref;
 
@@ -30,11 +32,11 @@ public class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceCh
         mPref.registerOnSharedPreferenceChangeListener(this);
     }
 
-    protected void registerLocalPreference(PreferenceItem item) {
+    public void registerLocalPreference(PreferenceItem item) {
         mLocalPreferences.put(item.getKey(), getOrDefault(item));
     }
 
-    protected PreferenceItem getLocalPreference(String key) {
+    public PreferenceItem getLocalPreference(String key) {
         return mLocalPreferences.get(key);
     }
 
@@ -69,7 +71,7 @@ public class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceCh
         return mPref.getString(key, def);
     }
 
-    public PreferenceItem getOrDefault(PreferenceItem defaultPreference) {
+    private PreferenceItem getOrDefault(PreferenceItem defaultPreference) {
         String res = getString(defaultPreference.getKey(), null);
         if (res != null)
             return defaultPreference.lookup(res);
@@ -80,7 +82,7 @@ public class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceCh
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (TextUtils.isEmpty(key)) {
-            Logger.error("Empty key");
+            Logger.error("empty key");
             return;
         }
 
@@ -90,26 +92,16 @@ public class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceCh
             registerLocalPreference(item.lookup(newVal));
         }
 
-        for (PreferenceListener listener : listeners) {
-            if (listener != null) {
-                listener.onSharedPreferenceChanged(sharedPreferences, key);
-            }
+        for (PreferenceListener listener : mListeners) {
+            listener.onSharedPreferenceChanged(sharedPreferences, key);
         }
     }
 
-    public void registerPreferenceListener(PreferenceListener listener) {
-        if (listener != null)
-            listeners.add(listener);
-        else {
-            Logger.error("listener is null");
-        }
+    public void registerPreferenceListener(@NonNull PreferenceListener listener) {
+        mListeners.add(listener);
     }
 
-    public void removePreferenceListener(PreferenceListener listener) {
-        if (listener != null)
-            listeners.remove(listener);
-        else {
-            Logger.error("listener is null");
-        }
+    public void removePreferenceListener(@NonNull PreferenceListener listener) {
+        mListeners.remove(listener);
     }
 }

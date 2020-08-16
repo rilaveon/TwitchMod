@@ -4,6 +4,7 @@ package tv.twitch.android.shared.chat.messagefactory;
 import android.text.SpannedString;
 
 import tv.twitch.android.core.mvp.viewdelegate.EventDispatcher;
+import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.models.webview.WebViewSource;
 import tv.twitch.android.shared.chat.ChatMessageInterface;
 import tv.twitch.android.shared.chat.chatsource.IClickableUsernameSpanListener;
@@ -17,6 +18,8 @@ import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 
 
 public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPLEMENT
+    private TwitchAccountManager accountManager;
+
     private final CharSequence imageSpannable(String str, MediaSpan$Type type, String str2, UrlImageClickableProvider urlImageClickableProvider, boolean z) {
         return null;
     }
@@ -33,9 +36,9 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
             /* ... */
 
             SpannedString parseChatMessageTokens$default = new SpannedString("KEKW");
-            SpannedString generateBadges2 = new SpannedString("LULW");
-            parseChatMessageTokens$default = Hooks.hookChatMessage(this, chatMessageInterface, parseChatMessageTokens$default, channelId); // TODO: __HOOK
-            generateBadges2 = Hooks.hookBadges(this, chatMessageInterface, generateBadges2);
+            SpannedString generateBadges = new SpannedString("LULW");
+            parseChatMessageTokens$default = Hooks.hookChatMessage(this, chatMessageInterface, parseChatMessageTokens$default, channelId, accountManager); // TODO: __HOOK
+            generateBadges = Hooks.hookBadges(this, chatMessageInterface, generateBadges); // TODO: __HOOK
             /* ... */
             return null;
         } catch (Throwable th) {

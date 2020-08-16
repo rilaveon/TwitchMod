@@ -72,10 +72,11 @@ public class ChatFactory {
 
     @NonNull
     private static EmoteUiModel getEmote(Emote emote) {
-        EmoteMessageInput emoteMessageInput = new EmoteMessageInput(emote.getCode(), "-1", false);
-        EmotePickerEmoteModel emotePicker = new EmotePickerEmoteModel.Generic("-1", emote.getCode());
+        String fakeEmoteId = generateEmoteId();
+        EmoteMessageInput emoteMessageInput = new EmoteMessageInput(emote.getCode(), fakeEmoteId, false);
+        EmotePickerEmoteModel emotePicker = new EmotePickerEmoteModel.Generic(fakeEmoteId, emote.getCode());
         EmotePickerPresenter.ClickedEmote clickedEmote = new EmotePickerPresenter.ClickedEmote.Unlocked(emotePicker, emoteMessageInput, null, Collections.<EmotePickerPresenter.ClickedEmote.Unlocked>emptyList());
-        return new EmoteUiModelWithUrl("-1", false, false, clickedEmote, emote.getUrl(EmoteSize.LARGE));
+        return new EmoteUiModelWithUrl(fakeEmoteId, false, false, clickedEmote, emote.getUrl(EmoteSize.LARGE));
     }
 
     @NonNull
