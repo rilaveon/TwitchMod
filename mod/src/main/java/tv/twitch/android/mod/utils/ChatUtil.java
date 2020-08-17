@@ -116,7 +116,7 @@ public class ChatUtil {
         }
 
         String userName = accountManager.getUsername();
-        if (userName == null || TextUtils.isEmpty(accountManager.getUsername())) {
+        if (userName == null || TextUtils.isEmpty(userName)) {
             Logger.error("empty userName");
             return msg;
         }
@@ -128,7 +128,7 @@ public class ChatUtil {
                 if (mentionUser == null || TextUtils.isEmpty(mentionUser))
                     continue;
 
-                if (mentionUser.equals(accountManager.getUsername())) {
+                if (mentionUser.equalsIgnoreCase(userName)) {
                     SpannableString mention = new SpannableString(msg);
                     mention.setSpan(new BackgroundColorSpan(Color.argb(100, 255, 0, 0)), 0, msg.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     return SpannedString.valueOf(mention);
