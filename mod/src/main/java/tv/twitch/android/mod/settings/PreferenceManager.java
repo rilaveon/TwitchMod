@@ -14,6 +14,7 @@ import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
 import tv.twitch.android.mod.models.settings.Gifs;
 import tv.twitch.android.mod.models.settings.MiniPlayerSize;
 import tv.twitch.android.mod.models.settings.PlayerImpl;
+import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 
 
@@ -46,7 +47,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     public static final String HIDE_DISCOVER = "nop_hide_discover";
     public static final String HIDE_ESPORTS = "nop_hide_esports";
     public static final String DISABLE_RECENT_SEARCH = "nop_disable_recent_search";
-    public static final String HIDE_GS = "nop_hide_gs";
+    public static final String HIDE_GS = "nop_hide_gs3";
     public static final String FORCE_OLD_CLIPS_VIEW = "nop_disable_new_clips";
     public static final String DEV = "nop_dev";
     public static final String DEV_INTERCEPTOR = "nop_dev_interceptor";
@@ -60,6 +61,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean isBadgesOn;
     private boolean isTimestampOn;
 
+    private boolean isNeedHideGPS = false;
+
     private PreferenceWrapper mWrapper;
 
 
@@ -71,6 +74,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
 
         mWrapper = new PreferenceWrapper(context);
         registerLocalPreferences();
+
+        isNeedHideGPS = !Helper.isGooglePlayServicesAvailable(context);
     }
 
     private void registerLocalPreferences() {
@@ -164,7 +169,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     }
 
     public boolean isHideGs() {
-        return getBoolean(HIDE_GS, false);
+        return getBoolean(HIDE_GS, isNeedHideGPS);
     }
 
     public boolean isDisableRecentWatching() {

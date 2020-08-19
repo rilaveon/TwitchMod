@@ -71,7 +71,7 @@ public interface SettingsPreferencesController {
         Interceptor( "nop_dev_interceptor", "mod_settings_interceptor", "mod_settings_interceptor_desc"),
         FfzBadges( "nop_badges", "mod_settings_badges", "mod_settings_badges_desc"),
         BypassChatBan( "nop_bypass_chat_ban", "mod_settings_bypass_chat_ban", "mod_settings_bypass_chat_ban_desc"),
-        HideGs( "nop_hide_gs", "mod_settings_hide_gs_error", "mod_settings_hide_gs_error_desc"),
+        HideGs( "nop_hide_gs3", "mod_settings_hide_gs_error", "mod_settings_hide_gs_error_desc"),
         ChatWidthScale( "nop_chat_width_scale", "mod_settings_landscape_chat_width", "mod_settings_landscape_chat_width_desc"),
         RedChatMention( "nop_chat_red_mention", "mod_settings_chat_red_mention", "mod_settings_chat_red_mention_desc"),
         DisableNewClips( "nop_disable_new_clips", "mod_settings_disable_new_clips", "mod_settings_disable_new_clips_desc");

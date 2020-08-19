@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.GooglePlayServicesUtilLight;
+
 import tv.twitch.android.api.parsers.PlayableModelParser;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.bridges.ResourcesManager;
@@ -24,6 +26,8 @@ import tv.twitch.android.settings.SettingsActivity;
 
 
 public class Helper {
+    private static int ConnectionResult_SUCCESS = 0;
+
     public static final Helper INSTANCE = new Helper();
 
     private int mCurrentChannel = 0;
@@ -146,5 +150,16 @@ public class Helper {
             channelID = 0;
 
         this.mCurrentChannel = channelID;
+    }
+
+    public static boolean isGooglePlayServicesAvailable(Context context) {
+        try {
+            int resCode = GooglePlayServicesUtilLight.isGooglePlayServicesAvailableOrg(context, GooglePlayServicesUtilLight.GOOGLE_PLAY_SERVICES_VERSION_CODE);
+            return resCode == ConnectionResult_SUCCESS;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return false;
     }
 }

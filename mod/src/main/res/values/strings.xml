@@ -60,8 +60,8 @@
     <string name="mod_settings_dev_mode">Developer mode</string>
     <string name="mod_settings_dev_mode_desc" translatable="false">This option should only be enable if you think you need it</string>
     <string name="mod_settings_interceptor">Enable interceptor</string>
-    <string name="mod_settings_hide_gs_error">Hide \'Google Play Services Error\' (for devices without Google Play Services)</string>
-    <string name="mod_settings_hide_gs_error_desc" translatable="false" />
+    <string name="mod_settings_hide_gs_error">Hide \'Google Play Services Error\'</string>
+    <string name="mod_settings_hide_gs_error_desc" translatable="false">for devices without Google Play Services</string>
     <string name="mod_settings_landscape_chat_width">Landscape chat width</string>
     <string name="mod_settings_landscape_chat_width_desc" translatable="false">% of the screen</string>
     <string name="mod_category_info">Info</string>
