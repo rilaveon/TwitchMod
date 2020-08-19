@@ -1,12 +1,12 @@
 package tv.twitch.android.mod.utils;
 
+
 import android.graphics.drawable.Drawable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.gif.GifDrawable;
-
 
 import java.util.List;
 
@@ -22,21 +22,21 @@ public class GifHelper {
             return;
 
         for (Object o : items)
-            recycleObject(o, true);
+            recycleObject(o);
     }
 
-    public static void recycleObject(Object item, boolean force) {
+    public static void recycleObject(Object item) {
         if (item == null)
             return;
 
         if (item instanceof IChatMessageItem) {
-            recycleGifsInText(((IChatMessageItem) item).getSpanned(), force);
+            recycleGifsInText(((IChatMessageItem) item).getSpanned());
         } else if (item instanceof TextView) {
-            recycleGifsInText(((TextView) item).getText(), force);
+            recycleGifsInText(((TextView) item).getText());
         }
     }
 
-    public static void recycleGifsInText(CharSequence sequence, boolean force) {
+    public static void recycleGifsInText(CharSequence sequence) {
         if (TextUtils.isEmpty(sequence))
             return;
 
@@ -58,16 +58,12 @@ public class GifHelper {
 
             Drawable gifDrawable = drawableContainer.getDrawable();
             if (gifDrawable instanceof GifDrawable) {
-                stopGifDrawable((GifDrawable) gifDrawable, force);
+                stopGifDrawable((GifDrawable) gifDrawable);
             }
         }
     }
 
-    private static void stopGifDrawable(GifDrawable drawable, boolean force) {
+    private static void stopGifDrawable(GifDrawable drawable) {
         drawable.stop();
-        if (force) {
-            drawable.setCallback(null);
-            drawable.recycle();
-        }
     }
 }

@@ -15,6 +15,8 @@ public class LiveChatSource {
 
     public final void addMessages(int i, List<? extends ChatLiveMessage> liveMessages /* ... */) {
         liveMessages = Hooks.hookLiveMessages(liveMessages, accountManager.getUsername()); // TODO: __HOOK_PARAM
+
+        /* ... */
     }
 
     public static void addSystemMessage$default(LiveChatSource liveChatSource, String str, boolean z, String str2, int i, Object obj) {
@@ -30,6 +32,5 @@ public class LiveChatSource {
         if (noticeEvents instanceof ChatNoticeEvents.SubscriptionNoticeEvent && !Hooks.isJumpSystemIgnore()) { // TODO: __JUMP_HOOK
             /* ... */
         }
-
     }
 }
