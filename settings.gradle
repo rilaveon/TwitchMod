@@ -1,3 +1,2 @@
-include ':downloader'
 include ':app', ':mod', ':libwrapper', ':twitch'
 rootProject.name='TwitchMod'
