@@ -3,13 +3,12 @@
     package="tv.twitch.android.app">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <application android:name="tv.twitch.android.mod.bridges.LoaderLS">
+    <application android:name="tv.twitch.android.mod.bridges.LoaderLS" android:theme="@style/Theme.AppCompat.Light">
         <activity android:name=".run.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="tv.twitch.android.mod.utils.DownloadService" />
     </application>
 </manifest>
