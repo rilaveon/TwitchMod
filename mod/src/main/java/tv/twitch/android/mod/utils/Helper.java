@@ -26,7 +26,7 @@ import tv.twitch.android.settings.SettingsActivity;
 
 
 public class Helper {
-    private static int ConnectionResult_SUCCESS = 0;
+    private final static int ConnectionResult_SUCCESS = 0;
 
     public static final Helper INSTANCE = new Helper();
 
@@ -68,7 +68,7 @@ public class Helper {
     }
 
     public static void downloadMP4File(final Context context, final String url, final String filename) {
-        PermissionsUtil.checkWritePermission(context, new PermissionsUtil.Result() {
+        PermissionsUtil.checkWritePermission(context, new PermissionsUtil.ResultCallback() {
             @Override
             public void onPermissionGranted() {
                 Uri uri = Uri.parse(url);

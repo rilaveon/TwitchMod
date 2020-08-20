@@ -18,7 +18,7 @@ public class PermissionsUtil {
     private static final String WRITE_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
-    public interface Result {
+    public interface ResultCallback {
         void onPermissionGranted();
 
         void onPermissionDenied();
@@ -26,7 +26,7 @@ public class PermissionsUtil {
         void onError();
     }
 
-    public static void checkWritePermission(Context context, final Result callback) {
+    public static void checkWritePermission(Context context, final ResultCallback callback) {
         Dexter.withContext(context)
                 .withPermission(WRITE_PERMISSION)
                 .withListener(new PermissionListener() {
