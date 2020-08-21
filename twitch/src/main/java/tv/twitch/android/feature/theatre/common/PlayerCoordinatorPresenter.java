@@ -1,6 +1,20 @@
 package tv.twitch.android.feature.theatre.common;
 
 
+import tv.twitch.android.shared.player.presenters.PlayerPresenter;
+
+
 public class PlayerCoordinatorPresenter {
-    public final void playWithCurrentModeAndQuality() {}
+    /* ... */
+
+    private PlayerPresenter playerPresenter;
+
+    /* ... */
+
+    private final void playWithCurrentModeAndQuality() {/* ... */}
+
+    public final void refreshStream() { // TODO: __INJECT_METHOD
+        playerPresenter.stop();
+        playWithCurrentModeAndQuality();
+    }
 }

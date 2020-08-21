@@ -6,4 +6,5 @@ import tv.twitch.android.shared.player.TwitchPlayerProvider;
 public interface PlayerPresenter {
     TwitchPlayerProvider getPlayerProvider();
 
+    void stop();
 }
