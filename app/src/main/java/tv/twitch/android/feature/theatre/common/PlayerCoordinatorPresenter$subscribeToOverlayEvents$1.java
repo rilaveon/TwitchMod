@@ -9,7 +9,7 @@ public class PlayerCoordinatorPresenter$subscribeToOverlayEvents$1 {
         /* ... */
 
         if (playerOverlayEvents instanceof PlayerOverlayEvents.Refresh) { // TODO: __INJECT_CODE
-            this$0.playWithCurrentModeAndQuality();
+            this$0.refreshStream();
         }
     }
 }
