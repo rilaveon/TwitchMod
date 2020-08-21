@@ -298,6 +298,14 @@ public class Hooks {
         return ChatUtil.fixUsernameColor(usernameColor, PreferenceManager.INSTANCE.isDarkThemeEnabled());
     }
 
+    public static int getFloatingChatQueueSize() {
+        return Integer.parseInt(PreferenceManager.INSTANCE.getFloatingChatQueueSize().getValue());
+    }
+
+    public static int getFloatingChatRefresh() {
+        return Integer.parseInt(PreferenceManager.INSTANCE.getFloatingChatRefresh().getValue());
+    }
+
     public static SpannedString hookBadges(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString badges) {
         if (!PreferenceManager.INSTANCE.isThirdPartyBadgesOn())
             return badges;

@@ -74,7 +74,9 @@ public interface SettingsPreferencesController {
         HideGs( "nop_hide_gs3", "mod_settings_hide_gs_error", "mod_settings_hide_gs_error_desc"),
         ChatWidthScale( "nop_chat_width_scale", "mod_settings_landscape_chat_width", "mod_settings_landscape_chat_width_desc"),
         RedChatMention( "nop_chat_red_mention", "mod_settings_chat_red_mention", "mod_settings_chat_red_mention_desc"),
-        DisableNewClips( "nop_disable_new_clips", "mod_settings_disable_new_clips", "mod_settings_disable_new_clips_desc");
+        DisableNewClips( "nop_disable_new_clips", "mod_settings_disable_new_clips", "mod_settings_disable_new_clips_desc"),
+        FloatingChatQueueSize("nop_floating_queue_size", "mod_settings_floating_queue", "mod_settings_floating_queue_desc"),
+        FloatingChatRefresh("nop_floating_refresh", "mod_settings_floating_refresh", "mod_settings_floating_refresh_desc");
 
         private final String mPreferenceKey;
         private final String mPreferenceTitle;

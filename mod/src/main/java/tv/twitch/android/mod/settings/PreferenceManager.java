@@ -8,6 +8,8 @@ import android.text.TextUtils;
 
 import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
+import tv.twitch.android.mod.models.settings.FloatingChatQueueSize;
+import tv.twitch.android.mod.models.settings.FloatingChatRefreshDelay;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
@@ -52,6 +54,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     public static final String DEV = "nop_dev";
     public static final String DEV_INTERCEPTOR = "nop_dev_interceptor";
     public static final String TWITCH_DARK_THEME = "dark_theme_enabled";
+    public static final String FLOATING_CHAT_QSIZE = "nop_floating_queue_size";
+    public static final String FLOATING_CHAT_REFRESH = "nop_floating_refresh";
 
 
     private boolean isDarkThemeEnabled;
@@ -86,6 +90,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         mWrapper.registerLocalPreference(ExoPlayerSpeed.DEFAULT);
         mWrapper.registerLocalPreference(MiniPlayerSize.DEFAULT);
         mWrapper.registerLocalPreference(ChatWidthPercent.DEFAULT);
+        this.mWrapper.registerLocalPreference(FloatingChatQueueSize.THREE);
+        this.mWrapper.registerLocalPreference(FloatingChatRefreshDelay.DEFAULT);
         mWrapper.registerPreferenceListener(this);
 
         isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME, false);
@@ -250,6 +256,14 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
 
     public MiniPlayerSize getMiniPlayerSize() {
         return (MiniPlayerSize) getLocalPreference(MINIPLAYER_SIZE, MiniPlayerSize.DEFAULT);
+    }
+
+    public FloatingChatRefreshDelay getFloatingChatRefresh() {
+        return (FloatingChatRefreshDelay) getLocalPreference(FLOATING_CHAT_REFRESH, FloatingChatRefreshDelay.DEFAULT);
+    }
+
+    public FloatingChatQueueSize getFloatingChatQueueSize() {
+        return (FloatingChatQueueSize) getLocalPreference(FLOATING_CHAT_QSIZE, FloatingChatQueueSize.THREE);
     }
 
     public Gifs getGifsStrategy() {

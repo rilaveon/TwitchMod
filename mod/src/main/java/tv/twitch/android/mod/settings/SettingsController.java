@@ -14,6 +14,8 @@ import tv.twitch.android.mod.BuildConfig;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
+import tv.twitch.android.mod.models.settings.FloatingChatQueueSize;
+import tv.twitch.android.mod.models.settings.FloatingChatRefreshDelay;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
@@ -161,10 +163,14 @@ public class SettingsController {
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.EmoteSize, context, resourcesManager, EmoteSize.values(), preferenceManager.getEmoteSize()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_category")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, preferenceManager.isFloatingChatEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, preferenceManager.isMessageTimestampOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RedChatMention, preferenceManager.isRedMentionOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, preferenceManager.isBypassChatBan()));
+
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_floating_chat")));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, preferenceManager.isFloatingChatEnabled()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FloatingChatQueueSize, context, resourcesManager, FloatingChatQueueSize.values(), preferenceManager.getFloatingChatQueueSize()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FloatingChatRefresh, context, resourcesManager, FloatingChatRefreshDelay.values(), preferenceManager.getFloatingChatRefresh()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_player_category")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, preferenceManager.isAdblockEnabled()));

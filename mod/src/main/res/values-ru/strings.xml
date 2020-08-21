@@ -5,7 +5,8 @@
     <string name="mod_settings_gifs">Гифки</string>
     <string name="mod_settings_emote_size">Исходный размер смайлов</string>
     <string name="mod_category_settings_chat_category">Чат</string>
-    <string name="mod_settings_floating_chat">Плавающий чат</string>
+    <string name="mod_settings_floating_queue">Размер очереди сообщений</string>
+    <string name="mod_settings_floating_chat">Включить</string>
     <string name="mod_settings_message_timestamp">Временные метки</string>
     <string name="mod_settings_bypass_chat_ban">Обход блокировки в чате</string>
     <string name="mod_settings_badges">FFZ значки</string>
@@ -46,4 +47,6 @@
     <string name="mod_category_settings_chat_bttv">BetterTTV/FFZ</string>
     <string name="mod_settings_landscape_chat_width">Ширина чата</string>
     <string name="mod_settings_disable_new_clips">Старый интерфейс клипов</string>
+    <string name="mod_category_settings_floating_chat">Плавающий чат</string>
+    <string name="mod_settings_floating_refresh">Обновление</string>
 </resources>
