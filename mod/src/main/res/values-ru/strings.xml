@@ -49,4 +49,5 @@
     <string name="mod_settings_disable_new_clips">Старый интерфейс клипов</string>
     <string name="mod_category_settings_floating_chat">Плавающий чат</string>
     <string name="mod_settings_floating_refresh">Обновление</string>
+    <string name="mod_settings_msg_delete">Стиль удаленных сообщений</string>
 </resources>

@@ -8,16 +8,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.mvp.viewdelegate.EventDispatcher;
 import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 import tv.twitch.android.shared.chat.adapter.SystemMessageType;
+import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.util.ChatItemClickEvent;
+import tv.twitch.android.shared.chat.util.ChatUtil;
 
 
 public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEMENT
     private boolean hasModAccess;
     private Spanned message;
+    private PublishSubject<ChatMessageClickedEvents> messageClickSubject;
+    private Context context;
+
 
     public String rawMessage;
 
@@ -27,7 +33,10 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
     }
 
     public void markAsDeleted() {
-        this.hasModAccess = true; // TODO: __INJECT_CODE
+        ChatUtil.Companion companion = ChatUtil.Companion;
+        /* ... */
+
+        this.message = Hooks.hookMarkAsDeleted(companion, this.message, this.context, this.messageClickSubject, this.hasModAccess); // TODO: __INJECT_CODE
     }
 
     @Override

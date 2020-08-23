@@ -10,6 +10,7 @@ import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
 import tv.twitch.android.mod.models.settings.FloatingChatQueueSize;
 import tv.twitch.android.mod.models.settings.FloatingChatRefreshDelay;
+import tv.twitch.android.mod.models.settings.MsgDelete;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
@@ -56,6 +57,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     public static final String TWITCH_DARK_THEME = "dark_theme_enabled";
     public static final String FLOATING_CHAT_QSIZE = "nop_floating_queue_size";
     public static final String FLOATING_CHAT_REFRESH = "nop_floating_refresh";
+    public static final String MSG_DELETE = "nop_msg_delete";
 
 
     private boolean isDarkThemeEnabled;
@@ -92,6 +94,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         mWrapper.registerLocalPreference(ChatWidthPercent.DEFAULT);
         this.mWrapper.registerLocalPreference(FloatingChatQueueSize.THREE);
         this.mWrapper.registerLocalPreference(FloatingChatRefreshDelay.DEFAULT);
+        this.mWrapper.registerLocalPreference(MsgDelete.DEFAULT);
         mWrapper.registerPreferenceListener(this);
 
         isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME, false);
@@ -264,6 +267,10 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
 
     public FloatingChatQueueSize getFloatingChatQueueSize() {
         return (FloatingChatQueueSize) getLocalPreference(FLOATING_CHAT_QSIZE, FloatingChatQueueSize.THREE);
+    }
+
+    public MsgDelete getMsgDelete() {
+        return (MsgDelete) getLocalPreference(MSG_DELETE, MsgDelete.DEFAULT);
     }
 
     public Gifs getGifsStrategy() {

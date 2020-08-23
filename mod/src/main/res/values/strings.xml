@@ -82,5 +82,7 @@
     <string name="mod_settings_disable_new_clips">Force old clips view</string>
     <string name="mod_settings_disable_new_clips_desc" translatable="false" />
     <string name="mod_settings_floating_queue">Queue size</string>
+    <string name="mod_settings_msg_delete">Deleted message style</string>
     <string name="mod_settings_floating_queue_desc" translatable="false" />
+    <string name="mod_settings_msg_delete_desc" translatable="false" />
 </resources>

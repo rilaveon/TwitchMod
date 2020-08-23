@@ -14,10 +14,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.badges.BadgeManager;
 import tv.twitch.android.mod.models.Badge;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
+import tv.twitch.android.mod.models.settings.MsgDelete;
+import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.events.ChannelSetEvent;
 import tv.twitch.android.shared.chat.ChatMessageInterface;
 import tv.twitch.android.shared.emotes.emotepicker.models.EmoteUiModel;
@@ -304,6 +307,26 @@ public class Hooks {
 
     public static int getFloatingChatRefresh() {
         return Integer.parseInt(PreferenceManager.INSTANCE.getFloatingChatRefresh().getValue());
+    }
+
+    public static Spanned hookMarkAsDeleted(tv.twitch.android.shared.chat.util.ChatUtil.Companion companion, Spanned msg, Context context, PublishSubject<ChatMessageClickedEvents> publishSubject, boolean hasModAccess) {
+        if (TextUtils.isEmpty(msg)) {
+            Logger.error("empty msg");
+            return msg;
+        }
+
+        MsgDelete st = PreferenceManager.INSTANCE.getMsgDelete();
+        switch (st) {
+            case MOD:
+                return companion.createDeletedSpanFromChatMessageSpan(msg, context, publishSubject, true);
+            case DEFAULT:
+                return companion.createDeletedSpanFromChatMessageSpan(msg, context, publishSubject, hasModAccess);
+            case STRIKETHROUGH:
+                return ChatUtil.tryAddStrikethrough(msg);
+            default:
+                Logger.debug("default state");
+                return msg;
+        }
     }
 
     public static SpannedString hookBadges(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString badges) {

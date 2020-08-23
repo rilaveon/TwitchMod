@@ -16,6 +16,7 @@ import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.models.settings.ChatWidthPercent;
 import tv.twitch.android.mod.models.settings.FloatingChatQueueSize;
 import tv.twitch.android.mod.models.settings.FloatingChatRefreshDelay;
+import tv.twitch.android.mod.models.settings.MsgDelete;
 import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
@@ -166,6 +167,7 @@ public class SettingsController {
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, preferenceManager.isMessageTimestampOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RedChatMention, preferenceManager.isRedMentionOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, preferenceManager.isBypassChatBan()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MsgDelete, context, resourcesManager, MsgDelete.values(), preferenceManager.getMsgDelete()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_floating_chat")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, preferenceManager.isFloatingChatEnabled()));

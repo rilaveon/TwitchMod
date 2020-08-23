@@ -9,6 +9,7 @@ import android.text.SpannedString;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StrikethroughSpan;
 import android.util.LruCache;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +26,7 @@ import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.settings.EmoteSize;
 import tv.twitch.android.models.chat.MessageToken;
 import tv.twitch.android.shared.chat.ChatMessageInterface;
+import tv.twitch.android.shared.chat.util.ClickableUsernameSpan;
 
 
 public class ChatUtil {
@@ -65,6 +67,42 @@ public class ChatUtil {
             return Color.HSVToColor(hsv);
         }
     };
+
+    public static Spanned tryAddStrikethrough(Spanned msg) {
+        try {
+            if (TextUtils.isEmpty(msg))
+                return msg;
+
+            StrikethroughSpan[] strikethroughSpanArr = msg.getSpans(0, msg.length(), StrikethroughSpan.class);
+            if (strikethroughSpanArr != null && strikethroughSpanArr.length > 0)
+                return msg;
+
+            ClickableUsernameSpan[] clickableUsernameSpanArr = (ClickableUsernameSpan[]) msg.getSpans(0, msg.length(), ClickableUsernameSpan.class);
+            int usernameSpannedEnd = 0;
+            if (clickableUsernameSpanArr.length != 0) {
+                usernameSpannedEnd = msg.getSpanEnd(clickableUsernameSpanArr[0]);
+                int i = usernameSpannedEnd + 2;
+                if (i < msg.length()) {
+                    if (msg.subSequence(usernameSpannedEnd, i).toString().equalsIgnoreCase(": ")) {
+                        usernameSpannedEnd = i;
+                    }
+                }
+            }
+
+            SpannableStringBuilder msgBuilder = new SpannableStringBuilder(msg, 0, usernameSpannedEnd);
+
+            SpannableStringBuilder msgTextBuilder = new SpannableStringBuilder(msg, usernameSpannedEnd, msg.length());
+            msgTextBuilder.setSpan(new StrikethroughSpan(), 0, msgTextBuilder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            msgBuilder.append(msgTextBuilder);
+
+            return SpannedString.valueOf(msgBuilder);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return msg;
+    }
 
     public static SpannedString tryAddBadges(SpannedString messageBadgeSpan, IChatMessageFactory factory, Collection<Badge> badges) {
         if (badges == null || badges.isEmpty())
