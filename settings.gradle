@@ -1,2 +1,3 @@
+include ':models'
 include ':app', ':mod', ':libwrapper', ':twitch'
 rootProject.name='TwitchMod'

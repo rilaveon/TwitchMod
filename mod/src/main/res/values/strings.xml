@@ -6,7 +6,7 @@
     <string name="mod_settings_bttv_widget">Emote menu</string>
     <string name="mod_settings_bttv_widget_desc" translatable="false">Adds extra BetterTTV/FFZ emoticons to emote picker</string>
     <string name="mod_settings_gifs">GIFS</string>
-    <string name="mod_settings_gifs_desc" translatable="false">Change the mode of how GIF emoticons are showing up</string>
+    <string name="mod_settings_gifs_desc" translatable="false">Change the mode of how GIF emoticons are showing up. </string>
     <string name="mod_settings_emote_size">Source emote size</string>
     <string name="mod_settings_emote_size_desc" translatable="false" />
     <string name="mod_category_settings_chat_category">Chat</string>
@@ -43,8 +43,6 @@
     <string name="mod_category_view">View</string>
     <string name="mod_settings_old_emote_picker">Use old emote picker</string>
     <string name="mod_settings_old_emote_picker_desc" translatable="false" />
-    <string name="mod_player_settings_follow_view">Use old follow button</string>
-    <string name="mod_player_settings_follow_view_desc" translatable="false">Old but gold</string>
     <string name="mod_settings_disable_recommendations">Hide «Recommended Streams»</string>
     <string name="mod_settings_disable_recommendations_desc" translatable="false" />
     <string name="mod_settings_disable_resume_watching">Hide «Recent Watching»</string>
@@ -74,10 +72,11 @@
     <string name="restart_dialog_text">Refresh and restart?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="mod_downloading">Downloading %1$s…</string>
     <string name="mod_settings_floating_refresh">Refresh</string>
     <string name="mod_settings_floating_refresh_desc" translatable="false"/>
     <string name="mod_settings_interceptor_desc" translatable="false">Enable for debugging requests</string>
-    <string name="mod_settings_chat_red_mention">Red mention</string>
+    <string name="mod_settings_chat_red_mention">Highlighting mentions</string>
     <string name="mod_settings_chat_red_mention_desc" translatable="false" >Highlight messages that mention you</string>
     <string name="mod_settings_disable_new_clips">Force old clips view</string>
     <string name="mod_settings_disable_new_clips_desc" translatable="false" />
@@ -85,4 +84,6 @@
     <string name="mod_settings_msg_delete">Deleted message style</string>
     <string name="mod_settings_floating_queue_desc" translatable="false" />
     <string name="mod_settings_msg_delete_desc" translatable="false" />
+    <string name="mod_settings_message_history">Load message history</string>
+    <string name="mod_settings_message_history_desc" translatable="false">API https://recent-messages.robotty.de</string>
 </resources>

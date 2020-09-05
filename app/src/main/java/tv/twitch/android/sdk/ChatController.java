@@ -8,6 +8,8 @@ import tv.twitch.chat.ChatEmoticonSet;
 public class ChatController {
     public ChatEmoticonSet[] mEmoticonSets = null;
 
+    /* ... */
+
     public ChatEmoticonSet[] getEmoticonSets() { // TODO: __REPLACE_METHOD
         return hookSets();
     }
@@ -16,4 +18,6 @@ public class ChatController {
     public ChatEmoticonSet[] hookSets() { // TODO: __INJECT_METHOD
         return Hooks.hookChatEmoticonSet(this.mEmoticonSets);
     }
+
+    /* ... */
 }

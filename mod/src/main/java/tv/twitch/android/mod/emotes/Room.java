@@ -24,7 +24,7 @@ class Room implements BttvChannelFetcher.Callback, FfzChannelFetcher.Callback {
         ffzChannelFetcher = new FfzChannelFetcher(channelId, this);
     }
 
-    public synchronized void requestEmotes() {
+    public synchronized void fetchEmotes() {
         bttvChannelFetcher.fetch();
         ffzChannelFetcher.fetch();
     }

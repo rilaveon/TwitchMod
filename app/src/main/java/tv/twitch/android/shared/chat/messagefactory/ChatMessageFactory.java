@@ -20,7 +20,9 @@ import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPLEMENT
     private TwitchAccountManager accountManager;
 
-    private final CharSequence imageSpannable(String str, MediaSpan$Type type, String str2, UrlImageClickableProvider urlImageClickableProvider, boolean z) {
+    /* ... */
+
+    private final CharSequence imageSpannable(String str, MediaSpan$Type mediaSpan$Type, String str2, UrlImageClickableProvider urlImageClickableProvider, boolean z) {
         return null;
     }
 
@@ -39,7 +41,9 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
             SpannedString generateBadges = new SpannedString("LULW");
             parseChatMessageTokens$default = Hooks.hookChatMessage(this, chatMessageInterface, parseChatMessageTokens$default, channelId, accountManager); // TODO: __HOOK
             generateBadges = Hooks.hookBadges(this, chatMessageInterface, generateBadges); // TODO: __HOOK
+
             /* ... */
+
             return null;
         } catch (Throwable th) {
             th.printStackTrace();
@@ -48,10 +52,7 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
         }
     }
 
-    static CharSequence imageSpannable$default(ChatMessageFactory chatMessageFactory, String str, MediaSpan$Type mediaSpan$Type, String str2, UrlImageClickableProvider urlImageClickableProvider, boolean z, int i, Object obj) {
-        return null;
-    }
-
+    /* ... */
 
     @Override
     public CharSequence getSpannedEmote(String url, String emoteText) { // TODO: __INJECT_METHOD
@@ -60,6 +61,6 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
 
     @Override
     public CharSequence getSpannedBadge(String url, String badgeName) { // TODO: __INJECT_METHOD
-        return imageSpannable$default(this, url, MediaSpan$Type.Badge, badgeName, null, true, 8, null);
+        return imageSpannable(url, MediaSpan$Type.Badge, badgeName, null, true);
     }
 }

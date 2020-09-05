@@ -24,19 +24,19 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
     private PublishSubject<ChatMessageClickedEvents> messageClickSubject;
     private Context context;
 
-
     public String rawMessage;
 
+    /* ... */
 
     public MessageRecyclerItem(Context context2, String str, int i, String str2, String str3, int i2, Spanned message, SystemMessageType systemMessageType, float f, int i3, float f2, boolean z, boolean z2, String str4, EventDispatcher<ChatItemClickEvent> eventDispatcher) {
-        message = Hooks.addTimestampToMessage(message); // TODO: __HOOK_PARAM
+        message = Hooks.addTimestampToMessage(message, i); // TODO: __HOOK_PARAM
     }
 
     public void markAsDeleted() {
         ChatUtil.Companion companion = ChatUtil.Companion;
         /* ... */
 
-        this.message = Hooks.hookMarkAsDeleted(companion, this.message, this.context, this.messageClickSubject, this.hasModAccess); // TODO: __INJECT_CODE
+        this.message = Hooks.hookMarkAsDeleted(companion, this.message, this.context, this.messageClickSubject, this.hasModAccess); // TODO: __REPLACE_CODE
     }
 
     @Override
@@ -55,11 +55,15 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
 
         @Override
         public Spanned getSpanned() { // TODO: __INJECT_METHOD
-            if (getMessageTextView() != null)
-                return (Spanned) getMessageTextView().getText();
+            TextView textView = getMessageTextView();
+            if (textView != null)
+                return (Spanned) textView.getText();
 
             return null;
         }
+
+        /* ... */
     }
 
+    /* ... */
 }

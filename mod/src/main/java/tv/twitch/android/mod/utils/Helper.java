@@ -14,7 +14,6 @@ import android.os.Process;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-
 import com.google.android.gms.common.GooglePlayServicesUtilLight;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
@@ -82,17 +81,17 @@ public class Helper {
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + filename + ".mp4");
 
                 downloadManager.enqueue(request);
-                Helper.showToast("Downloading " + filename + "...");
+                Helper.showToast(String.format(ResourcesManager.INSTANCE.getString("mod_downloading"), filename));
             }
 
             @Override
             public void onPermissionDenied() {
-                Helper.showToast("No access");
+                Helper.showToast("onPermissionDenied");
             }
 
             @Override
             public void onError() {
-                Helper.showToast("error");
+                Helper.showToast("onError");
             }
         });
     }
@@ -115,8 +114,7 @@ public class Helper {
     }
 
     public static void showToast(String message) {
-        Context context = LoaderLS.getInstance().getApplicationContext();
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(LoaderLS.getInstance().getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
     public static boolean isOnStackTrace(String clazz) {
@@ -125,14 +123,14 @@ public class Helper {
             return false;
         }
 
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            if (element == null)
+        for (StackTraceElement stackTraceElement : Thread.currentThread().getStackTrace()) {
+            if (stackTraceElement == null)
                 continue;
 
-            if (TextUtils.isEmpty(element.getClassName()))
+            if (TextUtils.isEmpty(stackTraceElement.getClassName()))
                 continue;
 
-            if (!element.getClassName().equalsIgnoreCase(clazz))
+            if (!stackTraceElement.getClassName().equalsIgnoreCase(clazz))
                 continue;
 
             return true;

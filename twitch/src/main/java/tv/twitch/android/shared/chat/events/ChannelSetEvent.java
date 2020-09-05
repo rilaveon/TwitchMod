@@ -5,7 +5,11 @@ import tv.twitch.android.models.channel.ChannelInfo;
 
 
 public class ChannelSetEvent {
+    /* ... */
+
     public final ChannelInfo getChannelInfo() {
         return null;
     }
+
+    /* ... */
 }

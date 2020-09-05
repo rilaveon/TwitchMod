@@ -15,7 +15,11 @@ import tv.twitch.android.shared.emotes.models.EmotePickerEmoteModel;
 public class EmotePickerPresenter {
     public EmotePickerAdapterBinder adapterBinder;
 
+    /* ... */
+
     public static abstract class State implements ViewDelegateState {
+        /* ... */
+
         public static final class Loaded extends State {
             /* ... */
 
@@ -25,14 +29,21 @@ public class EmotePickerPresenter {
 
             /* ... */
         }
+
+        /* ... */
     }
 
     public static abstract class UpdateEvent {
+        /* ... */
+
         public static final class EmoteSectionSelected extends UpdateEvent  {/* ... */}
+
+        /* ... */
     }
 
     public final State.Loaded createLoadedState(State.Loaded loaded, UpdateEvent updateEvent) {
         /* ... */
+
         if (updateEvent instanceof UpdateEvent.EmoteSectionSelected) {
             /* ... */
             int i;
@@ -44,12 +55,14 @@ public class EmotePickerPresenter {
 
             /* ... */
         }
+
         /* ... */
 
         return null;
     }
 
-    private int calcBttvPosition() { // TODO: __INJECT_CODE
+    // FIXME: need better calculation
+    private int calcBttvPosition() { // TODO: __INJECT_METHOD
         if (adapterBinder == null)
             return 0;
 
@@ -75,10 +88,19 @@ public class EmotePickerPresenter {
         return 0;
     }
 
-
     public static abstract class ClickedEmote {
+        /* ... */
+
         public static final class Unlocked extends ClickedEmote {
-            public Unlocked(EmotePickerEmoteModel emotePickerEmoteModel, EmoteMessageInput emoteMessageInput, EmotePickerTrackingMetadata emotePickerTrackingMetadata, List<Unlocked> list) {}
+            /* ... */
+
+            public Unlocked(EmotePickerEmoteModel emotePickerEmoteModel, EmoteMessageInput emoteMessageInput, EmotePickerTrackingMetadata emotePickerTrackingMetadata, List<Unlocked> list) {/* ... */}
+
+            /* ... */
         }
+
+        /* ... */
     }
+
+    /* ... */
 }

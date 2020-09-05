@@ -5,7 +5,13 @@ import android.app.Application;
 
 
 public class TwitchApplication extends Application {
+    /* ... */
+
     public void onCreate() {
         super.onCreate();
+
+        /* ... */
     }
+
+    /* ... */
 }

@@ -12,6 +12,9 @@ import android.graphics.drawable.Drawable;
  * https://bumptech.github.io/glide/javadocs/440/com/bumptech/glide/load/resource/gif/GifDrawable.html
  */
 public class GifDrawable extends Drawable {
+    private boolean isStarted;
+
+    /* ... */
 
     @Override
     public void draw(Canvas canvas) {/* ... */}
@@ -31,5 +34,7 @@ public class GifDrawable extends Drawable {
 
     public void stop() {/* ... */}
 
-    public void recycle() {/* ... */}
+    public boolean isStarted() { // TODO: __INJECT_METHOD
+        return isStarted;
+    }
 }

@@ -23,7 +23,6 @@
     <string name="mod_settings_filtering_level">Фильтр сообщений</string>
     <string name="mod_settings_filtering_ignore_system">Скрыть системные сообщения</string>
     <string name="mod_category_view">Внешний вид</string>
-    <string name="mod_player_settings_follow_view">Старый интерфейс отслеживания</string>
     <string name="mod_settings_old_emote_picker">Старый интерфейс меню смайлов</string>
     <string name="mod_settings_disable_recommendations">Скрыть «Рекомендуемые каналы»</string>
     <string name="mod_settings_disable_resume_watching">Скрыть «Продолжить просмотр»</string>
@@ -50,4 +49,7 @@
     <string name="mod_category_settings_floating_chat">Плавающий чат</string>
     <string name="mod_settings_floating_refresh">Обновление</string>
     <string name="mod_settings_msg_delete">Стиль удаленных сообщений</string>
+    <string name="mod_downloading">Загрузка %1$s…</string>
+    <string name="mod_settings_chat_red_mention">Выделять упоминания</string>
+    <string name="mod_settings_message_history">История чата</string>
 </resources>

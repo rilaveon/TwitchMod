@@ -6,7 +6,13 @@ import android.widget.FrameLayout;
 
 
 public class InteractiveRowView extends FrameLayout {
+    /* ... */
+
     public InteractiveRowView(Context context) {
         super(context);
+
+        /* ... */
     }
+
+    /* ... */
 }

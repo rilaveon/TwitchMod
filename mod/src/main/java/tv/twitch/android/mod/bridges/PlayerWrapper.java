@@ -95,10 +95,10 @@ public class PlayerWrapper extends RelativeLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        final int action = event.getAction();
-
         if (!mSwipper.isEnabled())
             return false;
+
+        final int action = event.getAction();
 
         switch (action) {
             case MotionEvent.ACTION_UP:

@@ -17,7 +17,7 @@ import tv.twitch.android.shared.emotes.models.EmoteMessageInput;
 import tv.twitch.android.mod.bridges.models.ChatEmoticonUrl;
 import tv.twitch.android.mod.bridges.models.EmoteUiModelWithUrl;
 import tv.twitch.android.mod.models.Emote;
-import tv.twitch.android.mod.models.settings.EmoteSize;
+import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.shared.emotes.models.EmotePickerEmoteModel;
 import tv.twitch.chat.ChatEmoticon;
 import tv.twitch.chat.ChatEmoticonSet;
@@ -64,7 +64,7 @@ public class ChatFactory {
 
         int i = 0;
         for (Emote emote : emoteList) {
-            chatEmoticons[i++] = emote.getChatEmoticon();
+            chatEmoticons[i++] = ChatFactory.getEmoticon(emote);
         }
 
         return chatEmoticons;
@@ -80,7 +80,7 @@ public class ChatFactory {
     }
 
     @NonNull
-    public static EmoteUiSet getEmoteSetUi(Collection<Emote> emoteList, Integer emoteSetId) {
+    public static EmoteUiSet getEmoteUiSet(Collection<Emote> emoteList, Integer emoteSetId) {
         EmoteHeaderUiModel header = new EmoteHeaderUiModel.EmoteHeaderStringResUiModel(emoteSetId, true, EmotePickerSection.BTTV, false);
         List<EmoteUiModel> emotes = new ArrayList<>();
         for (Emote emote : emoteList) {

@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class ResourcesManager {
     public static final ResourcesManager INSTANCE = new ResourcesManager();
 
-    private final HashMap<IdType, PubCache> mMap = new HashMap<>();
+    private final HashMap<IdType, PubCache> mCaches = new HashMap<>();
 
 
     private enum IdType {
@@ -32,7 +32,7 @@ public class ResourcesManager {
 
     private ResourcesManager () {
         for (IdType idType : IdType.values()) {
-            mMap.put(idType, new PubCache(200, idType.getType()));
+            mCaches.put(idType, new PubCache(200, idType.getType()));
         }
     }
 
@@ -53,7 +53,7 @@ public class ResourcesManager {
     }
 
     public Integer getId(String name) {
-        PubCache cache = mMap.get(IdType.ID);
+        PubCache cache = mCaches.get(IdType.ID);
         if (cache != null)
             return cache.get(name);
 
@@ -61,7 +61,7 @@ public class ResourcesManager {
     }
 
     public Integer getLayoutId(String name) {
-        PubCache cache = mMap.get(IdType.LAYOUT);
+        PubCache cache = mCaches.get(IdType.LAYOUT);
         if (cache != null)
             return cache.get(name);
 
@@ -69,19 +69,23 @@ public class ResourcesManager {
     }
 
     public Integer getStringId(String name) {
-        PubCache cache = mMap.get(IdType.STRING);
+        PubCache cache = mCaches.get(IdType.STRING);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
+    public String getStringById(Integer id) {
+        return LoaderLS.getInstance().getResources().getString(id);
+    }
+
     public String getString(String name) {
-        PubCache cache = mMap.get(IdType.STRING);
+        PubCache cache = mCaches.get(IdType.STRING);
 
         int resId = cache != null ? cache.get(name) : 0;
         if (resId == 0) {
-            return "RESOURCE ID NOT FOUND: '" + name + "'";
+            return "STRING RESOURCE NOT FOUND: '" + name + "'";
         } else {
             return LoaderLS.getInstance().getResources().getString(resId);
         }

@@ -17,7 +17,7 @@ public abstract class BaseSettingsPresenter {
 
     protected abstract SettingsPreferencesController getPrefController();
 
-    public final FragmentActivity getActivity() {
+    public final FragmentActivity getActivity() { // TODO: __CHANGE_ACCESS
         return null;
     }
 

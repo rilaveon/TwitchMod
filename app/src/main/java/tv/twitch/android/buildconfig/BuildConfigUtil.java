@@ -7,6 +7,7 @@ import tv.twitch.android.mod.bridges.Hooks;
 public class BuildConfigUtil {
     public static final BuildConfigUtil INSTANCE = new BuildConfigUtil();
 
+    /* ... */
 
     public final boolean isAlpha() { // TODO: __REPLACE_METHOD
         return Hooks.isDevModeOn();
@@ -19,4 +20,6 @@ public class BuildConfigUtil {
     public final boolean shouldShowDebugOptions(boolean z) { // TODO: __REPLACE_METHOD
         return Hooks.isDevModeOn();
     }
+
+    /* ... */
 }

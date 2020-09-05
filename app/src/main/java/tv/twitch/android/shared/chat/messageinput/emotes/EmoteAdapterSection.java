@@ -9,6 +9,7 @@ import tv.twitch.android.mod.bridges.Hooks;
 public class EmoteAdapterSection {
     private String emoteSetId = "";
 
+    /* ... */
 
     private final String constructHeaderFromEmotes() {
         return null;
@@ -22,4 +23,6 @@ public class EmoteAdapterSection {
 
         /* ... */
     }
+
+    /* ... */
 }

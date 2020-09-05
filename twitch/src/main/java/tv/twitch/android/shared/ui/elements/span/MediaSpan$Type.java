@@ -7,6 +7,7 @@ public enum MediaSpan$Type {
     Badge(18.0f),
     Reward(18.0f);
 
-
     MediaSpan$Type(float size) {/* ... */}
+
+    /* ... */
 }

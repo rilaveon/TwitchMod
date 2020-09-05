@@ -6,6 +6,8 @@ import tv.twitch.android.mod.bridges.Hooks;
 
 
 public class OkHttpClientFactory {
+    /* ... */
+
     public OkHttpClientFactory(Object cookieInterceptor, Object apiRequestInterceptor, Object userAgentInterceptor) {
         /* ... */
 
@@ -15,4 +17,6 @@ public class OkHttpClientFactory {
 
         /* ... */
     }
+
+    /* ... */
 }

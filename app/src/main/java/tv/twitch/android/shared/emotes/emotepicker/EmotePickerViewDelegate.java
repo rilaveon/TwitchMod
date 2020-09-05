@@ -13,7 +13,11 @@ import tv.twitch.android.shared.emotes.emotepicker.models.EmotePickerSection;
 public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter.State, EmotePickerViewDelegate.Event> {
     private final ImageView bttvEmoteButton = findView(ResourcesManager.INSTANCE.getId("bttv_emote_button")); // TODO: __INJECT_FIELD
 
+    /* ... */
+
     public static abstract class Event implements ViewDelegateEvent {
+        /* ... */
+
         public static final class EmoteSectionSelectedEvent extends Event  {
             /* ... */
 
@@ -21,6 +25,8 @@ public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter
 
             /* ... */
         }
+
+        /* ... */
     }
 
 
@@ -51,4 +57,6 @@ public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter
     private final void setBttvSelected(EmotePickerPresenter.State.Loaded state) { // TODO: __INJECT_METHOD
         this.bttvEmoteButton.setSelected(state.getSelectedEmotePickerSection() == EmotePickerSection.BTTV);
     }
+
+    /* ... */
 }

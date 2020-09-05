@@ -2,7 +2,6 @@ package tv.twitch.android.mod.bridges;
 
 
 import android.content.Context;
-import android.os.Parcel;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
@@ -17,9 +16,10 @@ import java.util.List;
 import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.badges.BadgeManager;
+import tv.twitch.android.mod.bridges.interfaces.ILiveChatSource;
 import tv.twitch.android.mod.models.Badge;
-import tv.twitch.android.mod.models.settings.ChatWidthPercent;
-import tv.twitch.android.mod.models.settings.MsgDelete;
+import tv.twitch.android.mod.models.preferences.ChatWidthScale;
+import tv.twitch.android.mod.models.preferences.MsgDelete;
 import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.events.ChannelSetEvent;
 import tv.twitch.android.shared.chat.ChatMessageInterface;
@@ -32,9 +32,9 @@ import tv.twitch.android.mod.bridges.models.EmoteSet;
 import tv.twitch.android.mod.bridges.models.EmoteUiModelWithUrl;
 import tv.twitch.android.mod.emotes.EmoteManager;
 import tv.twitch.android.mod.models.Emote;
-import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
-import tv.twitch.android.mod.models.settings.Gifs;
-import tv.twitch.android.mod.models.settings.PlayerImpl;
+import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
+import tv.twitch.android.mod.models.preferences.Gifs;
+import tv.twitch.android.mod.models.preferences.PlayerImpl;
 import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.mod.utils.ChatMesssageFilteringUtil;
 import tv.twitch.android.mod.utils.ChatUtil;
@@ -53,9 +53,6 @@ public class Hooks {
 
 
     public final static String hookSetName(String org, String setId) {
-        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
-            return org;
-
         EmoteSet set = EmoteSet.findById(setId);
         if (set != null)
             return set.getTitle();
@@ -86,7 +83,7 @@ public class Hooks {
             case FLOATING_CHAT:
                 return PreferenceManager.INSTANCE.isFloatingChatEnabled();
             case NEW_EMOTE_PICKER:
-                return !PreferenceManager.INSTANCE.isOldEmotePicker();
+                return !PreferenceManager.INSTANCE.isForceOldEmotePicker();
         }
 
         return org;
@@ -95,16 +92,18 @@ public class Hooks {
     public final static PlaybackParameters hookVodPlayerStandaloneMediaClockInit() {
         if (Helper.isOnStackTrace(VOD_PLAYER_PRESENTER_CLASS)) {
             PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
-            float speed = Float.parseFloat(preferenceManager.getExoplayerSpeed().getValue());
+            float speed = Float.parseFloat(preferenceManager.getExoplayerSpeed());
             return new PlaybackParameters(speed);
         }
 
         return PlaybackParameters.DEFAULT;
     }
 
-
-    public final static Spanned addTimestampToMessage(Spanned message) {
+    public final static Spanned addTimestampToMessage(Spanned message, int userId) {
         if (!PreferenceManager.INSTANCE.isMessageTimestampOn())
+            return message;
+
+        if (userId <= 0)
             return message;
 
         return ChatUtil.addTimestamp(message, new Date());
@@ -114,7 +113,7 @@ public class Hooks {
         if (orgSet == null)
             return null;
 
-        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
+        if (!PreferenceManager.INSTANCE.isBttvOn())
             return orgSet;
 
         final int currentChannel = Helper.INSTANCE.getCurrentChannel();
@@ -140,42 +139,12 @@ public class Hooks {
         EmoteManager.INSTANCE.requestRoomEmotes(channelInfo.getId());
     }
 
-    public final static void requestEmotes(final PlayableModelParser playableModelParser, final Playable playable) {
-        final int channelId = Helper.getChannelId(playableModelParser, playable);
-        requestEmotes(new ChannelInfo() {
-            @Override
-            public String getDisplayName() {
-                return null;
-            }
+    public final static void requestEmotes(final PlayableModelParser playableModelParser, Playable playable) {
+        if (!PreferenceManager.INSTANCE.isBttvOn())
+            return;
 
-            @Override
-            public String getGame() {
-                return null;
-            }
-
-            @Override
-            public int getId() {
-                return channelId;
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public boolean isPartner() {
-                return false;
-            }
-
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel dest, int flags) {}
-        });
+        EmoteManager.INSTANCE.fetchGlobalEmotes();
+        EmoteManager.INSTANCE.requestRoomEmotes(Helper.getChannelId(playableModelParser, playable));
     }
 
     public final static boolean hookFollowedGamesFetcher(boolean org) {
@@ -201,7 +170,7 @@ public class Hooks {
 
     public final static int hookMiniplayerSize(int size) {
         PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
-        float k = Float.parseFloat(preferenceManager.getMiniPlayerSize().getValue());
+        float k = Float.parseFloat(preferenceManager.getMiniPlayerSize());
 
         return (int) (k * size);
     }
@@ -212,14 +181,14 @@ public class Hooks {
             return name;
         }
 
-        PlayerImpl playerImpl = PreferenceManager.INSTANCE.getPlayerImplementation();
-        switch (playerImpl) {
+        switch (PreferenceManager.INSTANCE.getPlayerImplementation()) {
             default:
-            case AUTO:
+            case PlayerImpl.AUTO:
                 return name;
-            case CORE:
-            case EXO:
-                return playerImpl.getValue();
+            case PlayerImpl.CORE:
+                return "playercore";
+            case PlayerImpl.EXO:
+                return "exoplayer_2";
         }
     }
 
@@ -239,11 +208,16 @@ public class Hooks {
         return PreferenceManager.INSTANCE.isInterceptorOn();
     }
 
-    public final static List<? extends ChatLiveMessage> hookLiveMessages(List<? extends ChatLiveMessage> list, String accountName) {
+    public final static List<? extends ChatLiveMessage> hookLiveMessages(List<? extends ChatLiveMessage> list, TwitchAccountManager accountManager) {
+        if (accountManager == null) {
+            Logger.error("accountManager is null");
+            return list;
+        }
+
         if (list == null || list.isEmpty())
             return list;
 
-        UserMessagesFiltering filtering = PreferenceManager.INSTANCE.getChatFiltering();
+        @UserMessagesFiltering int filtering = PreferenceManager.INSTANCE.getChatFiltering();
         if (filtering == UserMessagesFiltering.DISABLED)
             return list;
 
@@ -254,7 +228,7 @@ public class Hooks {
                 continue;
             }
 
-            if (ChatMesssageFilteringUtil.filter(liveMessage, accountName, filtering))
+            if (ChatMesssageFilteringUtil.filter(liveMessage, accountManager.getUsername(), filtering))
                 filtered.add(liveMessage);
         }
 
@@ -302,11 +276,28 @@ public class Hooks {
     }
 
     public static int getFloatingChatQueueSize() {
-        return Integer.parseInt(PreferenceManager.INSTANCE.getFloatingChatQueueSize().getValue());
+        return PreferenceManager.INSTANCE.getFloatingChatQueueSize();
     }
 
     public static int getFloatingChatRefresh() {
-        return Integer.parseInt(PreferenceManager.INSTANCE.getFloatingChatRefresh().getValue());
+        return PreferenceManager.INSTANCE.getFloatingChatRefresh();
+    }
+
+    public static void injectRecentMessages(final ILiveChatSource source, final ChannelInfo channelInfo) {
+        if (source == null) {
+            Logger.error("source is null");
+            return;
+        }
+
+        if (channelInfo == null) {
+            Logger.error("channelInfo is null");
+            return;
+        }
+
+        if (!PreferenceManager.INSTANCE.isMessageHistoryEnabled())
+            return;
+
+        ChatUtil.tryAddRecentMessages(source, channelInfo);
     }
 
     public static Spanned hookMarkAsDeleted(tv.twitch.android.shared.chat.util.ChatUtil.Companion companion, Spanned msg, Context context, PublishSubject<ChatMessageClickedEvents> publishSubject, boolean hasModAccess) {
@@ -315,24 +306,19 @@ public class Hooks {
             return msg;
         }
 
-        MsgDelete st = PreferenceManager.INSTANCE.getMsgDelete();
-        switch (st) {
-            case MOD:
-                return companion.createDeletedSpanFromChatMessageSpan(msg, context, publishSubject, true);
-            case DEFAULT:
+        switch (PreferenceManager.INSTANCE.getMsgDelete()) {
+            case MsgDelete.DEFAULT:
                 return companion.createDeletedSpanFromChatMessageSpan(msg, context, publishSubject, hasModAccess);
-            case STRIKETHROUGH:
+            case MsgDelete.MOD:
+                return companion.createDeletedSpanFromChatMessageSpan(msg, context, publishSubject, true);
+            case MsgDelete.STRIKETHROUGH:
                 return ChatUtil.tryAddStrikethrough(msg);
             default:
-                Logger.debug("default state");
                 return msg;
         }
     }
 
     public static SpannedString hookBadges(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString badges) {
-        if (!PreferenceManager.INSTANCE.isThirdPartyBadgesOn())
-            return badges;
-
         if (factory == null) {
             Logger.error("factory is null");
             return badges;
@@ -346,10 +332,21 @@ public class Hooks {
             return badges;
         }
 
+        if (PreferenceManager.INSTANCE.isThirdPartyBadgesOn()) {
+            try {
+                Collection<Badge> newBadges = BadgeManager.INSTANCE.findBadges(chatMessageInterface.getUserId());
+                if (!newBadges.isEmpty()) {
+                    badges = ChatUtil.tryAddBadges(badges, factory, newBadges);
+                }
+            } catch (Throwable th) {
+                th.printStackTrace();
+            }
+        }
+
         try {
-            Collection<Badge> newBadges = BadgeManager.INSTANCE.getBadgesForUser(chatMessageInterface.getUserId());
+            Collection<Badge> newBadges = BadgeManager.INSTANCE.getCustomBadges(chatMessageInterface.getUserId());
             if (!newBadges.isEmpty()) {
-                return ChatUtil.tryAddBadges(badges, factory, newBadges);
+                badges = ChatUtil.tryAddBadges(badges, factory, newBadges);
             }
         } catch (Throwable th) {
             th.printStackTrace();
@@ -387,34 +384,34 @@ public class Hooks {
         return PreferenceManager.INSTANCE.isIgnoreSystemMessages();
     }
 
-    public static List<EmoteUiSet> hookEmotePickerSet(List<EmoteUiSet> list, Integer channelId) {
-        if (!PreferenceManager.INSTANCE.isEmotePickerOn())
-            return list;
-
-        if (list == null)
+    public static List<EmoteUiSet> hookEmotePickerSet(List<EmoteUiSet> emoteUiSets, Integer channelId) {
+        if (emoteUiSets == null)
             return null;
+
+        if (!PreferenceManager.INSTANCE.isBttvOn())
+            return emoteUiSets;
 
         Collection<Emote> bttvGlobalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
         if (!bttvGlobalEmotes.isEmpty()) {
-            Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.GLOBAL.getTitleRes());
-            list.add(ChatFactory.getEmoteSetUi(bttvGlobalEmotes, resId));
+            Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.GLOBAL.getTitleResId());
+            emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvGlobalEmotes, resId));
         }
 
         if (channelId != null && channelId != -1) {
             Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
             if (!bttvChannelEmotes.isEmpty()) {
-                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleRes());
-                list.add(ChatFactory.getEmoteSetUi(bttvChannelEmotes, resId));
+                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleResId());
+                emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvChannelEmotes, resId));
             }
 
             Collection<Emote> ffzChannelEmotes = EmoteManager.INSTANCE.getFfzEmotes(channelId);
             if (!ffzChannelEmotes.isEmpty()) {
-                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.FFZ.getTitleRes());
-                list.add(ChatFactory.getEmoteSetUi(ffzChannelEmotes, resId));
+                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.FFZ.getTitleResId());
+                emoteUiSets.add(ChatFactory.getEmoteUiSet(ffzChannelEmotes, resId));
             }
         }
 
-        return list;
+        return emoteUiSets;
     }
 
     public static String hookEmoteAdapterItem(Context context, EmoteUiModel emoteUiModel) {
@@ -426,11 +423,11 @@ public class Hooks {
     }
 
     public static int hookChatWidth(int org) {
-        ChatWidthPercent percent = PreferenceManager.INSTANCE.getChatWidthPercent();
-        if (percent == ChatWidthPercent.DEFAULT)
+        @ChatWidthScale int scale = PreferenceManager.INSTANCE.getChatWidthScale();
+        if (scale == ChatWidthScale.DEFAULT)
             return org;
 
-        return Integer.parseInt(percent.getValue());
+        return scale;
     }
 
     public static boolean isBypassChatBanJump() {

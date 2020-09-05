@@ -8,7 +8,11 @@ import tv.twitch.android.shared.analytics.PageViewTracker;
 
 
 public class ModelTheatreModeTracker {
+    /* ... */
+
     public ModelTheatreModeTracker(PlayableModelParser playableParser, Playable playable, PageViewTracker pageViewTracker2) {
         Hooks.requestEmotes(playableParser, playable); // TODO: __INJECT_CALL
     }
+
+    /* ... */
 }

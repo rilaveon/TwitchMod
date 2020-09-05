@@ -13,11 +13,16 @@ public class EmoteAdapterItem {
     private Context context;
     public EmoteUiModel model;
 
+    /* ... */
 
     public void bindToViewHolder(RecyclerView.ViewHolder viewHolder) {
         /* ... */
 
         // String url = EmoteUrlUtil.getEmoteUrl(this.context, this.model.getId());
        String url = Hooks.hookEmoteAdapterItem(context, this.model); // TODO: __HOOK
+
+        /* ... */
     }
+
+    /* ... */
 }

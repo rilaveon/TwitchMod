@@ -15,7 +15,8 @@ public class BottomNavigationPresenter {
         DISCOVER,
         BROWSE,
         ESPORTS,
-        BROADCAST;
+
+        /* ... */
     }
 
     public BottomNavigationPresenter() {

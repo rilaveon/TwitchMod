@@ -6,6 +6,8 @@ import tv.twitch.android.search.suggestion.SuggestableContent;
 
 
 public class SearchSuggestionAdapterBinder {
+    /* ... */
+
     public final void bind(SuggestableContent suggestableContent) {
         /* ... */
 
@@ -15,4 +17,6 @@ public class SearchSuggestionAdapterBinder {
 
         /* ... */
     }
+
+    /* ... */
 }

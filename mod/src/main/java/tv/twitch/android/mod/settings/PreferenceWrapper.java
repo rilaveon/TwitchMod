@@ -9,35 +9,23 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import tv.twitch.android.mod.models.PreferenceItem;
 import tv.twitch.android.mod.utils.Logger;
 
 
 public final class PreferenceWrapper implements SharedPreferences.OnSharedPreferenceChangeListener  {
-    private final HashMap<String, PreferenceItem> mLocalPreferences = new HashMap<>();
     private final List<PreferenceListener> mListeners = new ArrayList<>();
 
-    private final SharedPreferences mPref;
+    private final SharedPreferences mDefaultSharedPreferences;
 
     public interface PreferenceListener {
-        void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key);
+        void onPreferenceChanged(SharedPreferences sharedPreferences, String key);
     }
-
 
     public PreferenceWrapper(Context context) {
-        mPref = PreferenceManager.getDefaultSharedPreferences(context);
-        mPref.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    public void registerLocalPreference(PreferenceItem item) {
-        mLocalPreferences.put(item.getKey(), getOrDefault(item));
-    }
-
-    public PreferenceItem getLocalPreference(String key) {
-        return mLocalPreferences.get(key);
+        mDefaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mDefaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     public void updateBoolean(String key, boolean val) {
@@ -46,7 +34,16 @@ public final class PreferenceWrapper implements SharedPreferences.OnSharedPrefer
             return;
         }
 
-        mPref.edit().putBoolean(key, val).apply();
+        mDefaultSharedPreferences.edit().putBoolean(key, val).apply();
+    }
+
+    public void updateInt(String key, int val) {
+        if (TextUtils.isEmpty(key)) {
+            Logger.error("Empty key");
+            return;
+        }
+
+        mDefaultSharedPreferences.edit().putInt(key, val).apply();
     }
 
     public void updateString(String key, String val) {
@@ -60,48 +57,34 @@ public final class PreferenceWrapper implements SharedPreferences.OnSharedPrefer
             return;
         }
 
-        mPref.edit().putString(key, val).apply();
+        mDefaultSharedPreferences.edit().putString(key, val).apply();
     }
 
     public boolean getBoolean(String key, boolean def) {
-        return mPref.getBoolean(key, def);
+        return mDefaultSharedPreferences.getBoolean(key, def);
     }
 
     public String getString(String key, String def) {
-        return mPref.getString(key, def);
+        return mDefaultSharedPreferences.getString(key, def);
     }
 
-    private PreferenceItem getOrDefault(PreferenceItem defaultPreference) {
-        String res = getString(defaultPreference.getKey(), null);
-        if (res != null)
-            return defaultPreference.lookup(res);
-        else
-            return defaultPreference;
+    public int getInt(String key, int def) {
+        return mDefaultSharedPreferences.getInt(key, def);
     }
+
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (TextUtils.isEmpty(key)) {
-            Logger.error("empty key");
-            return;
-        }
-
-        PreferenceItem item = mLocalPreferences.get(key);
-        if (item != null) {
-            String newVal = sharedPreferences.getString(key, item.getDefault().getValue());
-            registerLocalPreference(item.lookup(newVal));
-        }
-
-        for (PreferenceListener listener : mListeners) {
-            listener.onSharedPreferenceChanged(sharedPreferences, key);
+        if (sharedPreferences == mDefaultSharedPreferences) {
+            for (PreferenceListener listener : mListeners) {
+                listener.onPreferenceChanged(sharedPreferences, key);
+            }
+        } else {
+            Logger.debug("check sharedPreferences");
         }
     }
 
     public void registerPreferenceListener(@NonNull PreferenceListener listener) {
         mListeners.add(listener);
-    }
-
-    public void removePreferenceListener(@NonNull PreferenceListener listener) {
-        mListeners.remove(listener);
     }
 }

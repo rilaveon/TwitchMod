@@ -12,6 +12,7 @@ import java.util.Map;
 
 import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.EmoteSet;
+import tv.twitch.android.mod.utils.Logger;
 
 
 public class BaseEmoteSet implements EmoteSet {
@@ -19,8 +20,10 @@ public class BaseEmoteSet implements EmoteSet {
 
     @Override
     public void addEmote(@NonNull Emote emote) {
-        if (TextUtils.isEmpty(emote.getCode()))
+        if (TextUtils.isEmpty(emote.getCode())) {
+            Logger.debug("empty code");
             return;
+        }
 
         mEmoteMap.put(emote.getCode(), emote);
     }

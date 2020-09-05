@@ -5,6 +5,8 @@ import tv.twitch.android.mod.bridges.Hooks;
 
 
 public class MiniPlayerSize {
+    /* ... */
+
     public final int org() { // TODO: __RENAME__getWidth
         return 0;
     }
@@ -12,4 +14,6 @@ public class MiniPlayerSize {
     public final int getWidth() { // TODO: __INJECT_METHOD
         return Hooks.hookMiniplayerSize(org());
     }
+
+    /* ... */
 }

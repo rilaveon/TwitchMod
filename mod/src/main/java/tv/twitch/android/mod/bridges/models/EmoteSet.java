@@ -30,11 +30,11 @@ public enum EmoteSet {
         return mSetId;
     }
 
-    public String getTitleRes() {
+    public String getTitleResId() {
         return mTitleRes;
     }
 
     public String getTitle() {
-        return ResourcesManager.INSTANCE.getString(getTitleRes());
+        return ResourcesManager.INSTANCE.getString(getTitleResId());
     }
 }

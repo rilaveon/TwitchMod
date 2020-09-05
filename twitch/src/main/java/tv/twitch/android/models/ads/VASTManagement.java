@@ -2,6 +2,8 @@ package tv.twitch.android.models.ads;
 
 
 public class VASTManagement {
+    /* ... */
+
     public enum AdDeclineReason {
         VAST_AD_API_ERROR,
         VAST_AD_INELIGIBLE_TURBO,
@@ -16,16 +18,10 @@ public class VASTManagement {
         VAST_AD_INELIGIBLE_SQUAD_SECONDARY,
         VAST_AD_INELIGIBLE_AUDIO_ONLY,
         LONG_TAIL,
-        REASON_OTHER;
+        REASON_OTHER
 
-        private String reason;
-
-        public String getReason() {
-            return this.reason;
-        }
-
-        public void setReason(String str) {
-            this.reason = str;
-        }
+        /* ... */
     }
+
+    /* ... */
 }

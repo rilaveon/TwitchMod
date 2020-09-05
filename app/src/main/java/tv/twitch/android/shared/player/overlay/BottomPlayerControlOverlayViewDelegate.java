@@ -7,22 +7,18 @@ import android.widget.ImageView;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.utils.Logger;
 
+
 public class BottomPlayerControlOverlayViewDelegate {
     private BottomPlayerControlListener mBottomPlayerControlListener = new EmptyBottomPlayerControlListener();
 
+    /* ... */
 
     private ImageView refreshButton;
 
+    /* ... */
+
     public interface BottomPlayerControlListener {
-        void onChangeOrientationButtonClicked();
-
-        void onExpandVideoButtonClicked();
-
-        void onShowChatButtonClicked();
-
-        void onVideoDebugInfoButtonClicked();
-
-        void onViewCountClicked();
+        /* ... */
 
         void onRefreshClicked(); // TODO: __INJECT_METHOD
     }

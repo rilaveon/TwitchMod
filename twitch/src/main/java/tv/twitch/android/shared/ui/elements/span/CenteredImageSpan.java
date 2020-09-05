@@ -8,6 +8,8 @@ import android.text.style.ImageSpan;
 public class CenteredImageSpan extends ImageSpan {
     private final Drawable imageDrawable = null;
 
+    /* ... */
+
     public CenteredImageSpan(Drawable drawable) {
         super(drawable);
     }
@@ -15,4 +17,6 @@ public class CenteredImageSpan extends ImageSpan {
     public final Drawable getImageDrawable() {
         return imageDrawable;
     }
+
+    /* ... */
 }

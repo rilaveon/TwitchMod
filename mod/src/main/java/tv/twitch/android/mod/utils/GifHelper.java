@@ -17,7 +17,7 @@ import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 
 public class GifHelper {
-    public static void forceRecycleItems(List<RecyclerAdapterItem> items) {
+    public static void recycleItems(List<RecyclerAdapterItem> items) {
         if (items == null || items.size() == 0)
             return;
 
@@ -58,12 +58,8 @@ public class GifHelper {
 
             Drawable gifDrawable = drawableContainer.getDrawable();
             if (gifDrawable instanceof GifDrawable) {
-                stopGifDrawable((GifDrawable) gifDrawable);
+                ((GifDrawable) gifDrawable).stop();
             }
         }
-    }
-
-    private static void stopGifDrawable(GifDrawable drawable) {
-        drawable.stop();
     }
 }

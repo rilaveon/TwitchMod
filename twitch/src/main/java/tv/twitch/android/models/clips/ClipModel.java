@@ -8,12 +8,15 @@ import tv.twitch.android.models.Playable;
 
 
 public class ClipModel implements Playable {
+    /* ... */
+
     public final List<ClipQualityOption> getQualityOptions() {
         return Collections.emptyList();
     }
 
     public final String getBestUrlForQuality(ClipQuality clipQuality) {
         /* ... */
+
         return null;
     }
 
@@ -32,4 +35,6 @@ public class ClipModel implements Playable {
     public final String getTitle() {
         return "";
     }
+
+    /* ... */
 }

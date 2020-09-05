@@ -6,71 +6,64 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 
-import tv.twitch.android.mod.models.PreferenceItem;
-import tv.twitch.android.mod.models.settings.ChatWidthPercent;
-import tv.twitch.android.mod.models.settings.FloatingChatQueueSize;
-import tv.twitch.android.mod.models.settings.FloatingChatRefreshDelay;
-import tv.twitch.android.mod.models.settings.MsgDelete;
-import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
-import tv.twitch.android.mod.models.settings.EmoteSize;
-import tv.twitch.android.mod.models.settings.ExoPlayerSpeed;
-import tv.twitch.android.mod.models.settings.Gifs;
-import tv.twitch.android.mod.models.settings.MiniPlayerSize;
-import tv.twitch.android.mod.models.settings.PlayerImpl;
+import tv.twitch.android.mod.models.Preferences;
+import tv.twitch.android.mod.models.preferences.ChatWidthScale;
+import tv.twitch.android.mod.models.preferences.EmoteSize;
+import tv.twitch.android.mod.models.preferences.ExoPlayerSpeed;
+import tv.twitch.android.mod.models.preferences.FloatingChatRefreshDelay;
+import tv.twitch.android.mod.models.preferences.FloatingChatSize;
+import tv.twitch.android.mod.models.preferences.Gifs;
+import tv.twitch.android.mod.models.preferences.MiniPlayerSize;
+import tv.twitch.android.mod.models.preferences.MsgDelete;
+import tv.twitch.android.mod.models.preferences.PlayerImpl;
+import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 
 
 public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
+    public static final String TWITCH_DARK_THEME_KEY = "dark_theme_enabled";
+
     public static final PreferenceManager INSTANCE = new PreferenceManager();
 
-    public static final String BTTV_EMOTES = "nop_bttv_emote";
-    public static final String BADGES = "nop_badges";
-    public static final String EMOTE_PICKER = "nop_emote_picker";
-    public static final String GIFS = "nop_gifs";
-    public static final String EMOTE_SIZE = "nop_emote_size";
-    public static final String FLOATING_CHAT = "nop_floating_chat";
-    public static final String MESSAGE_TIMESTAMP = "nop_emote_timestamp";
-    public static final String BYPASS_CHAT_BAN = "nop_bypass_chat_ban";
-    public static final String EMOTE_PICKER_VIEW = "nop_emote_picker_view";
-    public static final String CHAT_WIDTH_SCALE = "nop_chat_width_scale";
-    public static final String CHAT_RED_MENTION = "nop_chat_red_mention";
-    public static final String ADBLOCK = "nop_adblock";
-    public static final String DISABLE_PLAYER_AUTOPLAY = "nop_disable_player_autoplay";
-    public static final String PLAYER_IMPLEMENTATION = "nop_player_implementation";
-    public static final String MINIPLAYER_SIZE = "nop_miniplayer_size";
-    public static final String EXOPLAYER_SPEED = "nop_exoplayer_speed";
-    public static final String SWIPE_VOLUME = "nop_swipe_volume";
-    public static final String SWIPE_BRIGHTNESS = "nop_swipe_brightness";
-    public static final String USER_MESSAGES_FILTERING = "nop_user_messages_filtering";
-    public static final String USER_MESSAGES_FILTERING_SYSTEM = "nop_user_messages_filtering_system";
-    public static final String DISABLE_RECOMMENDATIONS = "nop_disable_recommendations";
-    public static final String DISABLE_FOLLOWED_GAMES = "nop_disable_followed_games";
-    public static final String DISABLE_RECENT_WATCHING = "nop_disable_recent_watching";
-    public static final String HIDE_DISCOVER = "nop_hide_discover";
-    public static final String HIDE_ESPORTS = "nop_hide_esports";
-    public static final String DISABLE_RECENT_SEARCH = "nop_disable_recent_search";
-    public static final String HIDE_GS = "nop_hide_gs3";
-    public static final String FORCE_OLD_CLIPS_VIEW = "nop_disable_new_clips";
-    public static final String DEV = "nop_dev";
-    public static final String DEV_INTERCEPTOR = "nop_dev_interceptor";
-    public static final String TWITCH_DARK_THEME = "dark_theme_enabled";
-    public static final String FLOATING_CHAT_QSIZE = "nop_floating_queue_size";
-    public static final String FLOATING_CHAT_REFRESH = "nop_floating_refresh";
-    public static final String MSG_DELETE = "nop_msg_delete";
-
-
-    private boolean isDarkThemeEnabled;
-    private boolean isAdblockEnabled;
-    private boolean isBttvOn;
-    private boolean isRedMentionOn;
+    private boolean isBttvEmotesOn;
+    private boolean isChatTimestampsOn;
+    private boolean isAdblockOn;
+    private boolean isVolumeSwiperOn;
+    private boolean isBrightnessSwiperOn;
+    private boolean isHideFollowRec;
+    private boolean isHideFollowResume;
+    private boolean isHideFollowGames;
+    private boolean isHideDiscoverTab;
+    private boolean isHideEsportsTab;
+    private boolean isHideRecentSearch;
+    private boolean isDevModeOn;
+    private boolean isTheatreAutoplayDisabled;
+    private boolean isUseOldEmotePicker;
+    private boolean isChatSystemFilteringOn;
+    private boolean isInterceptorEnabled;
     private boolean isBadgesOn;
-    private boolean isTimestampOn;
+    private boolean isBypassChatBan;
+    private boolean isHideGps;
+    private boolean isRedMentionOn;
+    private boolean isNewClipsViewDisabled;
+    private boolean isRobottyServiceEnabled;
 
-    private boolean isNeedHideGPS = false;
+    private @EmoteSize int emoteSize;
+    private @ChatWidthScale int chatWidthScale;
+    private @Gifs int gifs;
+    private @MsgDelete int msgDelete;
+    private @ExoPlayerSpeed String exoPlayerSpeed;
+    private @MiniPlayerSize String miniPlayerSize;
+    private @PlayerImpl int playerImpl;
+    private @UserMessagesFiltering int messageFiltering;
+    private @FloatingChatSize int floatingChatSize;
+    private @FloatingChatRefreshDelay int floatingChatRefresh;
 
     private PreferenceWrapper mWrapper;
 
+    private boolean isDarkThemeEnabled;
+    private boolean isNeedHideGPS = false;
 
     private PreferenceManager() {}
 
@@ -79,30 +72,52 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
             throw new ExceptionInInitializerError("mWrapper is not null");
 
         mWrapper = new PreferenceWrapper(context);
-        registerLocalPreferences();
-
         isNeedHideGPS = !Helper.isGooglePlayServicesAvailable(context);
+        initializePreferences();
     }
 
-    private void registerLocalPreferences() {
-        mWrapper.registerLocalPreference(EmoteSize.MEDIUM);
-        mWrapper.registerLocalPreference(Gifs.STATIC);
-        mWrapper.registerLocalPreference(UserMessagesFiltering.DISABLED);
-        mWrapper.registerLocalPreference(PlayerImpl.AUTO);
-        mWrapper.registerLocalPreference(ExoPlayerSpeed.DEFAULT);
-        mWrapper.registerLocalPreference(MiniPlayerSize.DEFAULT);
-        mWrapper.registerLocalPreference(ChatWidthPercent.DEFAULT);
-        this.mWrapper.registerLocalPreference(FloatingChatQueueSize.THREE);
-        this.mWrapper.registerLocalPreference(FloatingChatRefreshDelay.DEFAULT);
-        this.mWrapper.registerLocalPreference(MsgDelete.DEFAULT);
+    private void initializePreferences() {
+        updatePreferences();
         mWrapper.registerPreferenceListener(this);
+    }
 
-        isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME, false);
-        isAdblockEnabled = getBoolean(ADBLOCK, true);
-        isRedMentionOn = getBoolean(CHAT_RED_MENTION, false);
-        isBttvOn = getBoolean(BTTV_EMOTES, true);
-        isBadgesOn = getBoolean(BADGES, false);
-        isTimestampOn = getBoolean(MESSAGE_TIMESTAMP, false);
+    private void updatePreferences() {
+        isBttvEmotesOn = getBoolean(Preferences.BTTV_EMOTES, true);
+        isChatTimestampsOn = getBoolean(Preferences.CHAT_TIMESTAMPS, false);
+        isAdblockOn = getBoolean(Preferences.ADBLOCK, true);
+        isVolumeSwiperOn = getBoolean(Preferences.VOLUME_SWIPER, false);
+        isBrightnessSwiperOn = getBoolean(Preferences.BRIGHTNESS_SWIPER, false);
+        isVolumeSwiperOn = getBoolean(Preferences.VOLUME_SWIPER, false);
+        isHideFollowRec = getBoolean(Preferences.HIDE_FOLLOW_RECOMMENDED_STREAMS, false);
+        isHideFollowResume = getBoolean(Preferences.HIDE_FOLLOW_RESUME_STREAMS, false);
+        isHideFollowGames = getBoolean(Preferences.HIDE_FOLLOW_GAMES, false);
+        isHideDiscoverTab = getBoolean(Preferences.HIDE_DISCOVER_TAB, false);
+        isHideEsportsTab = getBoolean(Preferences.HIDE_ESPORTS_TAB, false);
+        isHideRecentSearch = getBoolean(Preferences.HIDE_RECENT_SEARCH_RESULTS, false);
+        isTheatreAutoplayDisabled = getBoolean(Preferences.DISABLE_THEATRE_AUTOPLAY, false);
+        isUseOldEmotePicker = getBoolean(Preferences.EMOTE_PICKER_VIEW, false);
+        isChatSystemFilteringOn = getBoolean(Preferences.CHAT_MESSAGE_FILTER_SYSTEM, false);
+        isInterceptorEnabled = getBoolean(Preferences.DEV_ENABLE_INTERCEPTOR, false);
+        isBadgesOn = getBoolean(Preferences.BADGES, false);
+        isBypassChatBan = getBoolean(Preferences.BYPASS_CHAT_BAN, false);
+        isHideGps = getBoolean(Preferences.HIDE_GPS_ERROR, isNeedHideGPS);
+        isRedMentionOn = getBoolean(Preferences.CHAR_RED_MENTION, true);
+        isNewClipsViewDisabled = getBoolean(Preferences.DISABLE_NEW_CLIPS_VIEW, false);
+        isDevModeOn = getBoolean(Preferences.DEV_MODE, false);
+        isRobottyServiceEnabled = getBoolean(Preferences.MESSAGE_HISTORY, false);
+
+        emoteSize = getInt(Preferences.EMOTE_SIZE, EmoteSize.MEDIUM);
+        chatWidthScale = getInt(Preferences.CHAT_WIDTH_SCALE, ChatWidthScale.DEFAULT);
+        gifs = getInt(Preferences.GIFS, Gifs.STATIC);
+        msgDelete = getInt(Preferences.MSG_DELETE_STRATEGY, MsgDelete.DEFAULT);
+        exoPlayerSpeed = getString(Preferences.EXOPLAYER_SPEED, ExoPlayerSpeed.DEFAULT);
+        miniPlayerSize = getString(Preferences.MINIPLAYER_SCALE, MiniPlayerSize.DEFAULT);
+        playerImpl = getInt(Preferences.PLAYER_IMPL, PlayerImpl.AUTO);
+        messageFiltering = getInt(Preferences.CHAT_MESSAGE_FILTER_LEVEL, UserMessagesFiltering.DISABLED);
+        floatingChatSize = getInt(Preferences.FLOAT_CHAT_SIZE, FloatingChatSize.DEFAULT);
+        floatingChatRefresh = getInt(Preferences.FLOATING_REFRESH, FloatingChatRefreshDelay.DEFAULT);
+
+        isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
     }
 
     public void updateBoolean(String key, boolean val) {
@@ -123,6 +138,54 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         mWrapper.updateString(key, val);
     }
 
+    public void updateInt(String key, int val) {
+        if (mWrapper == null) {
+            Logger.error("mWrapper is null");
+            return;
+        }
+
+        mWrapper.updateInt(key, val);
+    }
+
+    private int getInt(Preferences preference, int def) {
+        if (preference == null) {
+            throw new IllegalArgumentException("preference is null");
+        }
+
+        if (TextUtils.isEmpty(preference.getKey())) {
+            Logger.error("empty key");
+            return def;
+        }
+
+        return mWrapper.getInt(preference.getKey(), def);
+    }
+
+    private boolean getBoolean(Preferences preference, boolean def) {
+        if (preference == null) {
+            throw new IllegalArgumentException("preference is null");
+        }
+
+        if (TextUtils.isEmpty(preference.getKey())) {
+            Logger.error("empty key");
+            return def;
+        }
+
+        return mWrapper.getBoolean(preference.getKey(), def);
+    }
+
+    private String getString(Preferences preference, String def) {
+        if (preference == null) {
+            throw new IllegalArgumentException("preference is null");
+        }
+
+        if (TextUtils.isEmpty(preference.getKey())) {
+            Logger.error("empty key");
+            return def;
+        }
+
+        return mWrapper.getString(preference.getKey(), def);
+    }
+
     private boolean getBoolean(String key, boolean def) {
         if (mWrapper == null) {
             Logger.error("wrapper is null");
@@ -132,17 +195,9 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return mWrapper.getBoolean(key, def);
     }
 
-    private PreferenceItem getLocalPreference(String key, PreferenceItem def) {
-        if (mWrapper == null) {
-            Logger.error("wrapper is null");
-            return def;
-        }
-
-        return mWrapper.getLocalPreference(key);
-    }
 
     public boolean isBttvOn() {
-        return isBttvOn;
+        return isBttvEmotesOn;
     }
 
     public boolean isRedMentionOn() {
@@ -150,7 +205,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     }
 
     public boolean isForceOldClips() {
-        return getBoolean(FORCE_OLD_CLIPS_VIEW, false);
+        return isNewClipsViewDisabled;
     }
 
     public boolean isThirdPartyBadgesOn() {
@@ -158,75 +213,71 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     }
 
     public boolean isBypassChatBan() {
-        return getBoolean(BYPASS_CHAT_BAN, false);
-    }
-
-    public boolean isEmotePickerOn() {
-        return getBoolean(EMOTE_PICKER, true);
+        return isBypassChatBan;
     }
 
     public boolean isMessageTimestampOn() {
-        return isTimestampOn;
+        return isChatTimestampsOn;
     }
 
     public boolean isDisableAutoplay() {
-        return getBoolean(DISABLE_PLAYER_AUTOPLAY, false);
+        return isTheatreAutoplayDisabled;
     }
     
     public boolean isDisableRecentSearch() {
-        return getBoolean(DISABLE_RECENT_SEARCH, false);
+        return isHideRecentSearch;
     }
 
     public boolean isHideGs() {
-        return getBoolean(HIDE_GS, isNeedHideGPS);
+        return isHideGps;
     }
 
     public boolean isDisableRecentWatching() {
-        return getBoolean(DISABLE_RECENT_WATCHING, false);
+        return isHideFollowResume;
     }
 
     public boolean isDisableRecommendations() {
-        return getBoolean(DISABLE_RECOMMENDATIONS, false);
+        return isHideFollowRec;
     }
 
     public boolean isDisableFollowedGames() {
-        return getBoolean(DISABLE_FOLLOWED_GAMES, false);
+        return isHideFollowGames;
     }
 
     public boolean isVolumeSwipeEnabled() {
-        return getBoolean(SWIPE_VOLUME, false);
+        return isVolumeSwiperOn;
     }
 
     public boolean isBrightnessSwipeEnabled() {
-        return getBoolean(SWIPE_BRIGHTNESS, false);
+        return isBrightnessSwiperOn;
     }
 
-    public boolean isOldEmotePicker() {
-        return getBoolean(EMOTE_PICKER_VIEW, false);
+    public boolean isForceOldEmotePicker() {
+        return isUseOldEmotePicker;
     }
 
     public boolean isDevModeOn() {
-        return getBoolean(DEV, false);
+        return isDevModeOn;
     }
 
     public boolean isIgnoreSystemMessages() {
-        return getBoolean(USER_MESSAGES_FILTERING_SYSTEM, false);
+        return isChatSystemFilteringOn;
     }
 
     public boolean isInterceptorOn() {
-        return getBoolean(DEV_INTERCEPTOR, false);
+        return isInterceptorEnabled;
     }
 
     public boolean isHideDiscoverTab() {
-        return getBoolean(HIDE_DISCOVER, false);
+        return isHideDiscoverTab;
     }
 
     public boolean isHideEsportsTab() {
-        return getBoolean(HIDE_ESPORTS, false);
+        return isHideEsportsTab;
     }
 
     public boolean isFloatingChatEnabled() {
-        return getBoolean(FLOATING_CHAT, true);
+        return true;
     }
 
     public boolean isDarkThemeEnabled() {
@@ -234,69 +285,60 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     }
 
     public boolean isAdblockEnabled() {
-        return isAdblockEnabled;
+        return isAdblockOn;
     }
 
-    public EmoteSize getEmoteSize() {
-        return (EmoteSize) getLocalPreference(EMOTE_SIZE, EmoteSize.MEDIUM);
+    public boolean isMessageHistoryEnabled() {
+        return isRobottyServiceEnabled;
     }
 
-    public PlayerImpl getPlayerImplementation() {
-        return (PlayerImpl) getLocalPreference(PLAYER_IMPLEMENTATION, PlayerImpl.AUTO);
+    public @EmoteSize int getEmoteSize() {
+        return emoteSize;
     }
 
-    public UserMessagesFiltering getChatFiltering() {
-        return (UserMessagesFiltering) getLocalPreference(USER_MESSAGES_FILTERING, UserMessagesFiltering.DISABLED);
+    public @PlayerImpl int getPlayerImplementation() {
+        return playerImpl;
     }
 
-    public ExoPlayerSpeed getExoplayerSpeed() {
-        return (ExoPlayerSpeed) getLocalPreference(EXOPLAYER_SPEED, ExoPlayerSpeed.DEFAULT);
+    public @UserMessagesFiltering int getChatFiltering() {
+        return messageFiltering;
     }
 
-    public ChatWidthPercent getChatWidthPercent() {
-        return (ChatWidthPercent) getLocalPreference(CHAT_WIDTH_SCALE, ChatWidthPercent.DEFAULT);
+    public @ExoPlayerSpeed String getExoplayerSpeed() {
+        return exoPlayerSpeed;
     }
 
-    public MiniPlayerSize getMiniPlayerSize() {
-        return (MiniPlayerSize) getLocalPreference(MINIPLAYER_SIZE, MiniPlayerSize.DEFAULT);
+    public @ChatWidthScale int getChatWidthScale() {
+        return chatWidthScale;
     }
 
-    public FloatingChatRefreshDelay getFloatingChatRefresh() {
-        return (FloatingChatRefreshDelay) getLocalPreference(FLOATING_CHAT_REFRESH, FloatingChatRefreshDelay.DEFAULT);
+    public @MiniPlayerSize String getMiniPlayerSize() {
+        return miniPlayerSize;
     }
 
-    public FloatingChatQueueSize getFloatingChatQueueSize() {
-        return (FloatingChatQueueSize) getLocalPreference(FLOATING_CHAT_QSIZE, FloatingChatQueueSize.THREE);
+    public @FloatingChatRefreshDelay int getFloatingChatRefresh() {
+        return floatingChatRefresh;
     }
 
-    public MsgDelete getMsgDelete() {
-        return (MsgDelete) getLocalPreference(MSG_DELETE, MsgDelete.DEFAULT);
+    public @FloatingChatSize int getFloatingChatQueueSize() {
+        return floatingChatSize;
     }
 
-    public Gifs getGifsStrategy() {
-        return (Gifs) getLocalPreference(GIFS, Gifs.STATIC);
+    public @MsgDelete int getMsgDelete() {
+        return msgDelete;
     }
+
+    public @Gifs int getGifsStrategy() {
+        return gifs;
+    }
+
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String preferenceKey) {
-        if (TextUtils.isEmpty(preferenceKey)) {
-            Logger.error("Empty key");
-            return;
-        }
-
-        switch (preferenceKey) {
-            case PreferenceManager.TWITCH_DARK_THEME:
-                isDarkThemeEnabled = sharedPreferences.getBoolean(TWITCH_DARK_THEME, false);
-            case PreferenceManager.ADBLOCK:
-                isAdblockEnabled = sharedPreferences.getBoolean(ADBLOCK, true);
-            case PreferenceManager.BADGES:
-                isBadgesOn = sharedPreferences.getBoolean(BADGES, false);
-            case PreferenceManager.BTTV_EMOTES:
-                isBttvOn = sharedPreferences.getBoolean(BTTV_EMOTES, true);
-            case PreferenceManager.CHAT_RED_MENTION:
-                isRedMentionOn = sharedPreferences.getBoolean(CHAT_RED_MENTION, false);
-            case PreferenceManager.MESSAGE_TIMESTAMP:
-                isTimestampOn = sharedPreferences.getBoolean(MESSAGE_TIMESTAMP, false);
+    public void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (PreferenceManager.TWITCH_DARK_THEME_KEY.equals(key)) {
+            isDarkThemeEnabled = sharedPreferences.getBoolean(TWITCH_DARK_THEME_KEY, false);
+        } else {
+            updatePreferences();
         }
     }
 }

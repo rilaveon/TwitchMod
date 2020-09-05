@@ -10,7 +10,6 @@ import tv.twitch.android.app.core.ViewExtensionsKt;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.interfaces.ISharedPanelWidget;
 import tv.twitch.android.mod.utils.ClipDownloader;
-import tv.twitch.android.models.ShareTextData;
 import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.shared.ui.elements.bottomsheet.InteractiveRowView;
 
@@ -19,17 +18,16 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
     private ClipModel mClipModel;
     private SharePanelWidgetListener mSharePanelWidgetListener;
 
+    /* ... */
+
     private InteractiveRowView mDownloadButton; // TODO: __INJECT_FIELD
 
+    /* ... */
 
     public interface SharePanelWidgetListener {
-        void onHostClicked();
+        /* ... */
 
         void onShareClicked();
-
-        void onUrlCopiedToClipboard();
-
-        void onWhisperClicked(ShareTextData shareTextData);
     }
 
 

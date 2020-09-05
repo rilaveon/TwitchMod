@@ -5,15 +5,17 @@ import java.util.List;
 
 import tv.twitch.android.models.chat.MessageToken;
 
-public interface ChatMessageInterface {
-    boolean isDeleted();
 
+public interface ChatMessageInterface {
+    /* ... */
 
     List<MessageToken> getTokens();
 
-    boolean isSystemMessage();
-
     int getUserId();
 
-    String getUserName();
+    boolean isDeleted();
+
+    boolean isSystemMessage();
+
+    /* ... */
 }

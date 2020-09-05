@@ -31,8 +31,8 @@ public class UrlDrawable extends BitmapDrawable implements IDrawable { // TODO: 
         Drawable drawable = this.drawable;
         if (drawable != null) {
             drawable.draw(canvas);
-            if (drawable instanceof com.bumptech.glide.load.resource.gif.GifDrawable) {
-                if (Hooks.isGifsEnabled()) {
+            if (drawable instanceof GifDrawable) {
+                if (Hooks.isGifsEnabled() && !((GifDrawable) drawable).isStarted()) {
                     ((GifDrawable) drawable).start();
                 }
             }

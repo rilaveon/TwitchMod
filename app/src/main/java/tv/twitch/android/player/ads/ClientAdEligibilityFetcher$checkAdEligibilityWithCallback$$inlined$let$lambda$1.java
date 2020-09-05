@@ -8,10 +8,13 @@ import tv.twitch.android.models.subscriptions.SubscriptionStatusModel;
 
 import static tv.twitch.android.models.ads.VASTManagement.AdDeclineReason.REASON_OTHER;
 
+
 public class ClientAdEligibilityFetcher$checkAdEligibilityWithCallback$$inlined$let$lambda$1 {
     public final void accept(SubscriptionStatusModel subscriptionStatusModel) {
         /* ... */
+
         LinkedHashSet linkedHashSet = new LinkedHashSet();
+
         /* ... */
 
         // TODO: __INJECT_CODE
@@ -20,7 +23,6 @@ public class ClientAdEligibilityFetcher$checkAdEligibilityWithCallback$$inlined$
                 linkedHashSet.add(REASON_OTHER);
         }
 
-        /* ... */
-
+        // this.$adEligibilityCallback$inlined.eligibilityDetermined(linkedHashSet);
     }
 }

@@ -5,7 +5,13 @@ import android.view.View;
 
 
 public class BaseViewDelegate {
-    protected final <V extends View> V findView(int id) {
+    /* ... */
+
+    protected final <V extends View> V findView(int i) {
+        /* ... */
+
         return null;
     }
+
+    /* ... */
 }

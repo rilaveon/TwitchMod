@@ -1,7 +1,7 @@
 package tv.twitch.android.mod.utils;
 
 
-import tv.twitch.android.mod.models.settings.UserMessagesFiltering;
+import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
 import tv.twitch.chat.ChatLiveMessage;
 import tv.twitch.chat.ChatMessageInfo;
 
@@ -35,21 +35,21 @@ public class ChatMesssageFilteringUtil {
         return str.equalsIgnoreCase(str2);
     }
 
-    public static boolean filter(ChatLiveMessage liveMessage, String accountName, UserMessagesFiltering filtering) {
+    public static boolean filter(ChatLiveMessage liveMessage, String accountName, @UserMessagesFiltering int filtering) {
         if (liveMessage == null || liveMessage.messageInfo == null)
             return true;
 
         MessageLevel level = ChatMesssageFilteringUtil.getMessageLevel(liveMessage.messageInfo, accountName);
 
         switch (filtering) {
-            case BROADCASTER:
+            case UserMessagesFiltering.DISABLED:
+                return true;
+            case UserMessagesFiltering.BROADCASTER:
                 return level.isHighOrSame(MessageLevel.BROADCASTER);
-            case MODS:
+            case UserMessagesFiltering.MODS:
                 return level.isHighOrSame(MessageLevel.MODS);
-            case SUBS:
+            case UserMessagesFiltering.SUBS:
                 return level.isHighOrSame(MessageLevel.SUBS);
-            case PLEBS:
-                return level.isHighOrSame(MessageLevel.DEFAULT);
         }
 
         return true;

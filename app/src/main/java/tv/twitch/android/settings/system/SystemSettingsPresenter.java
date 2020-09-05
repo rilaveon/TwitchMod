@@ -9,8 +9,10 @@ import tv.twitch.android.shared.ui.menus.SettingsPreferencesController;
 
 
 public class SystemSettingsPresenter extends BaseSettingsPresenter {
+    /* ... */
+
     @Override
-    protected SettingsNavigationController getNavController() {
+    protected SettingsNavigationController getNavController() { // TODO: __REPLACE_METHOD
         return null;
     }
 
@@ -21,7 +23,7 @@ public class SystemSettingsPresenter extends BaseSettingsPresenter {
 
     @Override
     protected SettingsPreferencesController getPrefController() { // TODO: __REPLACE_METHOD
-        return SettingsController.getMenuListener(getActivity());
+        return SettingsController.getPrefController(this);
     }
 
     @Override
@@ -31,7 +33,8 @@ public class SystemSettingsPresenter extends BaseSettingsPresenter {
             return;
         }
 
-        getSettingModels().clear();
         SettingsController.initialize(getActivity(), getSettingModels());
     }
+
+    /* ... */
 }
