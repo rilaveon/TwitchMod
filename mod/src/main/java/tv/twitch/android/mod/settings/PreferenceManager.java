@@ -48,6 +48,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean isRedMentionOn;
     private boolean isNewClipsViewDisabled;
     private boolean isRobottyServiceEnabled;
+    private boolean isFloatingChatEnabled;
 
     private @EmoteSize int emoteSize;
     private @ChatWidthScale int chatWidthScale;
@@ -105,6 +106,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         isNewClipsViewDisabled = getBoolean(Preferences.DISABLE_NEW_CLIPS_VIEW, false);
         isDevModeOn = getBoolean(Preferences.DEV_MODE, false);
         isRobottyServiceEnabled = getBoolean(Preferences.MESSAGE_HISTORY, false);
+        isFloatingChatEnabled = getBoolean(Preferences.FLOATING_CHAT, false);
 
         emoteSize = getInt(Preferences.EMOTE_SIZE, EmoteSize.MEDIUM);
         chatWidthScale = getInt(Preferences.CHAT_WIDTH_SCALE, ChatWidthScale.DEFAULT);
@@ -277,7 +279,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     }
 
     public boolean isFloatingChatEnabled() {
-        return true;
+        return isFloatingChatEnabled;
     }
 
     public boolean isDarkThemeEnabled() {
