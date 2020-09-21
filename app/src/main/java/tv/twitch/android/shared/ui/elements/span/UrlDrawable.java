@@ -12,15 +12,7 @@ import tv.twitch.android.mod.bridges.interfaces.IDrawable;
 
 
 public class UrlDrawable extends BitmapDrawable implements IDrawable { // TODO: __IMPLEMENT
-    public Drawable drawable;
-    private String url;
-    public MediaSpan$Type type;
-
-
-    public UrlDrawable(String url, MediaSpan$Type type) {
-        this.url = url;
-        this.type = type;
-    }
+    private Drawable drawable;
 
     public final void setDrawable(Drawable drawable) {
         this.drawable = drawable;

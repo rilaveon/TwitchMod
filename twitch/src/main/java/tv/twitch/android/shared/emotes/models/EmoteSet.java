@@ -1,4 +1,4 @@
 package tv.twitch.android.shared.emotes.models;
 
 
-public class EmoteSet {/* ... */}
+public abstract class EmoteSet {/* ... */}

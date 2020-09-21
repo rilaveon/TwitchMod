@@ -7,14 +7,12 @@ import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 
 
-public class ChatUtil {
+public final class ChatUtil {
     public static final Companion Companion = new Companion();
 
     /* ... */
 
     public static final class Companion {
-        private Companion() {/* ... */}
-
         /* ... */
 
         public final Spanned createDeletedSpanFromChatMessageSpan(Spanned spanned, Context context, PublishSubject<ChatMessageClickedEvents> publishSubject, boolean z) {

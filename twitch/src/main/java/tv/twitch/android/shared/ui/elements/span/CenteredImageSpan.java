@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.text.style.ImageSpan;
 
 
-public class CenteredImageSpan extends ImageSpan {
+public final class CenteredImageSpan extends ImageSpan {
     private final Drawable imageDrawable = null;
 
     /* ... */

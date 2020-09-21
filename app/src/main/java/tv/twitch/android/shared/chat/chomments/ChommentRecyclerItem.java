@@ -8,7 +8,7 @@ import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 
 public class ChommentRecyclerItem implements IChatMessageItem { // TODO: __IMPLEMENT
-    private Spanned msgSpan;
+    private final Spanned msgSpan = null;
 
     /* ... */
 

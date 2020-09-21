@@ -23,15 +23,26 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
     private final FfzBadgesFetcher mFfzFetcher;
     private BadgeSet mFfzBadgeSet;
 
-    static {
-        Collection<Badge> badges = new ArrayList<>();
-        badges.add(new Badge("mod-dev", "file:///android_asset/mod/badges/custom/fire.png", null));
-        mCustomBadges.put(157861306, badges);
-    }
-
-
     private BadgeManager() {
         mFfzFetcher = new FfzBadgesFetcher(this);
+    }
+
+    public void clearCustomBadges() {
+        mCustomBadges.clear();
+    }
+
+    public void setUserBadges(int userId, Collection<Badge> badges) {
+        if (userId <= 0) {
+            Logger.error("Bad ID: " + userId);
+            return;
+        }
+
+        if (badges == null) {
+            Logger.error("badges == null");
+            return;
+        }
+
+        mCustomBadges.put(userId, new ArrayList<>(badges));
     }
 
     public void fetchBadges() {
@@ -41,7 +52,7 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
 
     public Collection<Badge> getCustomBadges(Integer userId) {
         if (userId <= 0) {
-            Logger.debug("userId  <= 0");
+            Logger.error("Bad ID: " + userId);
             return Collections.emptyList();
         }
 

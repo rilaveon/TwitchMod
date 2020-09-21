@@ -1,6 +1,8 @@
 package tv.twitch.android.adapters.social;
 
+
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.TextView;
@@ -12,6 +14,7 @@ import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.mvp.viewdelegate.EventDispatcher;
 import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
+import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.shared.chat.adapter.SystemMessageType;
 import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.util.ChatItemClickEvent;
@@ -22,14 +25,63 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
     private boolean hasModAccess;
     private Spanned message;
     private PublishSubject<ChatMessageClickedEvents> messageClickSubject;
-    private Context context;
+    private final Context context = null;
 
-    public String rawMessage;
+    public final String rawMessage = null;
+
+    private boolean isMentioned; // TODO: __INJECT_FIELD
 
     /* ... */
 
-    public MessageRecyclerItem(Context context2, String str, int i, String str2, String str3, int i2, Spanned message, SystemMessageType systemMessageType, float f, int i3, float f2, boolean z, boolean z2, String str4, EventDispatcher<ChatItemClickEvent> eventDispatcher) {
-        message = Hooks.addTimestampToMessage(message, i); // TODO: __HOOK_PARAM
+
+    public static final class Companion {
+
+
+        public final MessageRecyclerItem createMentioned(Context context, String str, int i, String str2, String str3, int i2, Spanned spanned, boolean z, boolean z2, String str4, EventDispatcher<ChatItemClickEvent> eventDispatcher) { // TODO: __INJECT
+            MessageRecyclerItem item = create(context, str, i, str2, str3, i2, spanned, z, z2, str4, eventDispatcher);
+            if (item != null)
+                item.setMentioned(true);
+            return item;
+        }
+
+        public final MessageRecyclerItem create(Context context, String str, int i, String str2, String str3, int i2, Spanned spanned, boolean z, boolean z2, String str4, EventDispatcher<ChatItemClickEvent> eventDispatcher) {
+            return null;
+        }
+    }
+
+    public void bindToViewHolder(RecyclerView.ViewHolder viewHolder) {
+        /* ... */
+
+        ChatMessageViewHolder chatMessageViewHolder = (ChatMessageViewHolder) viewHolder;
+        if (chatMessageViewHolder != null) {
+            /* ... */
+
+
+            setViewBackground(chatMessageViewHolder.getMessageTextView()); // TODO: __INJECT_CODE
+        }
+
+    }
+
+    private void setMentioned(boolean z) { // TODO: __INJECT_METHOD
+        isMentioned = z;
+    }
+
+    private void setViewBackground(TextView view) { // TODO: __INJECT_METHOD
+        if (view == null) {
+            Logger.error("view is null");
+            return;
+        }
+
+        if (isMentioned)
+            view.setBackgroundColor(Color.argb(100, 255, 0, 0));
+        else
+            view.setBackground(null);
+    }
+
+    public MessageRecyclerItem(Context context2, String str, int authorUserId, String str2, String str3, int i2, Spanned message, SystemMessageType systemMessageType, float f, int i3, float f2, boolean z, boolean z2, String str4, EventDispatcher<ChatItemClickEvent> eventDispatcher) {
+        message = Hooks.addTimestampToMessage(message, authorUserId); // TODO: __HOOK_PARAM
+
+        /* ... */
     }
 
     public void markAsDeleted() {

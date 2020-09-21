@@ -9,15 +9,15 @@ import tv.twitch.android.shared.chat.observables.ChatConnectionController;
 
 
 public class ChatViewPresenter {
-    public LiveChatSource liveChatSource;
+    public final LiveChatSource liveChatSource = null;
 
-    public ChannelInfo channel;
-    public String playbackSessionID;
-    public StreamType streamType;
+    private ChannelInfo channel;
+    private String playbackSessionID;
+    private StreamType streamType;
 
     /* ... */
 
-    public ChatConnectionController chatConnectionController;
+    private final ChatConnectionController chatConnectionController = null;
 
     /* ... */
 

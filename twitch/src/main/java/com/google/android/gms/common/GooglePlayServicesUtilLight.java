@@ -14,10 +14,7 @@ public class GooglePlayServicesUtilLight {
     }
 
     public static int isGooglePlayServicesAvailable(Context context, int i) { // TODO: __REPLACE_METHOD
-//        if (Hooks.isHideGsJump()) {
-//            return 0;
-//        }
-
+        // TODO: __GS_JUMP
         return isGooglePlayServicesAvailableOrg(context, i);
     }
 }

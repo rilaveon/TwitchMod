@@ -9,6 +9,6 @@ import tv.twitch.android.mod.models.api.RobottyResponse;
 
 
 public interface RobottyApi {
-    @GET("/api/v2/recent-messages/{username}?hide_moderation_messages=true&hide_moderated_messages=true")
+    @GET("/api/v2/recent-messages/{username}?hide_moderation_messages=false&hide_moderated_messages=true")
     Call<RobottyResponse> getPastMessages(@Path("username") String userName, @Query("limit") int limit);
 }

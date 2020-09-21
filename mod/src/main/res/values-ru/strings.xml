@@ -51,5 +51,8 @@
     <string name="mod_settings_msg_delete">Стиль удаленных сообщений</string>
     <string name="mod_downloading">Загрузка %1$s…</string>
     <string name="mod_settings_chat_red_mention">Выделять упоминания</string>
-    <string name="mod_settings_message_history">История чата</string>
+    <string name="mod_settings_message_history">Загружать историю чата</string>
+    <string name="mod_settings_blacklist">Фильтр по ключевым словам</string>
+    <string name="mod_settings_message_history_limit">Макс. количество</string>
+    <string name="mod_settings_compact_follow_view">Компактный интерфейс отслеживания</string>
 </resources>

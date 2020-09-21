@@ -7,11 +7,19 @@ import tv.twitch.android.mod.bridges.Hooks;
 public class ExperimentHelper {
     /* ... */
 
-    public boolean isInOnGroupForBinaryExperiment(Experiment experiment) { // TODO: __INJECT_METHOD
-        return Hooks.hookExperimental(experiment, org(experiment));
+    public final boolean isInOnGroupForBinaryExperiment(Experiment experiment) { // TODO: __INJECT_METHOD
+        return Hooks.hookExperimental(experiment, isInOnGroupForBinaryExperimentOrg(experiment));
     }
 
-    public boolean org(Experiment experiment) { // TODO: __RENAME__isInOnGroupForBinaryExperiment
+    public final String getGroupForExperiment(Experiment experiment) { // TODO: __INJECT_METHOD
+        return Hooks.hookExperimentalGroup(experiment, getGroupForExperimentOrg(experiment));
+    }
+
+    public final String getGroupForExperimentOrg(Experiment experiment) { // TODO: __RENAME__getGroupForExperiment
+        return null;
+    }
+
+    public boolean isInOnGroupForBinaryExperimentOrg(Experiment experiment) { // TODO: __RENAME__isInOnGroupForBinaryExperiment
         return false;
     }
 

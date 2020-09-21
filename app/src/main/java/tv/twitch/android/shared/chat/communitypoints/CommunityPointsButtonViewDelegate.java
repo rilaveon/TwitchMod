@@ -18,7 +18,8 @@ public class CommunityPointsButtonViewDelegate {
         this.buttonLayout.callOnClick(); // TODO: __INJECT_CODE
     }
 
-    private void handleClaimError() { // TODO: __REMOVE_TOAST
+    private void handleClaimError() {
+        // Toast.makeText(getContext(), R$string.claim_error_message, 1).show(); // TODO: __REMOVE
         /* ... */
     }
 

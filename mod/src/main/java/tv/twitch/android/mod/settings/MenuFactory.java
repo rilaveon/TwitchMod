@@ -32,6 +32,10 @@ public class MenuFactory {
         return new MenuMessageModel(text, 17, 0, false);
     }
 
+    public static MenuModel getSpannedMessage(String text) {
+        return new MenuMessageModel(text, 17, 0, true);
+    }
+
     public static MenuModel getDropDownMenu(SettingsPreferencesController.SettingsPreference controller, ResourcesManager resourcesManager, PreferenceArrayAdapter adapter, Object state) {
         return new DropDownMenuModel<>(adapter, adapter.findItemPos(state), resourcesManager.getString(controller.getPreference().getTitle()), resourcesManager.getString(controller.getPreference().getDescription()), null, null, new SettingsController.onMenuItemSelected(adapter));
     }

@@ -34,7 +34,12 @@ public enum Preferences {
     FLOATING_REFRESH("mod_floating_refresh_v2", "mod_settings_floating_refresh", "mod_settings_floating_refresh_desc"),
     MSG_DELETE_STRATEGY("mod_msg_delete_strategy_v2", "mod_settings_msg_delete", "mod_settings_msg_delete_desc"),
     FLOATING_CHAT("mod_floating_chat_v2", "mod_settings_floating_chat", "mod_settings_floating_chat_desc"),
-    MESSAGE_HISTORY("mod_message_history_v2", "mod_settings_message_history", "mod_settings_message_history_desc");
+    MESSAGE_HISTORY("mod_message_history_v2", "mod_settings_message_history", "mod_settings_message_history_desc"),
+    ROBOTTY_LIMIT("mod_robotty_limit_v2", "mod_settings_message_history_limit", "mod_settings_message_history_limit_desc"),
+    FILTER_TEXT("mod_filter_text", "mod_settings_blacklist", "mod_settings_blacklist_desc"),
+    COMPACT_FOLLOW_VIEW("mod_compact_follow_view", "mod_settings_compact_follow_view", "mod_settings_compact_follow_view_desc"),
+    REFRESH_BUTTON("mod_player_show_refresh_button", "mod_settings_show_refresh_button", "mod_settings_show_refresh_button_desc"),
+    STATS_BUTTON("mod_player_show_stats_button", "mod_settings_show_stats_button", "mod_settings_show_stats_button_desc");
 
     private final String mKey;
     private final String mTitle;

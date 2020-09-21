@@ -1,15 +1,19 @@
 package tv.twitch.android.mod.settings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import tv.twitch.android.mod.BuildConfig;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.models.Preferences;
@@ -17,12 +21,14 @@ import tv.twitch.android.mod.models.preferences.ChatWidthScale;
 import tv.twitch.android.mod.models.preferences.FloatingChatSize;
 import tv.twitch.android.mod.models.preferences.FloatingChatRefreshDelay;
 import tv.twitch.android.mod.models.preferences.MsgDelete;
+import tv.twitch.android.mod.models.preferences.RobottyLimit;
 import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
 import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.mod.models.preferences.ExoPlayerSpeed;
 import tv.twitch.android.mod.models.preferences.Gifs;
 import tv.twitch.android.mod.models.preferences.MiniPlayerSize;
 import tv.twitch.android.mod.models.preferences.PlayerImpl;
+import tv.twitch.android.mod.utils.ChatMesssageFilteringUtil;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.settings.base.BaseSettingsPresenter;
@@ -33,22 +39,24 @@ import tv.twitch.android.shared.ui.menus.dropdown.DropDownMenuModel;
 import tv.twitch.android.shared.ui.menus.togglemenu.ToggleMenuModel;
 
 
-
 public class SettingsController {
-    private static final List<Preferences> RESTART_PREFERENCES_LIST = new ArrayList<>();
+    private static final List<Preferences> RESTART_LIST = new ArrayList<>();
 
     public static final SettingsController INSTANCE = new SettingsController();
 
     private static final String TELEGRAM_URL = "https://t.me/pubTw";
+    private static final String RECENT_MESSAGES_SERVICE_URL = "https://recent-messages.robotty.de";
     private static final String GITHUB_URL = "https://github.com/nopbreak/TwitchMod";
 
+
     private SettingsController() {
-        RESTART_PREFERENCES_LIST.add(Preferences.ADBLOCK);
-        RESTART_PREFERENCES_LIST.add(Preferences.HIDE_ESPORTS_TAB);
-        RESTART_PREFERENCES_LIST.add(Preferences.HIDE_DISCOVER_TAB);
-        RESTART_PREFERENCES_LIST.add(Preferences.DEV_ENABLE_INTERCEPTOR);
-        RESTART_PREFERENCES_LIST.add(Preferences.BADGES);
-        RESTART_PREFERENCES_LIST.add(Preferences.HIDE_GPS_ERROR);
+        RESTART_LIST.add(Preferences.ADBLOCK);
+        RESTART_LIST.add(Preferences.HIDE_ESPORTS_TAB);
+        RESTART_LIST.add(Preferences.HIDE_DISCOVER_TAB);
+        RESTART_LIST.add(Preferences.DEV_ENABLE_INTERCEPTOR);
+        RESTART_LIST.add(Preferences.BADGES);
+        RESTART_LIST.add(Preferences.HIDE_GPS_ERROR);
+        RESTART_LIST.add(Preferences.DEV_MODE);
     }
 
     public static final class ModSettingsPreferencesController implements SettingsPreferencesController {
@@ -93,7 +101,7 @@ public class SettingsController {
 
             Logger.debug("preferenceKey=" + preferenceKey + ", isChecked=" + isChecked);
             PreferenceManager.INSTANCE.updateBoolean(preferenceKey, isChecked);
-            maybeRestartIfNeed(mActivity, preference);
+            maybeShowRestartDialog(mActivity, preference);
         }
 
         @Override
@@ -113,31 +121,30 @@ public class SettingsController {
         @Override
         public void onDropDownItemSelected(DropDownMenuModel<PreferenceArrayAdapter.AdapterItem> dropDownMenuModel, int itemPos) {
             if (itemPos == mSelected) {
-                Logger.debug("fix");
                 return;
             }
-            mSelected = itemPos;
 
+            mSelected = itemPos;
             PreferenceArrayAdapter.AdapterItem item = this.mAdapter.getItem(itemPos);
             if (item == null) {
                 Logger.error("item is null");
                 return;
             }
 
-            Logger.debug("item=" + item.toString() + ", itemPos=" + itemPos);
             Object val = item.getVal();
             if (val instanceof String) {
                 PreferenceManager.INSTANCE.updateString(mAdapter.getPrefKey(), (String) val);
             } else {
                 PreferenceManager.INSTANCE.updateInt(mAdapter.getPrefKey(), (int) val);
             }
+
             dropDownMenuModel.setSelectedOption(itemPos);
         }
     }
 
 
-    private static void maybeRestartIfNeed(Activity activity, Preferences preference) {
-        if (RESTART_PREFERENCES_LIST.indexOf(preference) == -1)
+    private static void maybeShowRestartDialog(Activity activity, Preferences preference) {
+        if (RESTART_LIST.indexOf(preference) == -1)
             return;
 
         Helper.showRestartDialog(activity, ResourcesManager.INSTANCE.getString("restart_dialog_text"));
@@ -174,6 +181,55 @@ public class SettingsController {
         return new ModSettingsPreferencesController(presenter);
     }
 
+    public final static class OpenFilterBlacklistDialog implements View.OnClickListener {
+        private final Context mContext;
+
+        public OpenFilterBlacklistDialog(Context context) {
+            this.mContext = context;
+        }
+
+        @Override
+        public void onClick(View v) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle(ResourcesManager.INSTANCE.getString("mod_settings_blacklist"));
+
+            View viewInflated = LayoutInflater.from(mContext).inflate(ResourcesManager.INSTANCE.getLayoutId("mod_filter_blacklist"), null, false);
+
+            final TextInputEditText input = viewInflated.findViewById(ResourcesManager.INSTANCE.getId("input"));
+            final String text = PreferenceManager.INSTANCE.getFilterText();
+            if (TextUtils.isEmpty(text)) {
+                input.setText("");
+            } else {
+                input.setText(text);
+            }
+
+            builder.setView(viewInflated);
+
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    CharSequence inputText = input.getText();
+                    if (text == null)
+                        inputText = "";
+
+                    String text = String.valueOf(inputText);
+
+                    PreferenceManager.INSTANCE.updateString(Preferences.FILTER_TEXT.getKey(), text);
+                    ChatMesssageFilteringUtil.INSTANCE.updateBlacklist(text);
+                }
+            });
+            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
+    }
+
     public static void initialize(final Context context, List<MenuModel> items) {
         final PreferenceManager preferenceManager = PreferenceManager.INSTANCE;
         final ResourcesManager resourcesManager = ResourcesManager.INSTANCE;
@@ -200,13 +256,39 @@ public class SettingsController {
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, resourcesManager, preferenceManager.isMessageTimestampOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RedChatMention, resourcesManager, preferenceManager.isRedMentionOn()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, resourcesManager, preferenceManager.isBypassChatBan()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.MessageHistory, resourcesManager, preferenceManager.isMessageHistoryEnabled()));
 
         PreferenceArrayAdapter msgDeleteAdapter = new PreferenceArrayAdapter(context, Preferences.MSG_DELETE_STRATEGY.getKey());
         msgDeleteAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", MsgDelete.DEFAULT));
-        msgDeleteAdapter.add(new PreferenceArrayAdapter.AdapterItem("Mod", MsgDelete.MOD));
+        msgDeleteAdapter.add(new PreferenceArrayAdapter.AdapterItem("Legacy", MsgDelete.MOD));
         msgDeleteAdapter.add(new PreferenceArrayAdapter.AdapterItem("Strikethrough", MsgDelete.STRIKETHROUGH));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MsgDelete, resourcesManager, msgDeleteAdapter, preferenceManager.getMsgDelete()));
+
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_chat_filtering")));
+
+        PreferenceArrayAdapter messagesFilteringAdapter = new PreferenceArrayAdapter(context, Preferences.CHAT_MESSAGE_FILTER_LEVEL.getKey());
+        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Disabled", UserMessagesFiltering.DISABLED));
+        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Subs", UserMessagesFiltering.SUBS));
+        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Mods", UserMessagesFiltering.MODS));
+        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Broadcaster", UserMessagesFiltering.BROADCASTER));
+
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, resourcesManager, messagesFilteringAdapter, preferenceManager.getChatFiltering()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, resourcesManager, preferenceManager.isIgnoreSystemMessages()));
+        items.add(MenuFactory.getInfoMenu(ResourcesManager.INSTANCE.getString("mod_settings_blacklist"), ResourcesManager.INSTANCE.getString("mod_settings_blacklist_desc"), new OpenFilterBlacklistDialog(context)));
+
+        items.add(MenuFactory.getInfoMenu("Recent-messages service"));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.MessageHistory, resourcesManager, preferenceManager.isMessageHistoryEnabled()));
+
+        PreferenceArrayAdapter robottyLimit = new PreferenceArrayAdapter(context, Preferences.ROBOTTY_LIMIT.getKey());
+        robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT1), RobottyLimit.LIMIT1));
+        robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT2), RobottyLimit.LIMIT2));
+        robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT3), RobottyLimit.LIMIT3));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.RobottyLimit, resourcesManager, robottyLimit, preferenceManager.getMessageHistoryLimit()));
+        items.add(MenuFactory.getInfoMenu("About the service", "Visit website", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.openUrl(RECENT_MESSAGES_SERVICE_URL);
+            }
+        }));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_floating_chat")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, resourcesManager, preferenceManager.isFloatingChatEnabled()));
@@ -231,6 +313,8 @@ public class SettingsController {
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_player_category")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, resourcesManager, preferenceManager.isAdblockEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.AutoPlay, resourcesManager, preferenceManager.isDisableAutoplay()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.StatsButton, resourcesManager, preferenceManager.isShowStatsButton()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RefreshButton, resourcesManager, preferenceManager.isShowRefreshButton()));
 
 
         PreferenceArrayAdapter playerImplAdapter = new PreferenceArrayAdapter(context, Preferences.PLAYER_IMPL.getKey());
@@ -262,17 +346,6 @@ public class SettingsController {
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VolumeSwipe, resourcesManager, preferenceManager.isVolumeSwipeEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BrightnessSwipe, resourcesManager, preferenceManager.isBrightnessSwipeEnabled()));
 
-        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_chat_filtering")));
-
-        PreferenceArrayAdapter messagesFilteringAdapter = new PreferenceArrayAdapter(context, Preferences.CHAT_MESSAGE_FILTER_LEVEL.getKey());
-        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Disabled", UserMessagesFiltering.DISABLED));
-        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Subs", UserMessagesFiltering.SUBS));
-        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Mods", UserMessagesFiltering.MODS));
-        messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Broadcaster", UserMessagesFiltering.BROADCASTER));
-
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, resourcesManager, messagesFilteringAdapter, preferenceManager.getChatFiltering()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, resourcesManager, preferenceManager.isIgnoreSystemMessages()));
-
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_view")));
 
         PreferenceArrayAdapter chatWidthScaleAdapter = new PreferenceArrayAdapter(context, Preferences.CHAT_WIDTH_SCALE.getKey());
@@ -286,6 +359,7 @@ public class SettingsController {
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("40%", ChatWidthScale.SCALE40));
 
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, resourcesManager, chatWidthScaleAdapter, preferenceManager.getChatWidthScale()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BetterFollowView, resourcesManager, preferenceManager.isCompactViewEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.EmotePickerView, resourcesManager, preferenceManager.isForceOldEmotePicker()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableNewClips, resourcesManager, preferenceManager.isForceOldClips()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, resourcesManager, preferenceManager.isDisableRecommendations()));
@@ -305,7 +379,7 @@ public class SettingsController {
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));
 
-        items.add(MenuFactory.getInfoMenu("TwitchMod v" + BuildConfig.VERSION_NAME, LoaderLS.APK_BUILD_INFO, new OnBuildClickListener()));
+        items.add(MenuFactory.getInfoMenu("TwitchMod v" + LoaderLS.getVersion(), LoaderLS.getBuildInfo(), new OnBuildClickListener()));
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), null, new View.OnClickListener() {
             @Override
             public void onClick(View v) {

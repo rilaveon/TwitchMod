@@ -14,12 +14,6 @@ public class ClipModel implements Playable {
         return Collections.emptyList();
     }
 
-    public final String getBestUrlForQuality(ClipQuality clipQuality) {
-        /* ... */
-
-        return null;
-    }
-
     public int getBroadcasterId() {
         return 0;
     }
@@ -33,7 +27,7 @@ public class ClipModel implements Playable {
     }
 
     public final String getTitle() {
-        return "";
+        return null;
     }
 
     /* ... */

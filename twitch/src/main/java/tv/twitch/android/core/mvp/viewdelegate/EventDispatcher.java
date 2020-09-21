@@ -1,4 +1,4 @@
 package tv.twitch.android.core.mvp.viewdelegate;
 
 
-public class EventDispatcher<E> {/* ... */}
+public final class EventDispatcher<E> {/* ... */}

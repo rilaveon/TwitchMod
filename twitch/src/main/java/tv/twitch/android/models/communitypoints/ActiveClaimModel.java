@@ -1,4 +1,4 @@
 package tv.twitch.android.models.communitypoints;
 
 
-public class ActiveClaimModel {/* ... */}
+public final class ActiveClaimModel {/* ... */}

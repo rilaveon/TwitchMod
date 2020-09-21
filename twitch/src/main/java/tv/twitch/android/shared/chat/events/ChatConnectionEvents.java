@@ -1,6 +1,7 @@
 package tv.twitch.android.shared.chat.events;
 
-public class ChatConnectionEvents {
+
+public abstract class ChatConnectionEvents {
     /* ... */
 
     public static final class ChatConnectingEvent extends ChatConnectionEvents {/* ... */}

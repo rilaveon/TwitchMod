@@ -12,8 +12,9 @@ import tv.twitch.android.shared.emotes.models.EmoteMessageInput;
 import tv.twitch.android.shared.emotes.models.EmotePickerEmoteModel;
 
 
-public class EmotePickerPresenter {
-    public EmotePickerAdapterBinder adapterBinder;
+public final class EmotePickerPresenter {
+    private final EmotePickerAdapterBinder adapterBinder = null;
+
 
     /* ... */
 
@@ -44,48 +45,11 @@ public class EmotePickerPresenter {
     public final State.Loaded createLoadedState(State.Loaded loaded, UpdateEvent updateEvent) {
         /* ... */
 
-        if (updateEvent instanceof UpdateEvent.EmoteSectionSelected) {
-            /* ... */
-            int i;
-            int i2 = 4;
-            if (i2 == 4) {
-                i = calcBttvPosition();// TODO: __INJECT_CODE
-                i += 1;
-            }
-
-            /* ... */
-        }
+        if (updateEvent instanceof UpdateEvent.EmoteSectionSelected) {/* ... */}
 
         /* ... */
 
         return null;
-    }
-
-    // FIXME: need better calculation
-    private int calcBttvPosition() { // TODO: __INJECT_METHOD
-        if (adapterBinder == null)
-            return 0;
-
-        TwitchSectionAdapter twitchSectionAdapter = adapterBinder.getAdapter();
-        if (twitchSectionAdapter == null)
-            return 0;
-
-        List<RecyclerAdapterSection> sections = twitchSectionAdapter.getSections();
-        if (sections == null)
-            return 0;
-
-        int index = 0;
-        for (RecyclerAdapterSection item : sections) {
-            if (item instanceof EmotePickerAdapterSection) {
-                EmotePickerSection type = ((EmotePickerAdapterSection) item).getEmotePickerSection();
-                if (type == EmotePickerSection.BTTV)
-                    return index;
-
-                index += item.sizeWithHeader();
-            }
-        }
-
-        return 0;
     }
 
     public static abstract class ClickedEmote {

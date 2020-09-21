@@ -12,13 +12,16 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Process;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesUtilLight;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
+import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.bridges.ResourcesManager;
+import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.settings.SettingsActivity;
@@ -159,5 +162,27 @@ public class Helper {
         }
 
         return false;
+    }
+
+    public static void showPartnerBanner(Context context) {
+
+    }
+
+    public static void maybeShowBanner(final Context context, final TwitchAccountManager accountManager) {
+        if (!PreferenceManager.INSTANCE.isShowBanner())
+            return;
+
+        StringBuilder text = new StringBuilder(ResourcesManager.INSTANCE.getString("mod_banner_text_default"));
+
+        AlertDialog dialog = new AlertDialog.Builder(context).setTitle("Mod Info").setMessage(text).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                PreferenceManager.INSTANCE.disableBanner();
+                dialog.cancel();
+                if (accountManager.isPartner())
+                    showPartnerBanner(context);
+            }
+        }).create();
+        dialog.show();
     }
 }

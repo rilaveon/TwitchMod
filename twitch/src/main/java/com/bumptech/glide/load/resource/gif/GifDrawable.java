@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 
 
 /**
- * Source: GifDrawable
  * https://bumptech.github.io/glide/javadocs/440/com/bumptech/glide/load/resource/gif/GifDrawable.html
  */
 public class GifDrawable extends Drawable {

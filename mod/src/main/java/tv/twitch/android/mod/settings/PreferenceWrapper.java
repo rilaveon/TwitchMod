@@ -52,11 +52,6 @@ public final class PreferenceWrapper implements SharedPreferences.OnSharedPrefer
             return;
         }
 
-        if (TextUtils.isEmpty(val)) {
-            Logger.error("Empty val");
-            return;
-        }
-
         mDefaultSharedPreferences.edit().putString(key, val).apply();
     }
 

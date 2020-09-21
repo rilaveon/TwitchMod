@@ -16,6 +16,8 @@ public class RequestBuilder<TranscodeType> {
     }
 
     private RequestBuilder<TranscodeType> loadGeneric(Object obj) {
+        /* ... */
+
         return this;
     }
 

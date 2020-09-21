@@ -4,10 +4,10 @@ package tv.twitch.android.feature.theatre.common;
 import tv.twitch.android.shared.player.presenters.PlayerPresenter;
 
 
-public class PlayerCoordinatorPresenter {
+public abstract class PlayerCoordinatorPresenter {
     /* ... */
 
-    private PlayerPresenter playerPresenter;
+    private final PlayerPresenter playerPresenter = null;
 
     /* ... */
 

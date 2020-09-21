@@ -2,7 +2,19 @@ package tv.twitch.android.shared.chat.messagefactory;
 
 
 public class ChatMessageSpanGroup {
-    public static final ChatMessageSpanGroup BLANK = new ChatMessageSpanGroup(null, null, "");
+    public static final Companion Companion = new Companion();
+
+    /* ... */
+
+    public static final class Companion {
+        /* ... */
+
+        public final ChatMessageSpanGroup getBLANK() {
+            return null;
+        }
+
+        /* ... */
+    }
 
     /* ... */
 

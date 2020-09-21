@@ -1,4 +1,4 @@
 package tv.twitch.android.core.adapters;
 
 
-public class RecyclerAdapterItem {/* ... */}
+public interface RecyclerAdapterItem {/* ... */}

@@ -1,4 +1,4 @@
 package tv.twitch.android.shared.analytics;
 
 
-public class PageViewTracker {/* ... */}
+public final class PageViewTracker {/* ... */}

@@ -81,7 +81,7 @@ public class ClipDownloader implements View.OnClickListener {
         builder.setAdapter(mAdapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ClipsAdapter.ClipItem option = (ClipsAdapter.ClipItem) mAdapter.getItem(which);
+                ClipsAdapter.ClipItem option = mAdapter.getItem(which);
                 if (option == null) {
                     Logger.debug("option is null. Pos=" + which);
                     return;

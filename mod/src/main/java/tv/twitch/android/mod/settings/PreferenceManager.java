@@ -16,6 +16,7 @@ import tv.twitch.android.mod.models.preferences.Gifs;
 import tv.twitch.android.mod.models.preferences.MiniPlayerSize;
 import tv.twitch.android.mod.models.preferences.MsgDelete;
 import tv.twitch.android.mod.models.preferences.PlayerImpl;
+import tv.twitch.android.mod.models.preferences.RobottyLimit;
 import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
 import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
@@ -23,6 +24,7 @@ import tv.twitch.android.mod.utils.Logger;
 
 public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     public static final String TWITCH_DARK_THEME_KEY = "dark_theme_enabled";
+    public static final String MOD_BANNER_KEY = "mod_banner";
 
     public static final PreferenceManager INSTANCE = new PreferenceManager();
 
@@ -49,6 +51,12 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean isNewClipsViewDisabled;
     private boolean isRobottyServiceEnabled;
     private boolean isFloatingChatEnabled;
+    private boolean isCompactViewEnabled;
+    private boolean isShowStatsButton;
+    private boolean isShowRefreshButton;
+    private boolean isShowBanner;
+
+    private String mFilterText;
 
     private @EmoteSize int emoteSize;
     private @ChatWidthScale int chatWidthScale;
@@ -60,6 +68,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private @UserMessagesFiltering int messageFiltering;
     private @FloatingChatSize int floatingChatSize;
     private @FloatingChatRefreshDelay int floatingChatRefresh;
+    private @RobottyLimit int robottyLimit;
 
     private PreferenceWrapper mWrapper;
 
@@ -107,6 +116,12 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         isDevModeOn = getBoolean(Preferences.DEV_MODE, false);
         isRobottyServiceEnabled = getBoolean(Preferences.MESSAGE_HISTORY, false);
         isFloatingChatEnabled = getBoolean(Preferences.FLOATING_CHAT, false);
+        isCompactViewEnabled = getBoolean(Preferences.COMPACT_FOLLOW_VIEW, false);
+        isShowStatsButton = getBoolean(Preferences.STATS_BUTTON, true);
+        isShowRefreshButton = getBoolean(Preferences.REFRESH_BUTTON, true);
+        isShowBanner = getBoolean(MOD_BANNER_KEY, true);
+
+        mFilterText = getString(Preferences.FILTER_TEXT, null);
 
         emoteSize = getInt(Preferences.EMOTE_SIZE, EmoteSize.MEDIUM);
         chatWidthScale = getInt(Preferences.CHAT_WIDTH_SCALE, ChatWidthScale.DEFAULT);
@@ -118,6 +133,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         messageFiltering = getInt(Preferences.CHAT_MESSAGE_FILTER_LEVEL, UserMessagesFiltering.DISABLED);
         floatingChatSize = getInt(Preferences.FLOAT_CHAT_SIZE, FloatingChatSize.DEFAULT);
         floatingChatRefresh = getInt(Preferences.FLOATING_REFRESH, FloatingChatRefreshDelay.DEFAULT);
+        robottyLimit = getInt(Preferences.ROBOTTY_LIMIT, RobottyLimit.LIMIT1);
 
         isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
     }
@@ -294,6 +310,28 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return isRobottyServiceEnabled;
     }
 
+    public boolean isCompactViewEnabled() {
+        return isCompactViewEnabled;
+    }
+
+    public boolean isShowRefreshButton() {
+        return isShowRefreshButton;
+    }
+
+    public boolean isShowStatsButton() {
+        return isShowStatsButton;
+    }
+
+    public boolean isShowBanner() {
+        return false;
+
+        // return isShowBanner;
+    }
+
+    public void disableBanner() {
+        updateBoolean(MOD_BANNER_KEY, false);
+    }
+
     public @EmoteSize int getEmoteSize() {
         return emoteSize;
     }
@@ -334,6 +372,13 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return gifs;
     }
 
+    public @RobottyLimit int getMessageHistoryLimit() {
+        return robottyLimit;
+    }
+
+    public String getFilterText() {
+        return mFilterText;
+    }
 
     @Override
     public void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {

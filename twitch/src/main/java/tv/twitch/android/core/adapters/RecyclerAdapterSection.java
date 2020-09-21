@@ -1,7 +1,7 @@
 package tv.twitch.android.core.adapters;
 
 
-public class RecyclerAdapterSection {
+public abstract class RecyclerAdapterSection {
     /* ... */
 
     public final int sizeWithHeader() {

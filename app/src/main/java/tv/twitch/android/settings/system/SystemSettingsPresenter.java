@@ -1,11 +1,14 @@
 package tv.twitch.android.settings.system;
 
 
+import java.util.List;
+
 import tv.twitch.android.mod.settings.SettingsController;
 import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.settings.base.BaseSettingsPresenter;
 import tv.twitch.android.settings.base.SettingsNavigationController;
 import tv.twitch.android.shared.ui.menus.SettingsPreferencesController;
+import tv.twitch.android.shared.ui.menus.core.MenuModel;
 
 
 public class SystemSettingsPresenter extends BaseSettingsPresenter {
@@ -28,12 +31,13 @@ public class SystemSettingsPresenter extends BaseSettingsPresenter {
 
     @Override
     public void updateSettingModels() { // TODO: __REPLACE_METHOD
-        if (getSettingModels() == null) {
-            Logger.error("getSettingModels() is null");
+        List<MenuModel> models = getSettingModels();
+        if (models == null) {
+            Logger.error("models is null");
             return;
         }
 
-        SettingsController.initialize(getActivity(), getSettingModels());
+        SettingsController.initialize(getActivity(), models);
     }
 
     /* ... */

@@ -6,7 +6,7 @@
     <string name="mod_settings_bttv_widget">Emote menu</string>
     <string name="mod_settings_bttv_widget_desc" translatable="false">Adds extra BetterTTV/FFZ emoticons to emote picker</string>
     <string name="mod_settings_gifs">GIFS</string>
-    <string name="mod_settings_gifs_desc" translatable="false">Change the mode of how GIF emoticons are showing up. </string>
+    <string name="mod_settings_gifs_desc" translatable="false">Change the mode of how GIF emoticons are showing up</string>
     <string name="mod_settings_emote_size">Source emote size</string>
     <string name="mod_settings_emote_size_desc" translatable="false" />
     <string name="mod_category_settings_chat_category">Chat</string>
@@ -16,9 +16,9 @@
     <string name="mod_settings_message_timestamp">Timestamps</string>
     <string name="mod_settings_message_timestamp_desc" translatable="false">Display timestamps alongside chat messages</string>
     <string name="mod_settings_bypass_chat_ban">Bypass chat ban</string>
-    <string name="mod_settings_bypass_chat_ban_desc" translatable="false">Viewing chat when you are banned</string>
+    <string name="mod_settings_bypass_chat_ban_desc" translatable="false">Viewing chat when you are banned. You can\'t send messages</string>
     <string name="mod_settings_badges">FFZ badges</string>
-    <string name="mod_settings_badges_desc" translatable="false">Use custom ffz badges where available</string>
+    <string name="mod_settings_badges_desc" translatable="false">Use ffz badges where available</string>
     <string name="mod_category_settings_player_category">Player</string>
     <string name="mod_settings_adblock">AdBlock</string>
     <string name="mod_settings_adblock_desc" translatable="false">Block player ads and disable analytics</string>
@@ -41,7 +41,7 @@
     <string name="mod_settings_filtering_ignore_system">Ignore system</string>
     <string name="mod_settings_filtering_ignore_system_desc" translatable="false">Ignore subs, events and etc.</string>
     <string name="mod_category_view">View</string>
-    <string name="mod_settings_old_emote_picker">Use old emote picker</string>
+    <string name="mod_settings_old_emote_picker">Force old emote picker</string>
     <string name="mod_settings_old_emote_picker_desc" translatable="false" />
     <string name="mod_settings_disable_recommendations">Hide «Recommended Streams»</string>
     <string name="mod_settings_disable_recommendations_desc" translatable="false" />
@@ -66,9 +66,9 @@
     <string name="mod_category_info">Info</string>
     <string name="mod_info_open_telegram">Telegram channel</string>
     <string name="mod_info_open_github">GitHub page</string>
-    <string name="mod_emote_picker_bttv_global">BTTV global emotes</string>
-    <string name="mod_emote_picker_bttv_channel">BTTV channel emotes</string>
-    <string name="mod_emote_picker_ffz_channel">FFZ channel emotes</string>
+    <string name="mod_emote_picker_bttv_global">BTTV Global Emotes</string>
+    <string name="mod_emote_picker_bttv_channel">BTTV Channel Emotes</string>
+    <string name="mod_emote_picker_ffz_channel">FFZ Channel Emotes</string>
     <string name="restart_dialog_text">Refresh and restart?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
@@ -82,8 +82,19 @@
     <string name="mod_settings_disable_new_clips_desc" translatable="false" />
     <string name="mod_settings_floating_queue">Queue size</string>
     <string name="mod_settings_msg_delete">Deleted message style</string>
-    <string name="mod_settings_floating_queue_desc" translatable="false" />
     <string name="mod_settings_msg_delete_desc" translatable="false" />
+    <string name="mod_settings_floating_queue_desc" translatable="false" />
+    <string name="mod_settings_compact_follow_view">Compact follow view</string>
+    <string name="mod_settings_blacklist">Set blacklist keywords</string>
+    <string name="mod_settings_blacklist_desc" translatable="false" />
     <string name="mod_settings_message_history">Load message history</string>
-    <string name="mod_settings_message_history_desc" translatable="false">API https://recent-messages.robotty.de</string>
+    <string name="mod_settings_message_history_desc" translatable="false">Load message history on connect. API https://recent-messages.robotty.de</string>
+    <string name="mod_settings_message_history_limit">Limit</string>
+    <string name="mod_settings_message_history_limit_desc" translatable="false">Limit the number of messages</string>
+    <string name="mod_settings_compact_follow_view_desc" translatable="false"/>
+    <string name="mod_settings_show_refresh_button">Show refresh button</string>
+    <string name="mod_settings_show_refresh_button_desc" translatable="false"/>
+    <string name="mod_settings_show_stats_button">Show stats button</string>
+    <string name="mod_settings_show_stats_button_desc" translatable="false"/>
+    <string name="mod_banner_text_default" translatable="false">TwitchMod is a modded version of Android Twitch Application.\n\nFeatures:\n • BTTV/FFZ Emotes\n • Adblock\n • Autoclicker for channel points\n • Blacklist\n • and more</string>
 </resources>

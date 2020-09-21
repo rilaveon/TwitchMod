@@ -8,10 +8,10 @@ import tv.twitch.android.shared.ui.menus.SettingsPreferencesController.SettingsP
 import tv.twitch.android.shared.ui.menus.core.MenuModel;
 
 
-public class ToggleMenuModel extends MenuModel {
+public final class ToggleMenuModel extends MenuModel {
     /* ... */
 
-    public ToggleMenuModel(String str, String str2, String str3, boolean z, boolean z2, Drawable drawable, String str4, boolean z3, String str5, Integer num, Integer num2, SettingsPreference settingsPreference, View.OnClickListener onClickListener) {/* ... */}
+    public ToggleMenuModel(String primaryText, String secondaryText, String auxiliaryText, boolean z, boolean z2, Drawable drawable, String eventName, boolean includeBackground, String pillText, Integer pillColor, Integer pillTextColor, SettingsPreference settingsPreference, View.OnClickListener onClickListener) {/* ... */}
 
     public final SettingsPreference getSettingsPref() {
         return null;

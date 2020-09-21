@@ -15,12 +15,6 @@ public class LiveChatSource implements ILiveChatSource { // TODO: __IMPLEMENT
 
     /* ... */
 
-    public final void addMessages(int i, List<? extends ChatLiveMessage> liveMessages /* ... */) {
-        liveMessages = Hooks.hookLiveMessages(liveMessages, accountManager); // TODO: __HOOK_PARAM
-
-        /* ... */
-    }
-
     public final void onUserNoticeReceived(ChatNoticeEvents noticeEvents) {
         if (noticeEvents instanceof ChatNoticeEvents.FirstTimeChatterNoticeEvent && !Hooks.isJumpSystemIgnore()) { // TODO: __JUMP_HOOK
             /* ... */

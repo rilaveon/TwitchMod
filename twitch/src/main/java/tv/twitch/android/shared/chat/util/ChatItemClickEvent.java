@@ -1,4 +1,4 @@
 package tv.twitch.android.shared.chat.util;
 
 
-public class ChatItemClickEvent {/* ... */}
+public abstract class ChatItemClickEvent {/* ... */}

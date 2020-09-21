@@ -1,4 +1,4 @@
 package tv.twitch.android.shared.ui.menus.core;
 
 
-public class MenuModel {/* ... */}
+public abstract class MenuModel {/* ... */}

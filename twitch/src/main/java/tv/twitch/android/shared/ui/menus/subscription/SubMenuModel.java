@@ -12,7 +12,7 @@ public class SubMenuModel extends MenuModel {
         return null;
     }
 
-    public SubMenuModel(String primaryText, String str2, String str3, SettingsDestination settingsDestination, boolean z) {
+    public SubMenuModel(String primaryText, String secondaryText, String auxiliaryText, SettingsDestination settingsDestination, boolean isEnabled) {
         /* ... */
     }
 

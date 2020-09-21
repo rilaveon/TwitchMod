@@ -7,7 +7,7 @@ import android.content.Context;
 public class EmoteUrlUtil {
     /* ... */
 
-    public static String getEmoteUrl(Context context, String str) {
+    public static final String getEmoteUrl(Context context, String str) {
         return null;
     }
 

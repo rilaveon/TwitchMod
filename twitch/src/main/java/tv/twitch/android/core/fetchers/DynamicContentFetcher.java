@@ -1,7 +1,7 @@
 package tv.twitch.android.core.fetchers;
 
 
-public class DynamicContentFetcher {
+public abstract class DynamicContentFetcher {
     private boolean hasMoreContent = true;
 
     /* ... */

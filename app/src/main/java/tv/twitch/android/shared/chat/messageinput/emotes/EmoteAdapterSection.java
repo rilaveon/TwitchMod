@@ -7,7 +7,7 @@ import tv.twitch.android.mod.bridges.Hooks;
 
 
 public class EmoteAdapterSection {
-    private String emoteSetId = "";
+    private String emoteSetId;
 
     /* ... */
 
