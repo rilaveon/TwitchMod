@@ -103,6 +103,9 @@ public class Hooks {
             case CLIPFINITY:
                 return PreferenceManager.INSTANCE.isForceOldClips() ? false : org;
 
+            case CREATOR_SETTINGS_MENU:
+                return true;
+
             case VAES_OM:
             case GRANDDADS:
             case SURESTREAM_OM:

@@ -14,6 +14,7 @@ public class IrcUtil {
     private static final String COMMAND_PRIVMSG = "PRIVMSG";
     private static final String COMMAND_NOTICE = "NOTICE";
     private static final String COMMAND_CLEARCHAT = "CLEARCHAT";
+    private static final String COMMAND_USERNOTICE = "USERNOTICE";
 
 
     static HashMap<String, String> parseIrcTags(String part) {
@@ -222,6 +223,8 @@ public class IrcUtil {
                 switch (command) {
                     case COMMAND_ROOMSTATE:
                         return formatRoomstate(parts);
+                    case COMMAND_USERNOTICE:
+                        return formatUsernotice(parts);
                     default:
                         Logger.debug("Bad line: " + line);
                         return null;
@@ -235,6 +238,8 @@ public class IrcUtil {
                         return formatNotice(parts);
                     case COMMAND_CLEARCHAT:
                         return formatClearchat(parts);
+                    case COMMAND_USERNOTICE:
+                        return formatUsernotice(parts);
                     default:
                         Logger.debug("Bad line: " + line);
                         return null;
@@ -244,5 +249,30 @@ public class IrcUtil {
                 Logger.debug("Bad line: " + line);
                 return null;
         }
+    }
+
+    private static String formatUsernotice(String[] parts) {
+        if (parts == null)
+            return null;
+
+        HashMap<String, String> tags = parseIrcTags(parts[0]);
+        if (tags == null) {
+            Logger.debug("no tags");
+            return null;
+        }
+
+        String systemMsg = tags.get("system-msg");
+        if (systemMsg == null || TextUtils.isEmpty(systemMsg))
+            return null;
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String time = getSendTime(tags);
+        if (time != null)
+            stringBuilder.append(time).append(" ");
+
+        stringBuilder.append(systemMsg.replace("\\s", " "));
+
+        return stringBuilder.toString();
     }
 }

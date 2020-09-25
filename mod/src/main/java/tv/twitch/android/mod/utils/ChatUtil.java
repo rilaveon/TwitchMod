@@ -95,17 +95,17 @@ public class ChatUtil {
                     return;
                 }
 
-                if (ircMessages.size() == 0) {
-                    source.addMessage("[ROBOTTY] No message available");
-                    return;
-                }
-
                 List<String> messages = new ArrayList<>();
                 for (int j = ircMessages.size() - 1; j >= 0; j--) {
                     String chatMessageText = IrcUtil.formatIrcMessage(ircMessages.get(j));
                     if (chatMessageText != null) {
                         messages.add(0, chatMessageText);
                     }
+                }
+
+                if (messages.size() == 0) {
+                    source.addMessage("[ROBOTTY] No message available");
+                    return;
                 }
 
                 for (String msg : messages) {

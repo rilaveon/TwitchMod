@@ -3,25 +3,25 @@
     <string name="mod_settings_bttv_emotes">Включить</string>
     <string name="mod_settings_bttv_widget">Меню смайлов</string>
     <string name="mod_settings_gifs">Гифки</string>
-    <string name="mod_settings_emote_size">Исходный размер смайлов</string>
+    <string name="mod_settings_emote_size">Исходный размер смайликов</string>
     <string name="mod_category_settings_chat_category">Чат</string>
     <string name="mod_settings_floating_queue">Размер очереди сообщений</string>
     <string name="mod_settings_floating_chat">Включить</string>
-    <string name="mod_settings_message_timestamp">Временные метки</string>
+    <string name="mod_settings_message_timestamp">Добавить временные метки</string>
     <string name="mod_settings_bypass_chat_ban">Обход блокировки в чате</string>
     <string name="mod_settings_badges">FFZ значки</string>
     <string name="mod_category_settings_player_category">Плеер</string>
-    <string name="mod_settings_adblock">Заблокировать рекламу</string>
+    <string name="mod_settings_adblock">Блокировщик рекламы</string>
     <string name="mod_settings_disable_autoplay">Отключить рекомендации</string>
     <string name="mod_settings_player_implementation">Выбор плеера</string>
     <string name="mod_settings_miniplayer_size">Размер мини-плеера</string>
     <string name="mod_settings_exoplayer_speed">Скорость воспроизведения ExoPlayer (Записи)</string>
-    <string name="mod_category_settings_swipe">Настройка свайпов</string>
+    <string name="mod_category_settings_swipe">Жесты</string>
     <string name="mod_settings_swipe_volume">Громкость</string>
     <string name="mod_settings_swipe_brightness">Яркость</string>
     <string name="mod_category_chat_filtering">Фильтры</string>
     <string name="mod_settings_filtering_level">Фильтр сообщений</string>
-    <string name="mod_settings_filtering_ignore_system">Скрыть системные сообщения</string>
+    <string name="mod_settings_filtering_ignore_system">Скрывать системные сообщения</string>
     <string name="mod_category_view">Внешний вид</string>
     <string name="mod_settings_old_emote_picker">Старый интерфейс меню смайлов</string>
     <string name="mod_settings_disable_recommendations">Скрыть «Рекомендуемые каналы»</string>
@@ -31,20 +31,19 @@
     <string name="mod_settings_hide_esports">Скрыть вкладку «Киберспорт»</string>
     <string name="mod_category_settings_patch">Патчи</string>
     <string name="mod_settings_disable_recent_search">Отключить историю недавнего поиска</string>
-    <string name="mod_settings_dev_mode">Режим разработчика</string>
     <string name="mod_settings_interceptor">Логировать запросы</string>
     <string name="mod_settings_hide_gs_error">Отключить предупреждения Google Play</string>
     <string name="mod_category_info">Инфо</string>
     <string name="mod_info_open_telegram">Телеграм</string>
     <string name="mod_info_open_github">Исходный код</string>
-    <string name="mod_emote_picker_bttv_global">Глобальные смайлики BTTV</string>
-    <string name="mod_emote_picker_bttv_channel">Смайлики канала BTTV</string>
-    <string name="mod_emote_picker_ffz_channel">Смайлики канала FFZ</string>
+    <string name="mod_emote_picker_bttv_global">Глобальные Смайлики BTTV</string>
+    <string name="mod_emote_picker_bttv_channel">Смайлики Канала BTTV</string>
+    <string name="mod_emote_picker_ffz_channel">Смайлики Канала FFZ</string>
     <string name="restart_dialog_text">Обновить и перезапустить приложение?</string>
     <string name="dialog_yes">Да</string>
     <string name="dialog_no">Нет</string>
     <string name="mod_category_settings_chat_bttv">BetterTTV/FFZ</string>
-    <string name="mod_settings_landscape_chat_width">Ширина чата</string>
+    <string name="mod_settings_landscape_chat_width">Ширина чата в альбомном режиме</string>
     <string name="mod_settings_disable_new_clips">Старый интерфейс клипов</string>
     <string name="mod_category_settings_floating_chat">Плавающий чат</string>
     <string name="mod_settings_floating_refresh">Обновление</string>
@@ -55,4 +54,18 @@
     <string name="mod_settings_blacklist">Фильтр по ключевым словам</string>
     <string name="mod_settings_message_history_limit">Макс. количество</string>
     <string name="mod_settings_compact_follow_view">Компактный интерфейс отслеживания</string>
+    <string name="mod_settings_show_refresh_button">Добавить кнопку «Обновить»</string>
+    <string name="mod_settings_show_stats_button">Добавить кнопку «Статистика»</string>
+    <string name="mod_settings_bttv_emotes_desc" translatable="false">Отображать смайлики BetterTTV/FFZ в чате</string>
+    <string name="mod_settings_gifs_desc" translatable="false">Изменить режим отображения GIF-смайликов</string>
+    <string name="mod_settings_floating_chat_desc" translatable="false">Включить плавающий чат в альбомном режиме</string>
+    <string name="mod_settings_bttv_widget_desc" translatable="false">Добавить смайлики BetterTTV/FFZ в меню смайлов</string>
+    <string name="mod_settings_badges_desc" translatable="false">Разрешить использовать значки FFZ</string>
+    <string name="mod_settings_adblock_desc" translatable="false">Заблокировать рекламу и аналитику в плеере</string>
+    <string name="mod_settings_disable_autoplay_desc" translatable="false">Отключить автоматическое воспроизведение рекомендаций</string>
+    <string name="mod_settings_message_history_limit_desc" translatable="false">Максимальное количество получаемых сообщений</string>
+    <string name="mod_settings_filtering_level_desc" translatable="false">Сообщения, не отправленные пользователями этого уровня или уровня выше, будут полностью убраны из чата</string>
+    <string name="mod_settings_swipe_brightness_desc" translatable="false">Регулировать яркость жестами</string>
+    <string name="mod_settings_swipe_volume_desc" translatable="false">Регулировать громкость жестами</string>
+    <string name="mod_settings_hide_gs_error_desc" translatable="false">для устройств без сервисов Google Play</string>
 </resources>

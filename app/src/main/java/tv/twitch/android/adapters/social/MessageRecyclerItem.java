@@ -96,6 +96,9 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
         return message;
     }
 
+    @Override
+    public void clearTextView() {} // TODO: __INJECT_METHOD
+
     public static final class ChatMessageViewHolder extends RecyclerView.ViewHolder implements IChatMessageItem { // TODO: __IMPLEMENT
         public ChatMessageViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -105,6 +108,8 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
             return null;
         }
 
+
+
         @Override
         public Spanned getSpanned() { // TODO: __INJECT_METHOD
             TextView textView = getMessageTextView();
@@ -112,6 +117,13 @@ public class MessageRecyclerItem implements IChatMessageItem { // TODO: __IMPLEM
                 return (Spanned) textView.getText();
 
             return null;
+        }
+
+        @Override
+        public void clearTextView() { // TODO: __INJECT_METHOD
+            TextView textView = getMessageTextView();
+            if (textView != null)
+                textView.setText(null);
         }
 
         /* ... */

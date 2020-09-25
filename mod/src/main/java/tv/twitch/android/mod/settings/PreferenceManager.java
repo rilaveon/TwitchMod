@@ -382,8 +382,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
 
     @Override
     public void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (PreferenceManager.TWITCH_DARK_THEME_KEY.equals(key)) {
-            isDarkThemeEnabled = sharedPreferences.getBoolean(TWITCH_DARK_THEME_KEY, false);
+        if (TWITCH_DARK_THEME_KEY.equals(key)) {
+            isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
         } else {
             updatePreferences();
         }

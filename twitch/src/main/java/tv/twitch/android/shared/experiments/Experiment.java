@@ -13,7 +13,8 @@ public enum Experiment {
     SURESTREAM_OM,
     VAES_OM,
     GRANDDADS,
-    VIDEOPLAYER_SELECTION
+    VIDEOPLAYER_SELECTION,
+    CREATOR_SETTINGS_MENU;
 
     /* ... */
 }

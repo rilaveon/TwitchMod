@@ -22,17 +22,21 @@ public class GifHelper {
             return;
 
         for (Object o : items)
-            recycleObject(o);
+            recycleObject(o, true);
     }
 
-    public static void recycleObject(Object item) {
+    public static void recycleObject(Object item, boolean clear) {
         if (item == null)
             return;
 
         if (item instanceof IChatMessageItem) {
             recycleGifsInText(((IChatMessageItem) item).getSpanned());
+            if (clear)
+                ((IChatMessageItem) item).clearTextView();
         } else if (item instanceof TextView) {
             recycleGifsInText(((TextView) item).getText());
+            if (clear)
+                ((TextView) item).setText(null);
         }
     }
 

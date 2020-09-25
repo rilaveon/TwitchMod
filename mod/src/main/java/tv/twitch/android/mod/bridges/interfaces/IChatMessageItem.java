@@ -6,4 +6,6 @@ import android.text.Spanned;
 
 public interface IChatMessageItem {
     Spanned getSpanned();
+
+    void clearTextView();
 }

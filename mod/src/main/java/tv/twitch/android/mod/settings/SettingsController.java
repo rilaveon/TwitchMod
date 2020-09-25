@@ -151,22 +151,37 @@ public class SettingsController {
     }
 
     public static class OnBuildClickListener implements View.OnClickListener {
-        private static final int CLICKS = 5;
+        private static final int CLICKS = 100;
 
         private int clicked = 0;
+
+        private void disableDevMod() {
+            PreferenceManager.INSTANCE.updateBoolean(Preferences.DEV_MODE.getKey(), false);
+            Helper.showToast("Developer mode disabled!");
+        }
+
+        private void enableDevMod() {
+            PreferenceManager.INSTANCE.updateBoolean(Preferences.DEV_MODE.getKey(), true);
+            Helper.showToast("Developer mode enabled!");
+        }
 
         @Override
         public void onClick(View v) {
             clicked++;
             if (clicked == CLICKS) {
                 if (PreferenceManager.INSTANCE.isDevModeOn()) {
-                    PreferenceManager.INSTANCE.updateBoolean(Preferences.DEV_MODE.getKey(), false);
-                    Helper.showToast("Developer mode disabled!");
+                    disableDevMod();
                 } else {
-                    PreferenceManager.INSTANCE.updateBoolean(Preferences.DEV_MODE.getKey(), true);
-                    Helper.showToast("Developer mode enabled!");
+                    enableDevMod();
                 }
                 clicked = 0;
+            } else if (clicked % 10 == 0 && clicked > 0) {
+                if (PreferenceManager.INSTANCE.isDevModeOn()) {
+                    disableDevMod();
+                    clicked = 0;
+                } else {
+                    Helper.showToast("Jebaited");
+                }
             }
         }
     }
@@ -380,13 +395,13 @@ public class SettingsController {
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));
 
         items.add(MenuFactory.getInfoMenu("TwitchMod v" + LoaderLS.getVersion(), LoaderLS.getBuildInfo(), new OnBuildClickListener()));
-        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), null, new View.OnClickListener() {
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), resourcesManager.getString("mod_info_open_telegram_desc"), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Helper.openUrl(TELEGRAM_URL);
             }
         }));
-        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_github"), null, new View.OnClickListener() {
+        items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_github"), resourcesManager.getString("mod_info_open_github_desc"), new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Helper.openUrl(GITHUB_URL);
