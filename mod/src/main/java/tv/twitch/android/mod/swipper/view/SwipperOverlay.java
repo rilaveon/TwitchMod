@@ -93,6 +93,7 @@ public class SwipperOverlay extends RelativeLayout {
     public void showBrightness() {
         if (brightnessProgressBar.getVisibility() != VISIBLE)
             brightnessProgressBar.setVisibility(VISIBLE);
+
         if (progress.getVisibility() != VISIBLE)
             progress.setVisibility(VISIBLE);
     }

@@ -5,10 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -16,6 +14,7 @@ import android.widget.RelativeLayout;
 import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.mod.swipper.Swipper;
 import tv.twitch.android.mod.utils.Logger;
+import tv.twitch.android.mod.utils.ViewUtil;
 
 
 public class PlayerWrapper extends RelativeLayout {
@@ -27,9 +26,8 @@ public class PlayerWrapper extends RelativeLayout {
 
     private final Swipper mSwipper;
 
-    private int PADDING_DEVICE_IGNORE = PADDING_DEFAULT_IGNORE;
-
-    private int mTouchSlop;
+    private final int mTouchSlop;
+    private final int mPaddingDeviceIgnore;
 
     private int mStartPosY = -1;
     private int mStartPosX = -1;
@@ -37,44 +35,39 @@ public class PlayerWrapper extends RelativeLayout {
 
 
     public PlayerWrapper(Context context) {
-        super(context);
-        mSwipper = new Swipper((Activity) context);
+        this(context, null);
     }
 
     public PlayerWrapper(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mSwipper = new Swipper((Activity) context);
+        this(context, attrs, 0);
     }
 
     public PlayerWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mSwipper = new Swipper((Activity) context);
-    }
-
-    private float getDensity() {
-        return this.getResources().getDisplayMetrics().density;
+        mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop() * 2;
+        mPaddingDeviceIgnore = Math.round(PADDING_DEFAULT_IGNORE * context.getResources().getDisplayMetrics().density);
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        PADDING_DEVICE_IGNORE = Math.round(PADDING_DEFAULT_IGNORE * getDensity());
-        mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop() * 2;
+        ResourcesManager resourcesManager = ResourcesManager.INSTANCE;
 
-        mPlayerOverlayContainer = findViewById(ResourcesManager.INSTANCE.getId("player_overlay_container"));
+        mPlayerOverlayContainer = findViewById(resourcesManager.getId("player_overlay_container"));
         if (mPlayerOverlayContainer == null) {
             Logger.error("mPlayerOverlayContainer is null. Update ID?");
             return;
         }
 
-        mFloatingChatContainer = findViewById(ResourcesManager.INSTANCE.getId("floating_chat_container"));
+        mFloatingChatContainer = findViewById(resourcesManager.getId("floating_chat_container"));
         if (mFloatingChatContainer == null) {
             Logger.error("mFloatingChatContainer is null. Update ID?");
             return;
         }
 
-        mDebugPanelContainer = findViewById(ResourcesManager.INSTANCE.getId("debug_panel_container"));
+        mDebugPanelContainer = findViewById(resourcesManager.getId("debug_panel_container"));
         if (mDebugPanelContainer == null) {
             Logger.error("mDebugPanelContainer is null. Update ID?");
             return;
@@ -83,19 +76,23 @@ public class PlayerWrapper extends RelativeLayout {
         initializeSwipper();
     }
 
+    private boolean isSwipperAllowed() {
+        return mSwipper.isEnabled();
+    }
+
     private void initializeSwipper() {
         mSwipper.setOverlay(mPlayerOverlayContainer);
 
-        if (PreferenceManager.INSTANCE.isVolumeSwipeEnabled())
+        if (PreferenceManager.INSTANCE.isVolumeSwiperEnabled())
             mSwipper.enableVolumeSwipe();
 
-        if (PreferenceManager.INSTANCE.isBrightnessSwipeEnabled())
+        if (PreferenceManager.INSTANCE.isBrightnessSwiperEnabled())
             mSwipper.enableBrightnessSwipe();
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (!mSwipper.isEnabled())
+        if (!isSwipperAllowed())
             return false;
 
         final int action = event.getAction();
@@ -106,9 +103,7 @@ public class PlayerWrapper extends RelativeLayout {
                 mStartPosY = -1;
                 mStartPosX = -1;
 
-                mSwipper.onTouchEvent(event);
-
-                return false;
+                return mSwipper.onTouchEvent(event);
             case MotionEvent.ACTION_DOWN:
                 mStartPosY = Math.round(event.getY());
                 mStartPosX = Math.round(event.getX());
@@ -144,51 +139,23 @@ public class PlayerWrapper extends RelativeLayout {
         return false;
     }
 
-    private static boolean isVisible(View view) {
-        if (view == null)
-            return false;
-
-        return view.getVisibility() == VISIBLE;
-    }
-
-    private static boolean isHit(ViewGroup view, int x, int y) {
-        if (view == null) {
-            Logger.debug("view is null");
-            return false;
-        }
-        Rect hitRect = new Rect();
-        view.getHitRect(hitRect);
-
-        return hitRect.contains(x, y);
-    }
-
-    private static View getFirstChild(ViewGroup viewGroup) {
-        if (viewGroup == null)
-            return null;
-
-        if (viewGroup.getChildCount() < 1)
-            return null;
-
-        return viewGroup.getChildAt(0);
-    }
-
     private boolean checkCollisions() {
-        if (!isHit(mPlayerOverlayContainer, mStartPosX, mStartPosY)) {
+        if (!ViewUtil.isHit(mPlayerOverlayContainer, mStartPosX, mStartPosY)) {
             Logger.debug("Ignore scrolling: Wrong area: x=" + mStartPosX + ", y="+ mStartPosY);
             return false;
         }
 
-        if (isVisible(mDebugPanelContainer)) {
+        if (ViewUtil.isVisible(mDebugPanelContainer)) {
             ViewGroup list = mDebugPanelContainer.findViewById(ResourcesManager.INSTANCE.getId("video_debug_list"));
-            if (isVisible(getFirstChild(mDebugPanelContainer)) && isVisible(list) && isHit(list, mStartPosX, mStartPosY)) {
+            if (ViewUtil.isVisible(ViewUtil.getFirstChild(mDebugPanelContainer)) && ViewUtil.isVisible(list) && ViewUtil.isHit(list, mStartPosX, mStartPosY)) {
                 Logger.debug("Ignore scrolling: Debug panel area: x=" + mStartPosX + ", y=" + mStartPosY);
                 return false;
             }
         }
 
-        if (isVisible(mFloatingChatContainer)) {
+        if (ViewUtil.isVisible(mFloatingChatContainer)) {
             ViewGroup container = mFloatingChatContainer.findViewById(ResourcesManager.INSTANCE.getId("messages_container"));
-            if (isVisible(container) && isHit(container, mStartPosX, mStartPosY)) {
+            if (ViewUtil.isVisible(container) && ViewUtil.isHit(container, mStartPosX, mStartPosY)) {
                 Logger.debug("Ignore scrolling: Floating chat area: x=" + mStartPosX + ", y=" + mStartPosY);
                 return false;
             }
@@ -198,14 +165,14 @@ public class PlayerWrapper extends RelativeLayout {
     }
 
     private boolean checkArea(MotionEvent event) {
-        if (mStartPosY <= PADDING_DEVICE_IGNORE) {
-            Logger.debug("Ignore scrolling: top PADDING_IGNORE=" + PADDING_DEVICE_IGNORE +", val="+ mStartPosY);
+        if (mStartPosY <= mPaddingDeviceIgnore) {
+            Logger.debug("Ignore scrolling: top PADDING_IGNORE=" + mPaddingDeviceIgnore +", val="+ mStartPosY);
             return false;
         }
 
-        float overlayBottomY = mPlayerOverlayContainer.getY()+mPlayerOverlayContainer.getHeight();
-        if (mStartPosY >= (overlayBottomY - PADDING_DEVICE_IGNORE)) {
-            Logger.debug("Ignore scrolling: bottom PADDING_IGNORE=" + PADDING_DEVICE_IGNORE +", val="+ overlayBottomY);
+        float overlayBottomY = mPlayerOverlayContainer.getY() + mPlayerOverlayContainer.getHeight();
+        if (mStartPosY >= (overlayBottomY - mPaddingDeviceIgnore)) {
+            Logger.debug("Ignore scrolling: bottom PADDING_IGNORE=" + mPaddingDeviceIgnore +", val="+ overlayBottomY);
             return false;
         }
 

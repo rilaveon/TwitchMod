@@ -1,4 +1,10 @@
 package tv.twitch.android.models.settings;
 
 
-public enum SettingsDestination {/* ... */}
+public enum SettingsDestination {
+    /* ... */
+
+    System
+
+    /* ... */
+}

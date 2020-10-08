@@ -25,9 +25,7 @@ public final class ExtendedPlayerMetadataViewDelegate {
     }
 
     private final void showSubscribeButton() {
-        if (!Hooks.isPlayerMetadataJump()) { // TODO: __JUMP_HOOK
-            // this.followOrSubButtonContainer.addView(this.subButtonViewDelegate.getContentView());
-        }
+        // this.followOrSubButtonContainer.addView(this.subButtonViewDelegate.getContentView()); // TODO: __REMOVE_CODE
     }
 
 }

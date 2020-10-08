@@ -12,10 +12,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Process;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesUtilLight;
+import java.util.Random;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
 import tv.twitch.android.core.user.TwitchAccountManager;
@@ -28,8 +27,6 @@ import tv.twitch.android.settings.SettingsActivity;
 
 
 public class Helper {
-    private final static int ConnectionResult_SUCCESS = 0;
-
     public static final Helper INSTANCE = new Helper();
 
     private int mCurrentChannel = 0;
@@ -56,7 +53,9 @@ public class Helper {
         new AlertDialog.Builder(context).setMessage(message).setPositiveButton(ResourcesManager.INSTANCE.getString("dialog_yes"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, new Intent(LoaderLS.getInstance(), SettingsActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+                Intent settingsIntent = new Intent(LoaderLS.getInstance(), SettingsActivity.class);
+                settingsIntent.putExtra("OPEN_MOD_SETTINGS", true);
+                PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, settingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                 ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1500, pendingIntent);
                 Process.killProcess(Process.myPid());
 
@@ -97,6 +96,10 @@ public class Helper {
                 Helper.showToast("onError");
             }
         });
+    }
+
+    public static int getRandomInt(int min, int max) {
+        return new Random().nextInt((max - min) + 1) + min;
     }
 
     public static int getChannelId(PlayableModelParser playableModelParser, Playable playable) {
@@ -153,20 +156,7 @@ public class Helper {
         this.mCurrentChannel = channelID;
     }
 
-    public static boolean isGooglePlayServicesAvailable(Context context) {
-        try {
-            int resCode = GooglePlayServicesUtilLight.isGooglePlayServicesAvailableOrg(context, GooglePlayServicesUtilLight.GOOGLE_PLAY_SERVICES_VERSION_CODE);
-            return resCode == ConnectionResult_SUCCESS;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public static void showPartnerBanner(Context context) {
-
-    }
+    public static void showPartnerBanner(Context context) {}
 
     public static void maybeShowBanner(final Context context, final TwitchAccountManager accountManager) {
         if (!PreferenceManager.INSTANCE.isShowBanner())

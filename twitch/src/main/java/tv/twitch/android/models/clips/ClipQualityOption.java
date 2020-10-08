@@ -4,7 +4,6 @@ package tv.twitch.android.models.clips;
 public final class ClipQualityOption {
     /* ... */
 
-
     public final Integer getFrameRate() {
         return null;
     }

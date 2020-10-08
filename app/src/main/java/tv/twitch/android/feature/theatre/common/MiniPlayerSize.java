@@ -12,7 +12,7 @@ public class MiniPlayerSize {
     }
 
     public final int getWidth() { // TODO: __INJECT_METHOD
-        return Hooks.hookMiniplayerSize(org());
+        return Hooks.hookMiniPlayerWidth(org());
     }
 
     /* ... */

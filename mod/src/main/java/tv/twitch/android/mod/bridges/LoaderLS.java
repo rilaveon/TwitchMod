@@ -84,7 +84,7 @@ public class LoaderLS extends TwitchApplication {
     }
 
     private void setFilterBlacklist() {
-        ChatMesssageFilteringUtil.INSTANCE.updateBlacklist(PreferenceManager.INSTANCE.getFilterText());
+        ChatMesssageFilteringUtil.INSTANCE.updateBlacklist(PreferenceManager.INSTANCE.getUserFilterText());
     }
 
     private void setCustomBadges() {
@@ -134,10 +134,10 @@ public class LoaderLS extends TwitchApplication {
     }
 
     private void fetchBttv() {
-        if (PreferenceManager.INSTANCE.isBttvOn())
+        if (PreferenceManager.INSTANCE.showBttvEmotesInChat())
             EmoteManager.INSTANCE.fetchGlobalEmotes();
 
-        if (PreferenceManager.INSTANCE.isThirdPartyBadgesOn())
+        if (PreferenceManager.INSTANCE.showCustomBadges())
             BadgeManager.INSTANCE.fetchBadges();
     }
 

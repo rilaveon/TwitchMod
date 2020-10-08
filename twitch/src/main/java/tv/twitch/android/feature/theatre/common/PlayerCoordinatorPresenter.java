@@ -14,7 +14,8 @@ public abstract class PlayerCoordinatorPresenter {
     private final void playWithCurrentModeAndQuality() {/* ... */}
 
     public final void refreshStream() { // TODO: __INJECT_METHOD
-        playerPresenter.stop();
+        if (playerPresenter != null)
+            playerPresenter.stop();
         playWithCurrentModeAndQuality();
     }
 }

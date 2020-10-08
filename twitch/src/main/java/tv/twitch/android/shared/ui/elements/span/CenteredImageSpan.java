@@ -10,8 +10,10 @@ public final class CenteredImageSpan extends ImageSpan {
 
     /* ... */
 
-    public CenteredImageSpan(Drawable drawable) {
-        super(drawable);
+    public CenteredImageSpan(Drawable imageDrawable, Integer backgroundColor) {
+        super(imageDrawable);
+
+        /* ... */
     }
 
     public final Drawable getImageDrawable() {

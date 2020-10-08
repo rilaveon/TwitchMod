@@ -21,20 +21,20 @@ import static tv.twitch.android.mod.net.ServiceFactory.getFfzApi;
 public class FfzBadgesFetcher extends ApiCallback<FfzBadgesResponse> {
     private final Callback mCallback;
 
-    private static final HashMap<Integer, String> sLocalBadges = new HashMap<>();
+    private static final HashMap<Integer, String> LOCAL_BADGES = new HashMap<>();
 
     static {
-        sLocalBadges.put(1, "file:///android_asset/mod/badges/ffz/1.png");
-        sLocalBadges.put(2, "file:///android_asset/mod/badges/ffz/2.png");
-        sLocalBadges.put(3, "file:///android_asset/mod/badges/ffz/3.png");
+        LOCAL_BADGES.put(1, "file:///android_asset/mod/badges/ffz/1.png");
+        LOCAL_BADGES.put(2, "file:///android_asset/mod/badges/ffz/2.png");
+        LOCAL_BADGES.put(3, "file:///android_asset/mod/badges/ffz/3.png");
     }
 
     public interface Callback {
         void onFfzBadgesParsed(FfzBadgeSet set);
     }
 
-    public FfzBadgesFetcher(Callback mCallback) {
-        this.mCallback = mCallback;
+    public FfzBadgesFetcher(Callback callback) {
+        this.mCallback = callback;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class FfzBadgesFetcher extends ApiCallback<FfzBadgesResponse> {
             }
 
             String url;
-            if (sLocalBadges.containsKey(badge.getId())) {
-                url = sLocalBadges.get(badge.getId());
+            if (LOCAL_BADGES.containsKey(badge.getId())) {
+                url = LOCAL_BADGES.get(badge.getId());
             } else {
                 url = getUrl(badge.getUrls());
             }
@@ -93,7 +93,6 @@ public class FfzBadgesFetcher extends ApiCallback<FfzBadgesResponse> {
         }
 
         mCallback.onFfzBadgesParsed(set);
-        Logger.debug("done!");
     }
 
     @Override

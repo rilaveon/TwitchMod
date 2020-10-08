@@ -1,14 +1,10 @@
 package tv.twitch.android.shared.chat;
 
 
-import java.util.List;
-
 import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.bridges.interfaces.ILiveChatSource;
 import tv.twitch.android.shared.chat.events.ChatNoticeEvents;
-import tv.twitch.chat.ChatLiveMessage;
-
 
 public class LiveChatSource implements ILiveChatSource { // TODO: __IMPLEMENT
     public final TwitchAccountManager accountManager = null;

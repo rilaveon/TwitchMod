@@ -7,7 +7,7 @@ public class VideoDebugConfig {
     /* ... */
 
     public final boolean shouldShowVideoDebugPanel() { // TODO: __REPLACE_METHOD
-        return Hooks.shouldShowStatsButton();
+        return Hooks.shouldShowStatButton();
     }
 
     /* ... */

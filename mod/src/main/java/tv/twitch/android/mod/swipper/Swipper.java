@@ -15,11 +15,11 @@ import tv.twitch.android.mod.swipper.util.BrightnessHelper;
 import tv.twitch.android.mod.swipper.view.SwipperOverlay;
 
 
-public class Swipper implements GestureDetector.OnGestureListener {
-    private final static int DELAY_TIMEOUT = 500;
-    private final static float H = 0.66f;
+public class Swipper extends GestureDetector.SimpleOnGestureListener {
+    private final static int DELAY_TIMEOUT_MILLISECONDS = 500;
+    private final static float HEIGHT_FACTOR = 0.7f;
 
-    private final SwipperOverlay mSwipperOverlay;
+    private final SwipperOverlay mOverlay;
     private final GestureDetector mGestureDetector;
 
     private final Activity mContext;
@@ -32,9 +32,11 @@ public class Swipper implements GestureDetector.OnGestureListener {
 
     private int mOldVolume;
     private int mOldBrightness;
+    private int mCurrentVolume;
+    private int mCurrentBrightness;
 
-    private boolean bIsVolumeSwipeEnabled = false;
-    private boolean bIsBrightnessSwipeEnabled = false;
+    private boolean bIsVolumeSwipeEnabled;
+    private boolean bIsBrightnessSwipeEnabled;
 
 
     public Swipper(Activity activity) {
@@ -44,26 +46,27 @@ public class Swipper implements GestureDetector.OnGestureListener {
         mGestureDetector = new GestureDetector(mContext, this);
         mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
 
-        mSwipperOverlay = new SwipperOverlay(mContext);
-    }
-
-    public void setOverlay(ViewGroup viewGroup) {
         bIsVolumeSwipeEnabled = false;
         bIsBrightnessSwipeEnabled = false;
 
+        mOverlay = new SwipperOverlay(mContext);
+    }
+
+    public void setOverlay(ViewGroup viewGroup) {
         RelativeLayout.LayoutParams overlayParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
 
         RelativeLayout relativeLayout = new RelativeLayout(mContext);
         relativeLayout.setGravity(Gravity.CENTER);
-        relativeLayout.addView(mSwipperOverlay);
+        relativeLayout.addView(mOverlay);
 
-        mSwipperOverlay.setMaxVolume(getSystemMaxVolume());
-        mSwipperOverlay.setVolume(getSystemVolume());
-        mSwipperOverlay.setBrightness(BrightnessHelper.getWindowBrightness(mContext));
+        mOverlay.setMaxVolume(getSystemMaxVolume());
+        mOverlay.setVolume(getSystemVolume());
+        mOverlay.setBrightness(BrightnessHelper.getWindowBrightness(mContext));
 
         viewGroup.addView(relativeLayout, overlayParams);
-        mSwipperOverlay.setVisibility(View.VISIBLE);
-        mSwipperOverlay.requestLayout();
+        mOverlay.setVisibility(View.VISIBLE);
+        mOverlay.invalidate();
+        mOverlay.requestLayout();
     }
 
     public boolean isEnabled() {
@@ -77,35 +80,43 @@ public class Swipper implements GestureDetector.OnGestureListener {
         switch (motionEvent.getActionMasked()) {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                delayHide();
+                delayHideProgress();
         }
 
         return mGestureDetector.onTouchEvent(motionEvent);
     }
 
-    private void delayHide() {
+    private void delayHideProgress() {
         if (mProgressHide != null) {
-            mHandler.removeCallbacks(mProgressHide);
-            mProgressHide = null;
+            synchronized (mHandler) {
+                if (mProgressHide != null) {
+                    mHandler.removeCallbacks(mProgressHide);
+                    mProgressHide = null;
+                }
+            }
         }
 
         mProgressHide = new Runnable() {
             @Override
             public void run() {
-                hideAll();
+                hideProgress();
             }
         };
 
-        mHandler.postDelayed(mProgressHide, DELAY_TIMEOUT);
+        mHandler.postDelayed(mProgressHide, DELAY_TIMEOUT_MILLISECONDS);
     }
 
     @Override
     public boolean onDown(MotionEvent e) {
         mOldBrightness = BrightnessHelper.getWindowBrightness(mContext);
         mOldVolume = getSystemVolume();
-        bIsLeftArea = e.getX() < mSwipperOverlay.getWidth() / 2.0f;
 
-        return true;
+        mCurrentBrightness = mOldBrightness;
+        mCurrentVolume = mOldVolume;
+
+        bIsLeftArea = e.getX() < mOverlay.getWidth() / 2.0f;
+
+        return false;
     }
 
     @Override
@@ -148,19 +159,19 @@ public class Swipper implements GestureDetector.OnGestureListener {
     }
 
     private int getOverlayHeight() {
-        return mSwipperOverlay.getHeight();
+        return mOverlay.getHeight();
     }
 
     private int getMaxVolume() {
-        return mSwipperOverlay.getMaxVolume();
+        return mOverlay.getMaxVolume();
     }
 
     private int getMaxBrightness() {
-        return mSwipperOverlay.getMaxBrightness();
+        return mOverlay.getMaxBrightness();
     }
 
     private int calculate(float delta, int oldStep, int max) {
-        float height = getOverlayHeight() * H;
+        float height = getOverlayHeight() * HEIGHT_FACTOR;
 
         float step = height / max;
         int diff = (int) (delta / step);
@@ -169,33 +180,41 @@ public class Swipper implements GestureDetector.OnGestureListener {
     }
 
     private void updateVolumeProgress(float delta) {
-        updateVolume(calculate(delta, mOldVolume, getMaxVolume()));
+        int val = calculate(delta, mOldVolume, getMaxVolume());
+
+        if (mCurrentVolume != val) {
+            setSystemVolume(val);
+            mCurrentVolume = val;
+            mOverlay.setVolume(val);
+        }
+
+        mOverlay.showVolume();
     }
 
     private void updateBrightnessProgress(float delta) {
-        updateBrightness(calculate(delta, mOldBrightness, getMaxBrightness()));
-    }
+        int val = calculate(delta, mOldBrightness, getMaxBrightness());
 
-    private void updateBrightness(int val) {
-        BrightnessHelper.setWindowBrightness(mContext, val);
-        mSwipperOverlay.setBrightness(val);
-        mSwipperOverlay.showBrightness();
-    }
-
-    public void updateVolume(int index) {
-        setSystemVolume(index);
-        mSwipperOverlay.setVolume(index);
-        mSwipperOverlay.showVolume();
-    }
-
-    public void hideAll() {
-        if (mProgressHide != null) {
-            mHandler.removeCallbacks(mProgressHide);
-            mProgressHide = null;
+        if (mCurrentBrightness != val) {
+            BrightnessHelper.setWindowBrightness(mContext, val);
+            mCurrentBrightness = val;
+            mOverlay.setBrightness(val);
         }
 
-        mSwipperOverlay.hideVolume();
-        mSwipperOverlay.hideBrightness();
+        mOverlay.showBrightness();
+    }
+
+    public void hideProgress() {
+        if (mProgressHide != null) {
+            synchronized (mHandler) {
+                if (mProgressHide != null) {
+                    mHandler.removeCallbacks(mProgressHide);
+                    mProgressHide = null;
+                }
+            }
+        }
+
+        mOverlay.hideVolume();
+        mOverlay.hideBrightness();
     }
 
     @Override
@@ -212,5 +231,9 @@ public class Swipper implements GestureDetector.OnGestureListener {
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         return false;
+    }
+
+    public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+         return false;
     }
 }

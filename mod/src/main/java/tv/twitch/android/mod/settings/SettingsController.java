@@ -48,16 +48,15 @@ public class SettingsController {
     private static final String RECENT_MESSAGES_SERVICE_URL = "https://recent-messages.robotty.de";
     private static final String GITHUB_URL = "https://github.com/nopbreak/TwitchMod";
 
-
-    private SettingsController() {
-        RESTART_LIST.add(Preferences.ADBLOCK);
+    static {
+        RESTART_LIST.add(Preferences.PLAYER_ADBLOCK);
         RESTART_LIST.add(Preferences.HIDE_ESPORTS_TAB);
         RESTART_LIST.add(Preferences.HIDE_DISCOVER_TAB);
-        RESTART_LIST.add(Preferences.DEV_ENABLE_INTERCEPTOR);
-        RESTART_LIST.add(Preferences.BADGES);
-        RESTART_LIST.add(Preferences.HIDE_GPS_ERROR);
+        RESTART_LIST.add(Preferences.DEV_INTERCEPTOR);
+        RESTART_LIST.add(Preferences.CUSTOM_BADGES);
         RESTART_LIST.add(Preferences.DEV_MODE);
     }
+
 
     public static final class ModSettingsPreferencesController implements SettingsPreferencesController {
         private final Activity mActivity;
@@ -151,7 +150,7 @@ public class SettingsController {
     }
 
     public static class OnBuildClickListener implements View.OnClickListener {
-        private static final int CLICKS = 100;
+        private static final int CLICKS = 15;
 
         private int clicked = 0;
 
@@ -175,12 +174,16 @@ public class SettingsController {
                     enableDevMod();
                 }
                 clicked = 0;
-            } else if (clicked % 10 == 0 && clicked > 0) {
+            } else if (clicked % 5 == 0 && clicked > 0) {
                 if (PreferenceManager.INSTANCE.isDevModeOn()) {
                     disableDevMod();
                     clicked = 0;
                 } else {
-                    Helper.showToast("Jebaited");
+                    if (clicked == 10) {
+                        Helper.showToast("monkaHmm");
+                    } else {
+                        Helper.showToast("Jebaited");
+                    }
                 }
             }
         }
@@ -196,10 +199,10 @@ public class SettingsController {
         return new ModSettingsPreferencesController(presenter);
     }
 
-    public final static class OpenFilterBlacklistDialog implements View.OnClickListener {
+    public final static class OpenUserFilterBlacklistDialog implements View.OnClickListener {
         private final Context mContext;
 
-        public OpenFilterBlacklistDialog(Context context) {
+        public OpenUserFilterBlacklistDialog(Context context) {
             this.mContext = context;
         }
 
@@ -211,7 +214,7 @@ public class SettingsController {
             View viewInflated = LayoutInflater.from(mContext).inflate(ResourcesManager.INSTANCE.getLayoutId("mod_filter_blacklist"), null, false);
 
             final TextInputEditText input = viewInflated.findViewById(ResourcesManager.INSTANCE.getId("input"));
-            final String text = PreferenceManager.INSTANCE.getFilterText();
+            final String text = PreferenceManager.INSTANCE.getUserFilterText();
             if (TextUtils.isEmpty(text)) {
                 input.setText("");
             } else {
@@ -230,7 +233,7 @@ public class SettingsController {
 
                     String text = String.valueOf(inputText);
 
-                    PreferenceManager.INSTANCE.updateString(Preferences.FILTER_TEXT.getKey(), text);
+                    PreferenceManager.INSTANCE.updateString(Preferences.USER_FILTER_TEXT.getKey(), text);
                     ChatMesssageFilteringUtil.INSTANCE.updateBlacklist(text);
                 }
             });
@@ -252,14 +255,15 @@ public class SettingsController {
         items.clear();
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_bttv")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotes, resourcesManager, preferenceManager.isBttvOn()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Badges, resourcesManager, preferenceManager.isThirdPartyBadgesOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BttvEmotes, resourcesManager, preferenceManager.showBttvEmotesInChat()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.CustomBadges, resourcesManager, preferenceManager.showCustomBadges()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.WideEmotes, resourcesManager, preferenceManager.fixWideEmotes()));
 
-        PreferenceArrayAdapter gifsAdapter = new PreferenceArrayAdapter(context, Preferences.GIFS.getKey());
+        PreferenceArrayAdapter gifsAdapter = new PreferenceArrayAdapter(context, Preferences.GIFS_RENDER_TYPE.getKey());
         gifsAdapter.add(new PreferenceArrayAdapter.AdapterItem("Disabled", Gifs.DISABLED));
         gifsAdapter.add(new PreferenceArrayAdapter.AdapterItem("Static", Gifs.STATIC));
         gifsAdapter.add(new PreferenceArrayAdapter.AdapterItem("Animated", Gifs.ANIMATED));
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.Gifs, resourcesManager, gifsAdapter, preferenceManager.getGifsStrategy()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.GifsRenderType, resourcesManager, gifsAdapter, preferenceManager.getGifsStrategy()));
 
         PreferenceArrayAdapter emoteSizeAdapter = new PreferenceArrayAdapter(context, Preferences.EMOTE_SIZE.getKey());
         emoteSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("Small", EmoteSize.SMALL));
@@ -268,9 +272,9 @@ public class SettingsController {
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.EmoteSize, resourcesManager, emoteSizeAdapter, preferenceManager.getEmoteSize()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_chat_category")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, resourcesManager, preferenceManager.isMessageTimestampOn()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RedChatMention, resourcesManager, preferenceManager.isRedMentionOn()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, resourcesManager, preferenceManager.isBypassChatBan()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Timestamps, resourcesManager, preferenceManager.isChatTimestampsEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.ChatMentionHighlights, resourcesManager, preferenceManager.showMentionHighlights()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BypassChatBan, resourcesManager, preferenceManager.showChatForBannedUser()));
 
         PreferenceArrayAdapter msgDeleteAdapter = new PreferenceArrayAdapter(context, Preferences.MSG_DELETE_STRATEGY.getKey());
         msgDeleteAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", MsgDelete.DEFAULT));
@@ -286,18 +290,18 @@ public class SettingsController {
         messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Mods", UserMessagesFiltering.MODS));
         messagesFilteringAdapter.add(new PreferenceArrayAdapter.AdapterItem("Broadcaster", UserMessagesFiltering.BROADCASTER));
 
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, resourcesManager, messagesFilteringAdapter, preferenceManager.getChatFiltering()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, resourcesManager, preferenceManager.isIgnoreSystemMessages()));
-        items.add(MenuFactory.getInfoMenu(ResourcesManager.INSTANCE.getString("mod_settings_blacklist"), ResourcesManager.INSTANCE.getString("mod_settings_blacklist_desc"), new OpenFilterBlacklistDialog(context)));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FilterLevel, resourcesManager, messagesFilteringAdapter, preferenceManager.getFilterMessageLevel()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FilterSystem, resourcesManager, preferenceManager.hideSystemMessagesInChat()));
+        items.add(MenuFactory.getInfoMenu(ResourcesManager.INSTANCE.getString("mod_settings_blacklist"), ResourcesManager.INSTANCE.getString("mod_settings_blacklist_desc"), new OpenUserFilterBlacklistDialog(context)));
 
         items.add(MenuFactory.getInfoMenu("Recent-messages service"));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.MessageHistory, resourcesManager, preferenceManager.isMessageHistoryEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.MessageHistory, resourcesManager, preferenceManager.showMessageHistory()));
 
         PreferenceArrayAdapter robottyLimit = new PreferenceArrayAdapter(context, Preferences.ROBOTTY_LIMIT.getKey());
         robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT1), RobottyLimit.LIMIT1));
         robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT2), RobottyLimit.LIMIT2));
         robottyLimit.add(new PreferenceArrayAdapter.AdapterItem(String.valueOf(RobottyLimit.LIMIT3), RobottyLimit.LIMIT3));
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.RobottyLimit, resourcesManager, robottyLimit, preferenceManager.getMessageHistoryLimit()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MessageHistoryLimit, resourcesManager, robottyLimit, preferenceManager.getMessageHistoryLimit()));
         items.add(MenuFactory.getInfoMenu("About the service", "Visit website", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -306,7 +310,7 @@ public class SettingsController {
         }));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_floating_chat")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, resourcesManager, preferenceManager.isFloatingChatEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.FloatingChat, resourcesManager, preferenceManager.showFloatingChat()));
 
         PreferenceArrayAdapter floatingChatQueueSizeAdapter = new PreferenceArrayAdapter(context, Preferences.FLOAT_CHAT_SIZE.getKey());
         floatingChatQueueSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", FloatingChatSize.DEFAULT));
@@ -316,28 +320,28 @@ public class SettingsController {
         floatingChatQueueSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("7", FloatingChatSize.SEVEN));
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FloatingChatQueueSize, resourcesManager, floatingChatQueueSizeAdapter, preferenceManager.getFloatingChatQueueSize()));
 
-        PreferenceArrayAdapter floatingChatRefreshAdapter = new PreferenceArrayAdapter(context, Preferences.FLOATING_REFRESH.getKey());
+        PreferenceArrayAdapter floatingChatRefreshAdapter = new PreferenceArrayAdapter(context, Preferences.FLOATING_CHAT_REFRESH_RATE.getKey());
         floatingChatRefreshAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", FloatingChatRefreshDelay.DEFAULT));
         floatingChatRefreshAdapter.add(new PreferenceArrayAdapter.AdapterItem("1.25x", FloatingChatRefreshDelay.MUL1));
         floatingChatRefreshAdapter.add(new PreferenceArrayAdapter.AdapterItem("1.5x", FloatingChatRefreshDelay.MUL2));
         floatingChatRefreshAdapter.add(new PreferenceArrayAdapter.AdapterItem("1.75x", FloatingChatRefreshDelay.MUL3));
         floatingChatRefreshAdapter.add(new PreferenceArrayAdapter.AdapterItem("2x", FloatingChatRefreshDelay.MUL4));
 
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FloatingChatRefresh, resourcesManager, floatingChatRefreshAdapter, preferenceManager.getFloatingChatRefresh()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.FloatingChatRefreshRate, resourcesManager, floatingChatRefreshAdapter, preferenceManager.getFloatingChatRefreshRate()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_player_category")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, resourcesManager, preferenceManager.isAdblockEnabled()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.AutoPlay, resourcesManager, preferenceManager.isDisableAutoplay()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.StatsButton, resourcesManager, preferenceManager.isShowStatsButton()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RefreshButton, resourcesManager, preferenceManager.isShowRefreshButton()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Adblock, resourcesManager, preferenceManager.isPlayerAdblockOn()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.TheatreAutoPlay, resourcesManager, preferenceManager.disableTheatreAutoplay()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.StatButton, resourcesManager, preferenceManager.shouldShowPlayerStatButton()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RefreshButton, resourcesManager, preferenceManager.shouldShowPlayerRefreshButton()));
 
 
-        PreferenceArrayAdapter playerImplAdapter = new PreferenceArrayAdapter(context, Preferences.PLAYER_IMPL.getKey());
+        PreferenceArrayAdapter playerImplAdapter = new PreferenceArrayAdapter(context, Preferences.PLAYER_IMPELEMTATION.getKey());
         playerImplAdapter.add(new PreferenceArrayAdapter.AdapterItem("Auto", PlayerImpl.AUTO));
         playerImplAdapter.add(new PreferenceArrayAdapter.AdapterItem("TwitchCore", PlayerImpl.CORE));
         playerImplAdapter.add(new PreferenceArrayAdapter.AdapterItem("ExoPlayer V2", PlayerImpl.EXO));
 
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.PlayerImpl, resourcesManager, playerImplAdapter, preferenceManager.getPlayerImplementation()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.PlayerImplementation, resourcesManager, playerImplAdapter, preferenceManager.getPlayerImplementation()));
 
         PreferenceArrayAdapter miniPlayerSizeAdapter = new PreferenceArrayAdapter(context, Preferences.MINIPLAYER_SCALE.getKey());
         miniPlayerSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", MiniPlayerSize.DEFAULT));
@@ -346,7 +350,7 @@ public class SettingsController {
         miniPlayerSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("1.75x", MiniPlayerSize.SIZE3));
         miniPlayerSizeAdapter.add(new PreferenceArrayAdapter.AdapterItem("2x", MiniPlayerSize.SIZE4));
 
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MiniplayerSize, resourcesManager, miniPlayerSizeAdapter, preferenceManager.getMiniPlayerSize()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.MiniplayerScale, resourcesManager, miniPlayerSizeAdapter, preferenceManager.getMiniPlayerScale()));
 
         PreferenceArrayAdapter exoPlayerVodSpeedAdapter = new PreferenceArrayAdapter(context, Preferences.EXOPLAYER_SPEED.getKey());
         exoPlayerVodSpeedAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", ExoPlayerSpeed.DEFAULT));
@@ -358,12 +362,12 @@ public class SettingsController {
         items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ExoplayerSpeed, resourcesManager, exoPlayerVodSpeedAdapter, preferenceManager.getExoplayerSpeed()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_swipe")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VolumeSwipe, resourcesManager, preferenceManager.isVolumeSwipeEnabled()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BrightnessSwipe, resourcesManager, preferenceManager.isBrightnessSwipeEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VolumeSwiper, resourcesManager, preferenceManager.isVolumeSwiperEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BrightnessSwiper, resourcesManager, preferenceManager.isBrightnessSwiperEnabled()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_view")));
 
-        PreferenceArrayAdapter chatWidthScaleAdapter = new PreferenceArrayAdapter(context, Preferences.CHAT_WIDTH_SCALE.getKey());
+        PreferenceArrayAdapter chatWidthScaleAdapter = new PreferenceArrayAdapter(context, Preferences.LANDSCAPE_CHAT_SCALE.getKey());
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("Default", ChatWidthScale.DEFAULT));
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("10%", ChatWidthScale.SCALE10));
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("15%", ChatWidthScale.SCALE15));
@@ -373,23 +377,23 @@ public class SettingsController {
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("35%", ChatWidthScale.SCALE35));
         chatWidthScaleAdapter.add(new PreferenceArrayAdapter.AdapterItem("40%", ChatWidthScale.SCALE40));
 
-        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, resourcesManager, chatWidthScaleAdapter, preferenceManager.getChatWidthScale()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BetterFollowView, resourcesManager, preferenceManager.isCompactViewEnabled()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.EmotePickerView, resourcesManager, preferenceManager.isForceOldEmotePicker()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableNewClips, resourcesManager, preferenceManager.isForceOldClips()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, resourcesManager, preferenceManager.isDisableRecommendations()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideResumeWatchingStreams, resourcesManager, preferenceManager.isDisableRecentWatching()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideFollowedGames, resourcesManager, preferenceManager.isDisableFollowedGames()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideDiscoverTab, resourcesManager, preferenceManager.isHideDiscoverTab()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideEsportsTab, resourcesManager, preferenceManager.isHideEsportsTab()));
+        items.add(MenuFactory.getDropDownMenu(SettingsPreferencesController.SettingsPreference.ChatWidthScale, resourcesManager, chatWidthScaleAdapter, preferenceManager.getLandscapeChatScale()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideChatRestriction, resourcesManager, preferenceManager.hideChatRestriction()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BetterFollowView, resourcesManager, preferenceManager.isCompactPlayerFollowViewEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.OldEmotePicker, resourcesManager, preferenceManager.forceOldEmotePickerView()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableClipfinity, resourcesManager, preferenceManager.disabledClipfinity()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, resourcesManager, preferenceManager.hideFollowRecommendationSection()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideResumeWatchingStreams, resourcesManager, preferenceManager.hideFollowResumeSection()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideFollowedGames, resourcesManager, preferenceManager.hideFollowGameSection()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideDiscoverTab, resourcesManager, preferenceManager.hideDiscoverTab()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideEsportsTab, resourcesManager, preferenceManager.hideEsportsTab()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_patch")));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.RecentSearch, resourcesManager,  preferenceManager.isDisableRecentSearch()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideGs, resourcesManager,  preferenceManager.isHideGs()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecentSearch, resourcesManager,  preferenceManager.hideRecentSearchResult()));
 
         if (preferenceManager.isDevModeOn()) {
             items.add(MenuFactory.getInfoMenu("Dev"));
-            items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Interceptor, resourcesManager, preferenceManager.isInterceptorOn()));
+            items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.Interceptor, resourcesManager, preferenceManager.isInterceptorEnabled()));
         }
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));

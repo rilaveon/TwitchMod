@@ -58,7 +58,6 @@ public class BottomPlayerControlOverlayViewDelegate {
             @Override
             public void onClick(View v) {
                 if (mBottomPlayerControlListener != null) {
-                    Logger.debug("clicked!");
                     mBottomPlayerControlListener.onRefreshClicked();
                 }
             }

@@ -26,21 +26,33 @@ public class GifHelper {
     }
 
     public static void recycleObject(Object item, boolean clear) {
-        if (item == null)
-            return;
-
         if (item instanceof IChatMessageItem) {
-            recycleGifsInText(((IChatMessageItem) item).getSpanned());
+            TextView textView = ((IChatMessageItem) item).getTextView();
+            if (textView == null) {
+                Logger.debug("textView is null");
+                return;
+            }
+
+            recycleGifsInText(textView.getText(), clear);
             if (clear)
-                ((IChatMessageItem) item).clearTextView();
+                textView.setText(null);
         } else if (item instanceof TextView) {
-            recycleGifsInText(((TextView) item).getText());
+            recycleGifsInText(((TextView) item).getText(), clear);
             if (clear)
                 ((TextView) item).setText(null);
+        } else if (item instanceof CharSequence) {
+            recycleGifsInText((CharSequence) item, clear);
+        } else {
+            if (item == null) {
+                Logger.debug("Object is null");
+                return;
+            }
+
+            Logger.debug("class=" + item.getClass());
         }
     }
 
-    public static void recycleGifsInText(CharSequence sequence) {
+    public static void recycleGifsInText(CharSequence sequence, boolean clear) {
         if (TextUtils.isEmpty(sequence))
             return;
 

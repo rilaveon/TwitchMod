@@ -32,8 +32,4 @@ public class GifDrawable extends Drawable {
     public void start() {/* ... */}
 
     public void stop() {/* ... */}
-
-    public boolean isStarted() { // TODO: __INJECT_METHOD
-        return isStarted;
-    }
 }

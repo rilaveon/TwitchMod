@@ -96,4 +96,8 @@
     <string name="mod_settings_show_stats_button_desc" translatable="false"/>
     <string name="mod_info_open_telegram_desc" translatable="false">t.me/pubTw</string>
     <string name="mod_info_open_github_desc" translatable="false">github.com/nopbreak/TwitchMod</string>
+    <string name="mod_settings_hide_chat_restriction">Hide chat restrictions</string>
+    <string name="mod_settings_hide_chat_restriction_desc" translatable="false" />
+    <string name="mod_settings_wide_emotes">Support wide emotes</string>
+    <string name="mod_settings_wide_emotes_desc" translatable="false" />
 </resources>

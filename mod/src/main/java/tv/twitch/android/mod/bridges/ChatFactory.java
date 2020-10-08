@@ -21,6 +21,7 @@ import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.shared.emotes.models.EmotePickerEmoteModel;
 import tv.twitch.chat.ChatEmoticon;
 import tv.twitch.chat.ChatEmoticonSet;
+import tv.twitch.chat.ChatEmoticonToken;
 
 
 public class ChatFactory {

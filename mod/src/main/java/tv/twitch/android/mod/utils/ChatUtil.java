@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 
+import tv.twitch.android.mod.bridges.ChatFactory;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 import tv.twitch.android.mod.bridges.interfaces.ILiveChatSource;
 import tv.twitch.android.mod.chat.fetchers.RobottyFetcher;
@@ -27,6 +28,8 @@ import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.models.channel.ChannelInfo;
 import tv.twitch.android.shared.chat.util.ClickableUsernameSpan;
+import tv.twitch.chat.ChatMessageToken;
+import tv.twitch.chat.ChatTextToken;
 
 
 public class ChatUtil {
@@ -114,7 +117,7 @@ public class ChatUtil {
             }
 
             @Override
-            public void onError(String text) {
+            public void onError(ChannelInfo info, String text) {
                 if (!TextUtils.isEmpty(text)) {
                     Logger.error(text);
                     source.addMessage("[ROBOTTY] Error: " + text);

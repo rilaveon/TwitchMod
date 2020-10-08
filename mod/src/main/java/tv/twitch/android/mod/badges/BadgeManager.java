@@ -17,7 +17,7 @@ import tv.twitch.android.mod.utils.Logger;
 public class BadgeManager implements FfzBadgesFetcher.Callback {
     public static final BadgeManager INSTANCE = new BadgeManager();
 
-    private final static HashMap<Integer, Collection<Badge>> mCustomBadges = new HashMap<>();
+    private final static HashMap<Integer, Collection<Badge>> sCustomBadges = new HashMap<>();
 
 
     private final FfzBadgesFetcher mFfzFetcher;
@@ -28,7 +28,7 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
     }
 
     public void clearCustomBadges() {
-        mCustomBadges.clear();
+        sCustomBadges.clear();
     }
 
     public void setUserBadges(int userId, Collection<Badge> badges) {
@@ -42,7 +42,7 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
             return;
         }
 
-        mCustomBadges.put(userId, new ArrayList<>(badges));
+        sCustomBadges.put(userId, new ArrayList<>(badges));
     }
 
     public void fetchBadges() {
@@ -56,7 +56,7 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
             return Collections.emptyList();
         }
 
-        Collection<Badge> badges = mCustomBadges.get(userId);
+        Collection<Badge> badges = sCustomBadges.get(userId);
         if (badges == null)
             return Collections.emptyList();
 

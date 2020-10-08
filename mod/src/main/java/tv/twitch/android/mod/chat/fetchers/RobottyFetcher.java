@@ -26,7 +26,7 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
     public interface Callback {
         void onMessagesParsed(ChannelInfo channel, List<String> ircMessages);
 
-        void onError(String text);
+        void onError(ChannelInfo channel, String text);
     }
 
 
@@ -52,7 +52,7 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
 
         mRetryCount = 0;
         callThrowable.printStackTrace();
-        mCallback.onError("Server response error");
+        mCallback.onError(mChannel, "Server response error");
     }
 
     protected final void retry(Call<RobottyResponse> call) {
@@ -63,20 +63,20 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
     public void onResponse(Call<RobottyResponse> call, Response<RobottyResponse> response) {
         if (response.code() == 403) {
             Logger.warning("403 for channel " + mChannel.getName());
-            mCallback.onError("Not available for this channel");
+            mCallback.onError(mChannel, "Not available for this channel");
             return;
         }
 
         if (response.code() == 400) {
             Logger.error("400 for channel " + mChannel.getName());
-            mCallback.onError("Bad request");
+            mCallback.onError(mChannel, "Bad request");
             return;
         }
 
         RobottyResponse robottyResponse = response.body();
         if (robottyResponse == null) {
             Logger.error("null body");
-            mCallback.onError("Unexpected server response");
+            mCallback.onError(mChannel, "Unexpected server response");
             return;
         }
 
@@ -90,7 +90,7 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
             }
 
             Logger.debug("errorCode=" + errorCode + ", error=" + robottyResponse.getError());
-            mCallback.onError("Server response error");
+            mCallback.onError(mChannel, "Server response error");
             return;
         }
 

@@ -22,10 +22,10 @@ public class BottomNavigationPresenter {
 
         /* ... */
 
-        this.mBottomNavigationItems = filterList(arrayList);  // TODO: __INJECT_CODE
+        this.mBottomNavigationItems = filterNavItems(arrayList);  // TODO: __INJECT_CODE
     }
 
-    private static List<BottomNavigationItem> filterList(ArrayList<BottomNavigationItem> items) { // TODO: __INJECT_METHOD
+    private static List<BottomNavigationItem> filterNavItems(ArrayList<BottomNavigationItem> items) { // TODO: __INJECT_METHOD
         if (items == null || items.isEmpty()) {
             return null;
         }

@@ -1,11 +1,9 @@
 package tv.twitch.android.mod.bridges.interfaces;
 
 
-import android.text.Spanned;
+import android.widget.TextView;
 
 
 public interface IChatMessageItem {
-    Spanned getSpanned();
-
-    void clearTextView();
+    TextView getTextView();
 }
