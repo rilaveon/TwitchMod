@@ -1,15 +1,26 @@
 package tv.twitch.android.mod.utils;
 
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import org.w3c.dom.Text;
+
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Locale;
 
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.interfaces.ISharedPanelWidget;
@@ -44,6 +55,7 @@ public class ClipDownloader implements View.OnClickListener {
             private final String mUrl;
             private final String mQuality;
             private final String mFrameRate;
+            private int mSize;
 
             public ClipItem(String url, String qual, String rate) {
                 mUrl = url;
@@ -58,6 +70,74 @@ public class ClipDownloader implements View.OnClickListener {
 
             public String getUrl() {
                 return mUrl;
+            }
+
+            public String getSize() {
+                if (mSize <= 0)
+                    return "unknown";
+
+                return mSize / 1024  + " kb";
+            }
+
+            public void setSize(int size) {
+                if (size < 0)
+                    mSize = -1;
+
+                mSize = size;
+            }
+
+            public String getFormattedQuality() {
+                return getQuality() + "p" + getFrameRate();
+            }
+
+            public String getQuality() {
+                return mQuality;
+            }
+
+            public String getFrameRate() {
+                return mFrameRate;
+            }
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            final ClipItem item = getItem(position);
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(ResourcesManager.INSTANCE.getLayoutId("mod_download_item"), parent, false);
+                final TextView clipQualityView = convertView.findViewById(ResourcesManager.INSTANCE.getId("clip_quality"));
+                final TextView clipSizeView = convertView.findViewById(ResourcesManager.INSTANCE.getId("clip_size"));
+
+                clipQualityView.setText(item.getFormattedQuality());
+                clipSizeView.setText(item.getSize());
+
+                new UpdateSize(clipSizeView, item).execute();
+            }
+
+            return convertView;
+        }
+
+        public static class UpdateSize extends AsyncTask<Object, Object, Integer> {
+            final WeakReference<TextView> textView;
+            final ClipItem clipItem;
+
+            public UpdateSize(TextView view, ClipItem item) {
+                textView = new WeakReference<>(view);
+                clipItem = item;
+            }
+
+            @Override
+            protected Integer doInBackground(Object... objects) {
+                return Helper.getFileLength(clipItem.getUrl());
+            }
+
+            @Override
+            protected void onPostExecute(Integer integer) {
+                clipItem.setSize(integer);
+                TextView view = textView.get();
+                if (view != null)
+                    view.setText(clipItem.getSize());
             }
         }
 
@@ -76,7 +156,7 @@ public class ClipDownloader implements View.OnClickListener {
 
         fillAdapter(mWidget.getClipModel().getQualityOptions());
         AlertDialog.Builder builder = new AlertDialog.Builder(mWidget.getLayout().getContext());
-        builder.setTitle("Download");
+        builder.setTitle(clipModel.getTitle());
 
         builder.setAdapter(mAdapter, new DialogInterface.OnClickListener() {
             @Override
@@ -89,11 +169,12 @@ public class ClipDownloader implements View.OnClickListener {
 
                 ClipModel clipModel = mWidget.getClipModel();
 
-                String filename = clipModel.getTitle() + " - " + clipModel.getBroadcasterName() + " - " + clipModel.getClipSlugId();
+                String filename = clipModel.getTitle() + " - " + clipModel.getBroadcasterName() + " - " + clipModel.getClipSlugId() + " - " + option.mQuality;
                 Helper.downloadMP4File(mWidget.getLayout().getContext(), option.getUrl(), filename);
             }
         });
-        builder.create().show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
         mWidget.hidePanel();
     }

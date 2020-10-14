@@ -72,7 +72,7 @@ public class ChatMesssageFilteringUtil {
     }
 
     public boolean isEnabled() {
-        return !mWordBlacklist.isEmpty() && !mWordCaseInsensitiveBlacklist.isEmpty() && !mUserBlacklist.isEmpty();
+        return !mWordBlacklist.isEmpty() || !mWordCaseInsensitiveBlacklist.isEmpty() || !mUserBlacklist.isEmpty();
     }
 
     private boolean isUserInBlacklist(String username) {

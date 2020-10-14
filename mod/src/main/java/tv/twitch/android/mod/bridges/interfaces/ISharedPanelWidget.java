@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import tv.twitch.android.models.clips.ClipModel;
 
 
+
 public interface ISharedPanelWidget {
     ClipModel getClipModel();
 

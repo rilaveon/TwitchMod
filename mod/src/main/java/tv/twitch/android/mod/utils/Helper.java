@@ -8,12 +8,22 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Process;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.text.HtmlCompat;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Random;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
@@ -28,6 +38,7 @@ import tv.twitch.android.settings.SettingsActivity;
 
 public class Helper {
     public static final Helper INSTANCE = new Helper();
+    private MediaPlayer mediaPlayer;
 
     private int mCurrentChannel = 0;
 
@@ -54,7 +65,6 @@ public class Helper {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent settingsIntent = new Intent(LoaderLS.getInstance(), SettingsActivity.class);
-                settingsIntent.putExtra("OPEN_MOD_SETTINGS", true);
                 PendingIntent pendingIntent = PendingIntent.getActivity(LoaderLS.getInstance(), 0, settingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
                 ((AlarmManager) LoaderLS.getInstance().getSystemService(Context.ALARM_SERVICE)).setExact(AlarmManager.RTC, 1500, pendingIntent);
                 Process.killProcess(Process.myPid());
@@ -68,7 +78,46 @@ public class Helper {
         }).create().show();
     }
 
+    public static String filterFilename(final String filename, final char replace) {
+        if (TextUtils.isEmpty(filename))
+            return filename;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < filename.length(); i++) {
+            char ch = filename.charAt(i);
+            if (isValidFatFilenameChar(ch)) {
+                stringBuilder.append(ch);
+            } else {
+                stringBuilder.append(replace);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public static boolean isValidFatFilenameChar(final char c) {
+        if (c <= 0x1f)
+            return false;
+
+        switch (c) {
+            case '"':
+            case '*':
+            case '/':
+            case ':':
+            case '<':
+            case '>':
+            case '?':
+            case '\\':
+            case '|':
+            case 0x7F:
+                return false;
+            default:
+                return true;
+        }
+    }
+
     public static void downloadMP4File(final Context context, final String url, final String filename) {
+        final String fixedFilename = filterFilename(filename, '_');
         PermissionsUtil.checkWritePermission(context, new PermissionsUtil.ResultCallback() {
             @Override
             public void onPermissionGranted() {
@@ -80,10 +129,10 @@ public class Helper {
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
                 request.setMimeType("video/mp4");
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + filename + ".mp4");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + fixedFilename + ".mp4");
 
                 downloadManager.enqueue(request);
-                Helper.showToast(String.format(ResourcesManager.INSTANCE.getString("mod_downloading"), filename));
+                Helper.showToast(String.format(ResourcesManager.INSTANCE.getString("mod_downloading"), fixedFilename));
             }
 
             @Override
@@ -159,20 +208,91 @@ public class Helper {
     public static void showPartnerBanner(Context context) {}
 
     public static void maybeShowBanner(final Context context, final TwitchAccountManager accountManager) {
-        if (!PreferenceManager.INSTANCE.isShowBanner())
+        if (!PreferenceManager.INSTANCE.shouldShowBanner())
             return;
 
-        StringBuilder text = new StringBuilder(ResourcesManager.INSTANCE.getString("mod_banner_text_default"));
+        if (PreferenceManager.INSTANCE.isBannerShown())
+            return;
 
-        AlertDialog dialog = new AlertDialog.Builder(context).setTitle("Mod Info").setMessage(text).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        String text = ResourcesManager.INSTANCE.getString("mod_banner_text_default");
+
+        StringBuilder titleBuilder = new StringBuilder("TwitchMod ").append(LoaderLS.getVersionName());
+
+        AlertDialog dialog = new AlertDialog.Builder(context)
+                .setTitle(titleBuilder)
+                .setMessage(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PreferenceManager.INSTANCE.disableBanner();
                 dialog.cancel();
+                PreferenceManager.INSTANCE.setBannerShown(true);
+                PreferenceManager.INSTANCE.setShouldShowBanner(false);
                 if (accountManager.isPartner())
                     showPartnerBanner(context);
             }
+        }).setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                dialog.cancel();
+                PreferenceManager.INSTANCE.setBannerShown(true);
+            }
         }).create();
         dialog.show();
+        TextView textView = dialog.findViewById(android.R.id.message);
+        if (textView != null) {
+            textView.setClickable(true);
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
+        } else {
+            Logger.error("textView is null");
+        }
+    }
+
+    public static void playSoundFromFd(AssetFileDescriptor fd) {
+        if (fd == null) {
+            Logger.error("fd is null");
+            return;
+        }
+
+        final MediaPlayer player = new MediaPlayer();
+
+        try {
+            player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+            player.prepare();
+            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    if (mp != null) {
+                        mp.release();
+                    }
+                }
+            });
+            player.start();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    public static int getFileLength(@NonNull String url) {
+        URL fileUrl;
+        try {
+            fileUrl = new URL(url);
+        } catch (Throwable th) {
+            th.printStackTrace();
+            return -1;
+        }
+
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) fileUrl.openConnection();
+            conn.setRequestMethod("HEAD");
+            return conn.getContentLength();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
     }
 }

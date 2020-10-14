@@ -21,7 +21,6 @@ import tv.twitch.android.shared.chat.adapter.item.ChatAdapterItem;
 import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.util.ChatItemClickEvent;
 import tv.twitch.android.shared.chat.util.ChatUtil;
-import tv.twitch.android.shared.ui.elements.GlideHelper;
 
 
 public class MessageRecyclerItem implements ChatAdapterItem {
@@ -43,7 +42,6 @@ public class MessageRecyclerItem implements ChatAdapterItem {
         if (chatMessageViewHolder != null) {
             /* ... */
 
-            GlideHelper.loadImagesFromSpanned(null, null, null, viewHolder.itemView); // TODO: __CHANGE_CODE
             maybeHighlightMessage(chatMessageViewHolder.getMessageTextView()); // TODO: __INJECT_CODE
         }
 

@@ -1,13 +1,20 @@
 package tv.twitch.android.shared.emotes.emotepicker;
 
 
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.view.View;
 import android.widget.ImageView;
 
 import tv.twitch.android.core.mvp.viewdelegate.RxViewDelegate;
 import tv.twitch.android.core.mvp.viewdelegate.ViewDelegateEvent;
+import tv.twitch.android.mod.bridges.Hooks;
+import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.bridges.ResourcesManager;
+import tv.twitch.android.mod.utils.Helper;
+import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.shared.emotes.emotepicker.models.EmotePickerSection;
+import tv.twitch.android.shared.player.parsers.extm3u.raw.Media;
 
 
 public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter.State, EmotePickerViewDelegate.Event> {
@@ -31,12 +38,7 @@ public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter
 
 
     EmotePickerViewDelegate() {
-        this.bttvEmotesButton.setOnClickListener(new View.OnClickListener() { // TODO: __INJECT_CODE
-            public final void onClick(View view) {
-                pushEvent(new Event.EmoteSectionSelectedEvent(EmotePickerSection.BTTV));
-            }
-        });
-
+        setupVan(); // TODO: __INJECT_CODE
     }
 
     public void render(EmotePickerPresenter.State state) {
@@ -56,6 +58,15 @@ public class EmotePickerViewDelegate extends RxViewDelegate<EmotePickerPresenter
 
     private final void setBttvSelected(EmotePickerPresenter.State.Loaded state) { // TODO: __INJECT_METHOD
         this.bttvEmotesButton.setSelected(state.getSelectedEmotePickerSection() == EmotePickerSection.BTTV);
+    }
+
+    private void setupVan() { // TODO: __INJECT_METHOD
+        if (this.bttvEmotesButton == null) {
+            Logger.error("bttvEmotesButton is null");
+            return;
+        }
+
+        Hooks.playVan(bttvEmotesButton);
     }
 
     private ImageView getBttvButtonView() { // TODO: __INJECT_METHOD

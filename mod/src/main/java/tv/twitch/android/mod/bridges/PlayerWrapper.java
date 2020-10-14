@@ -77,7 +77,7 @@ public class PlayerWrapper extends RelativeLayout {
     }
 
     private boolean isSwipperAllowed() {
-        return mSwipper.isEnabled();
+        return mSwipper.isEnabled() && !PreferenceManager.INSTANCE.shouldLockSwiper();
     }
 
     private void initializeSwipper() {

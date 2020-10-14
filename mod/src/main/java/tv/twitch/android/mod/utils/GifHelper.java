@@ -44,7 +44,7 @@ public class GifHelper {
             recycleGifsInText((CharSequence) item, clear);
         } else {
             if (item == null) {
-                Logger.debug("Object is null");
+                Logger.debug("item is null");
                 return;
             }
 
@@ -75,6 +75,9 @@ public class GifHelper {
             Drawable gifDrawable = drawableContainer.getDrawable();
             if (gifDrawable instanceof GifDrawable) {
                 ((GifDrawable) gifDrawable).stop();
+                if (clear) {
+                    gifDrawable.setCallback(null);
+                }
             }
         }
     }

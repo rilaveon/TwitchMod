@@ -16,13 +16,10 @@ public class UrlDrawable extends BitmapDrawable implements IDrawable { // TODO: 
     private MediaSpan$Type type;
 
     private boolean isWideEmote = false; // TODO: __INJECT_FIELD
-    private final boolean isBadge; // TODO: __INJECT_FIELD
 
 
     public UrlDrawable(String str, MediaSpan$Type mediaSpan$Type) {
         /* ... */
-
-        isBadge = type == MediaSpan$Type.Badge;
     }
 
     public final void setDrawable(Drawable drawable) {
@@ -48,7 +45,7 @@ public class UrlDrawable extends BitmapDrawable implements IDrawable { // TODO: 
     }
 
     public boolean isBadge() { // TODO: __INJECT_METHOD
-        return isBadge;
+        return type == MediaSpan$Type.Badge;
     }
 
     public void setIsWideEmote(boolean z) { // TODO: __INJECT_METHOD

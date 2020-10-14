@@ -23,7 +23,7 @@ import tv.twitch.android.mod.utils.Logger;
 
 public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     public static final String TWITCH_DARK_THEME_KEY = "dark_theme_enabled";
-    public static final String MOD_BANNER_KEY = "mod_banner";
+    public static final String MOD_BANNER_KEY = "mod_show_banner";
 
     public static final PreferenceManager INSTANCE = new PreferenceManager();
 
@@ -54,8 +54,11 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean showPlayerRefreshButton;
     private boolean hideChatRestriction;
     private boolean showWideEmotes;
+    private boolean lockSwiper;
+    private boolean disableGoogleBilling;
 
-    private boolean showModBanner;
+    private boolean shouldShowBanner;
+    private boolean isBannerShown;
 
     private String userFilterText;
 
@@ -117,9 +120,10 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         isCompactPlayerFollowViewEnabled = getBoolean(Preferences.COMPACT_PLAYER_FOLLOW_VIEW, false);
         showPlayerStatButton = getBoolean(Preferences.PLAYER_STAT_BUTTON, true);
         showPlayerRefreshButton = getBoolean(Preferences.PLAYER_REFRESH_BUTTON, true);
-        showModBanner = getBoolean(MOD_BANNER_KEY, true);
+        shouldShowBanner = getBoolean(MOD_BANNER_KEY, true);
         hideChatRestriction = getBoolean(Preferences.HIDE_CHAT_RESTRICTION, false);
         showWideEmotes = getBoolean(Preferences.SHOW_WIDE_EMOTES, false);
+        disableGoogleBilling = getBoolean(Preferences.DISABLE_GOOGLE_BILLING, false);
 
         userFilterText = getString(Preferences.USER_FILTER_TEXT, null);
 
@@ -136,6 +140,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         robottyLimit = getInt(Preferences.ROBOTTY_LIMIT, RobottyLimit.LIMIT1);
 
         isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
+
+        lockSwiper = false;
     }
 
     public void updateBoolean(String key, boolean val) {
@@ -222,7 +228,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return showMentionHighlightsInChat;
     }
 
-    public boolean disabledClipfinity() {
+    public boolean disableClipfinity() {
         return disableClipfinity;
     }
 
@@ -318,8 +324,20 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return showPlayerStatButton;
     }
 
-    public boolean isShowBanner() {
-        return false;
+    public boolean isBannerShown() {
+        return isBannerShown;
+    }
+
+    public void setBannerShown(boolean z) {
+        isBannerShown = z;
+    }
+
+    public boolean shouldShowBanner() {
+        return shouldShowBanner;
+    }
+
+    public void setShouldShowBanner(boolean z) {
+        updateBoolean(MOD_BANNER_KEY, z);
     }
 
     public boolean hideChatRestriction() {
@@ -330,8 +348,8 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return showWideEmotes;
     }
 
-    public void disableBanner() {
-        updateBoolean(MOD_BANNER_KEY, false);
+    public boolean isGoogleBillingDisabled() {
+        return disableGoogleBilling;
     }
 
     public @EmoteSize int getEmoteSize() {
@@ -386,14 +404,31 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return getUserFilterText().isEmpty();
     }
 
+    public boolean shouldLockSwiper() {
+        return lockSwiper;
+    }
+
+    public void setLockSwiper(boolean z) {
+        lockSwiper = z;
+    }
+
     @Override
     public void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (TWITCH_DARK_THEME_KEY.equals(key)) {
-            isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
-            return;
+        switch (key) {
+            case TWITCH_DARK_THEME_KEY:
+                isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
+                return;
+            case MOD_BANNER_KEY:
+                shouldShowBanner = sharedPreferences.getBoolean(MOD_BANNER_KEY, false);
+                return;
         }
 
         Preferences preference = Preferences.lookupKey(key);
+        if (preference == null) {
+            Logger.warning("Preference not found. Key: " + key);
+            return;
+        }
+
         switch (preference) {
             case CUSTOM_BADGES:
                 showCustomBadges = sharedPreferences.getBoolean(key, showCustomBadges);
@@ -511,6 +546,9 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
                 break;
             case HIDE_FOLLOW_RECOMMENDED_STREAMS:
                 hideFollowRecommendation = sharedPreferences.getBoolean(key, hideFollowRecommendation);
+                break;
+            case DISABLE_GOOGLE_BILLING:
+                disableGoogleBilling = sharedPreferences.getBoolean(key, disableGoogleBilling);
                 break;
             default:
                 Logger.warning("Check key: " + key);

@@ -15,11 +15,19 @@ public class ExperimentHelper {
         return Hooks.hookExperimentalGroup(experiment, getGroupForExperimentOrg(experiment));
     }
 
+    public boolean isInGroupForMultiVariantExperiment(Experiment experiment, String str) { // TODO: __RENAME__isInGroupForMultiVariantExperiment
+        return Hooks.hookExperimentalMultiVariant(experiment, str, isInGroupForMultiVariantExperimentOrg(experiment, str));
+    }
+
     public final String getGroupForExperimentOrg(Experiment experiment) { // TODO: __RENAME__getGroupForExperiment
         return null;
     }
 
     public boolean isInOnGroupForBinaryExperimentOrg(Experiment experiment) { // TODO: __RENAME__isInOnGroupForBinaryExperiment
+        return false;
+    }
+
+    public boolean isInGroupForMultiVariantExperimentOrg(Experiment experiment, String str) { // TODO: __RENAME__isInGroupForMultiVariantExperiment
         return false;
     }
 

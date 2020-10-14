@@ -17,122 +17,123 @@ public class IrcUtil {
     private static final String COMMAND_USERNOTICE = "USERNOTICE";
 
 
-    static HashMap<String, String> parseIrcTags(String part) {
-        if (TextUtils.isEmpty(part)) {
-            Logger.debug("empty part");
+    private static HashMap<String, String> parseIrcTags(String part) {
+        if (part == null || part.length() == 0)
             return null;
-        }
 
-        if (!part.startsWith("@")) {
-            Logger.debug("bad part: " + part);
+        if (!part.startsWith("@"))
             return null;
-        }
+
+        part = part.substring(1);
 
         HashMap<String, String> tags = new HashMap<>();
 
-        for (String t : part.substring(1).split(";")) {
-            String[] tParts = t.split("=", 2);
-            if (tParts.length != 2)
-                continue;
-            if (TextUtils.isEmpty(tParts[0]))
+        for (String t : part.split(";")) {
+            String[] pair = t.split("=", 2);
+
+            if (pair.length != 2)
                 continue;
 
-            tags.put(tParts[0], tParts[1]);
+            if (pair[0] == null || pair[0].length() == 0)
+                continue;
+
+            if (pair[1] == null || pair[1].length() == 0)
+                continue;
+
+            tags.put(pair[0], pair[1]);
         }
 
         return tags;
     }
 
-    static String formatPrivMsg(String[] parts) {
+    private static String formatPrivMsg(String[] parts) {
         if (parts == null)
             return null;
 
-        HashMap<String, String> tags = parseIrcTags(parts[0]);
-        if (tags == null) {
-            Logger.debug("no tags");
+        if (parts.length != 5)
             return null;
-        }
 
-        if (TextUtils.isEmpty(parts[4])) {
-            Logger.debug("no content");
+        HashMap<String, String> tags = parseIrcTags(parts[0]);
+        if (tags == null)
             return null;
-        }
+
+        if (parts[4] == null || parts[4].length() == 0)
+            return null;
 
         String content = getContent(parts[4]);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder msgBuilder = new StringBuilder();
 
         String time = getSendTime(tags);
         if (time != null)
-            stringBuilder.append(time).append(" ");
+            msgBuilder.append(time).append(" ");
 
         String username = getUsername(tags);
         if (username != null)
-            stringBuilder.append(username).append(": ");
+            msgBuilder.append(username).append(": ");
 
-        stringBuilder.append(content);
+        msgBuilder.append(content);
 
-        return stringBuilder.toString();
+        return msgBuilder.toString();
     }
 
-    static String formatNotice(String[] parts) {
+    private static String formatNotice(String[] parts) {
         if (parts == null)
             return null;
 
-        HashMap<String, String> tags = parseIrcTags(parts[0]);
-        if (tags == null) {
-            Logger.debug("no tags");
+        if (parts.length != 5)
             return null;
-        }
 
-        if (TextUtils.isEmpty(parts[4])) {
-            Logger.debug("no content");
+        HashMap<String, String> tags = parseIrcTags(parts[0]);
+        if (tags == null)
             return null;
-        }
+
+        if (parts[4] == null || parts[4].length() == 0)
+            return null;
 
         String content = getContent(parts[4]);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder msgBuilder = new StringBuilder();
 
         String time = getSendTime(tags);
         if (time != null)
-            stringBuilder.append(time).append(" ");
+            msgBuilder.append(time).append(" ");
 
-        stringBuilder.append(content);
+        msgBuilder.append(content);
 
-        return stringBuilder.toString();
+        return msgBuilder.toString();
     }
 
-    static String getContent(String c) {
-        if (TextUtils.isEmpty(c))
+    private static String getContent(String part) {
+        if (part == null || part.length() == 0)
             return null;
 
-        if (c.startsWith(":"))
-            return c.substring(1);
+        if (part.startsWith(":"))
+            return part.substring(1);
 
-        return c;
+        return part;
     }
 
     private static String getUsername(HashMap<String, String> tags) {
         if (tags == null)
             return null;
 
-        String tagVal = tags.get("display-name");
-        if (tagVal == null || TextUtils.isEmpty(tagVal))
+        String displayName = tags.get("display-name");
+        if (displayName == null || displayName.length() == 0)
             return null;
 
-        return tagVal;
+        return displayName;
     }
 
-    static String getSendTime(HashMap<String, String> tags) {
+    private static String getSendTime(HashMap<String, String> tags) {
         if (tags == null)
             return null;
 
-        String tagVal = tags.get("rm-received-ts");
-        if (tagVal == null || TextUtils.isEmpty(tagVal))
+        String receivedTime = tags.get("rm-received-ts");
+        if (receivedTime == null || receivedTime.length() == 0)
             return null;
 
-        long time = Long.parseLong(tagVal);
+        long time = Long.parseLong(receivedTime);
 
         return new SimpleDateFormat("HH:mm", Locale.UK).format(new Date(time));
     }
@@ -141,54 +142,53 @@ public class IrcUtil {
         if (tags == null)
             return 0;
 
-        String tagVal = tags.get("ban-duration");
-        if (tagVal == null || TextUtils.isEmpty(tagVal))
+        String duration = tags.get("ban-duration");
+        if (duration == null || duration.length() == 0)
             return -1;
 
-        return Integer.parseInt(tagVal);
+        return Integer.parseInt(duration);
     }
 
-    static String formatClearchat(String[] parts) {
+    private static String formatClearchat(String[] parts) {
         if (parts == null)
             return null;
 
-        HashMap<String, String> tags = parseIrcTags(parts[0]);
-        if (tags == null) {
-            Logger.debug("no tags");
+        if (parts.length != 5)
             return null;
-        }
 
-        if (TextUtils.isEmpty(parts[4])) {
-            Logger.debug("no username");
+        HashMap<String, String> tags = parseIrcTags(parts[0]);
+        if (tags == null)
             return null;
-        }
+
+        if (parts[4] == null || parts[4].length() == 0)
+            return null;
 
         String username = getContent(parts[4]);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder msgBuilder = new StringBuilder();
 
         String time = getSendTime(tags);
         if (time != null)
-            stringBuilder.append(time).append(" ");
+            msgBuilder.append(time).append(" ");
 
         int banDuration = getBanDuration(tags);
 
-        stringBuilder.append(username);
+        msgBuilder.append(username);
+
         if (banDuration == -1) {
-            stringBuilder.append(" has been permanently banned");
+            msgBuilder.append(" has been permanently banned");
         } else {
             if (banDuration > 0) {
-                stringBuilder.append(" has been timed out for ").append(banDuration).append(" seconds");
+                msgBuilder.append(" has been timed out for ").append(banDuration).append(" seconds");
             } else {
-                stringBuilder.append(" has been timed out");
-                Logger.debug("banDuration=" + banDuration);
+                msgBuilder.append(" has been timed out");
             }
         }
 
-        return stringBuilder.toString();
+        return msgBuilder.toString();
     }
 
-    public static String formatRoomstate(String[] parts) {
+    private static String formatRoomstate(String[] parts) {
         if (parts == null)
             return null;
 
@@ -202,16 +202,16 @@ public class IrcUtil {
     }
 
     public static String formatIrcMessage(String line) {
-        if (TextUtils.isEmpty(line))
+        if (line == null || line.length() == 0)
             return null;
 
         String[] parts = line.split(" ", 5);
-        if (parts.length < 4) {
+        if (parts.length < 3) {
             Logger.debug("Bad line: " + line);
             return null;
         }
 
-        if (TextUtils.isEmpty(parts[2])) {
+        if (parts[2] == null || parts[2].length() == 0) {
             Logger.debug("empty command part");
             return null;
         }
@@ -256,23 +256,21 @@ public class IrcUtil {
             return null;
 
         HashMap<String, String> tags = parseIrcTags(parts[0]);
-        if (tags == null) {
-            Logger.debug("no tags");
+        if (tags == null)
             return null;
-        }
 
         String systemMsg = tags.get("system-msg");
         if (systemMsg == null || TextUtils.isEmpty(systemMsg))
             return null;
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder msgBuilder = new StringBuilder();
 
         String time = getSendTime(tags);
         if (time != null)
-            stringBuilder.append(time).append(" ");
+            msgBuilder.append(time).append(" ");
 
-        stringBuilder.append(systemMsg.replace("\\s", " "));
+        msgBuilder.append(systemMsg.replace("\\s", " "));
 
-        return stringBuilder.toString();
+        return msgBuilder.toString();
     }
 }

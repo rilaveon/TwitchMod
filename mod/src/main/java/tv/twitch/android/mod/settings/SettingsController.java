@@ -381,7 +381,7 @@ public class SettingsController {
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideChatRestriction, resourcesManager, preferenceManager.hideChatRestriction()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BetterFollowView, resourcesManager, preferenceManager.isCompactPlayerFollowViewEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.OldEmotePicker, resourcesManager, preferenceManager.forceOldEmotePickerView()));
-        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableClipfinity, resourcesManager, preferenceManager.disabledClipfinity()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableClipfinity, resourcesManager, preferenceManager.disableClipfinity()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecommendedStreams, resourcesManager, preferenceManager.hideFollowRecommendationSection()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideResumeWatchingStreams, resourcesManager, preferenceManager.hideFollowResumeSection()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideFollowedGames, resourcesManager, preferenceManager.hideFollowGameSection()));
@@ -390,6 +390,7 @@ public class SettingsController {
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_patch")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.HideRecentSearch, resourcesManager,  preferenceManager.hideRecentSearchResult()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.DisableGoogleBilling, resourcesManager,  preferenceManager.isGoogleBillingDisabled()));
 
         if (preferenceManager.isDevModeOn()) {
             items.add(MenuFactory.getInfoMenu("Dev"));
@@ -398,7 +399,7 @@ public class SettingsController {
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_info")));
 
-        items.add(MenuFactory.getInfoMenu("TwitchMod v" + LoaderLS.getVersion(), LoaderLS.getBuildInfo(), new OnBuildClickListener()));
+        items.add(MenuFactory.getInfoMenu("TwitchMod v" + LoaderLS.getVersionName(), LoaderLS.getBuildInfo(), new OnBuildClickListener()));
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_info_open_telegram"), resourcesManager.getString("mod_info_open_telegram_desc"), new View.OnClickListener() {
             @Override
             public void onClick(View v) {

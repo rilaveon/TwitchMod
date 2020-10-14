@@ -45,7 +45,8 @@ public enum Preferences {
     PLAYER_REFRESH_BUTTON("mod_player_show_refresh_button", "mod_settings_show_refresh_button", "mod_settings_show_refresh_button_desc", Type.BOOLEAN),
     PLAYER_STAT_BUTTON("mod_player_show_stats_button", "mod_settings_show_stats_button", "mod_settings_show_stats_button_desc", Type.BOOLEAN),
     HIDE_CHAT_RESTRICTION("mod_hide_chat_restriction", "mod_settings_hide_chat_restriction", "mod_settings_hide_chat_restriction_desc", Type.BOOLEAN),
-    SHOW_WIDE_EMOTES("mod_wide_emotes", "mod_settings_wide_emotes", "mod_settings_wide_emotes_desc", Type.BOOLEAN);
+    SHOW_WIDE_EMOTES("mod_wide_emotes", "mod_settings_wide_emotes", "mod_settings_wide_emotes_desc", Type.BOOLEAN),
+    DISABLE_GOOGLE_BILLING("mod_disable_google_billing", "mod_settings_force_disable_google_billing", "mod_settings_force_disable_google_billing_desc", Type.BOOLEAN);
 
     private static Map<String, Preferences> s_Map = new HashMap<>();
 

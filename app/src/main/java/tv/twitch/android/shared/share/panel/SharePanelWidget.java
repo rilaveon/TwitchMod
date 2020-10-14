@@ -11,11 +11,16 @@ import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.interfaces.ISharedPanelWidget;
 import tv.twitch.android.mod.utils.ClipDownloader;
 import tv.twitch.android.models.clips.ClipModel;
+import tv.twitch.android.models.videos.VodModel;
+import tv.twitch.android.shared.player.presenters.PlayerPresenter;
 import tv.twitch.android.shared.ui.elements.bottomsheet.InteractiveRowView;
 
 
 public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget { // TODO: __IMPLEMENT
     private ClipModel mClipModel;
+    private VodModel mVodModel;
+    private PlayerPresenter mPlayerPresenter;
+
     private SharePanelWidgetListener mSharePanelWidgetListener;
 
     /* ... */
@@ -35,20 +40,29 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
         super(context);
     }
 
-    private void initDownloadModel() { // TODO: __INJECT_METHOD
-        this.mDownloadButton = findViewById(ResourcesManager.INSTANCE.getId("download_model"));
-        ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
-        mDownloadButton.setOnClickListener(new ClipDownloader(this));
+    private void initModels() { // TODO: __INJECT_METHOD
+        int downloadButtonId = ResourcesManager.INSTANCE.getId("download_model");
+        if (downloadButtonId != 0) {
+            this.mDownloadButton = findViewById(downloadButtonId);
+            if (this.mDownloadButton != null) {
+                ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
+                mDownloadButton.setOnClickListener(new ClipDownloader(this));
+            }
+        }
     }
 
     private void init() {
-        initDownloadModel(); // TODO: __INJECT_CODE
+        initModels(); // TODO: __INJECT_CODE
+    }
+
+    private void updateModButtonsVisibility() {
+        if (this.mDownloadButton != null) {
+            ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
+        }
     }
 
     private void updateViewState() {
-        if (this.mDownloadButton != null) { // TODO: __INJECT_CODE
-            ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
-        }
+        updateModButtonsVisibility();  // TODO: __INJECT_CODE
     }
 
     @Override

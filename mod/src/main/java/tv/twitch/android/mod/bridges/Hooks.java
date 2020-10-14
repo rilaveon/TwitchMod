@@ -2,13 +2,17 @@ package tv.twitch.android.mod.bridges;
 
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
-import android.widget.ImageView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import com.google.android.exoplayer2.PlaybackParameters;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -65,6 +69,7 @@ public class Hooks {
         return org;
     }
 
+    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     public final static String hookExperimentalGroup(Experiment experiment, String org) {
         if (experiment == null) {
             Logger.error("experimental is null");
@@ -100,9 +105,6 @@ public class Hooks {
 
             case MGST_DISABLE_PRE_ROLLS:
                 return PreferenceManager.INSTANCE.isPlayerAdblockOn() ? true : org;
-
-            case CLIPFINITY:
-                return PreferenceManager.INSTANCE.disabledClipfinity() ? false : org;
 
             case CREATOR_SETTINGS_MENU:
                 return true;
@@ -238,6 +240,18 @@ public class Hooks {
 
     public final static boolean shouldShowRefreshButton() {
         return PreferenceManager.INSTANCE.shouldShowPlayerRefreshButton();
+    }
+
+    public final static boolean isSwipperEnabled() {
+        return PreferenceManager.INSTANCE.isVolumeSwiperEnabled() || PreferenceManager.INSTANCE.isBrightnessSwiperEnabled();
+    }
+
+    public final static boolean shouldLockSwiper() {
+        return PreferenceManager.INSTANCE.shouldLockSwiper();
+    }
+
+    public final static void setLockSwiper(boolean z) {
+        PreferenceManager.INSTANCE.setLockSwiper(z);
     }
 
     public final static boolean isFollowedGamesFetcherJump() {
@@ -493,7 +507,7 @@ public class Hooks {
             emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvGlobalEmotes, resId));
         }
 
-        if (channelId > 0) {
+        if (channelId != null && channelId > 0) {
             Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
             if (!bttvChannelEmotes.isEmpty()) {
                 Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleResId());
@@ -536,5 +550,77 @@ public class Hooks {
 
     public static boolean isSupportWideEmotes() {
         return PreferenceManager.INSTANCE.fixWideEmotes();
+    }
+
+    public static boolean isDisableGoogleBillingJump() {
+        return PreferenceManager.INSTANCE.isGoogleBillingDisabled();
+    }
+
+    public static void playVan(View view) {
+        if (view == null) {
+            Logger.error("view is null");
+            return;
+        }
+
+        view.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                try {
+                    AssetFileDescriptor fd = LoaderLS.getInstance().getAssets().openFd("mod/van.wav");
+                    Helper.playSoundFromFd(fd);
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @SuppressWarnings({"SwitchStatementWithTooFewBranches", "SimplifiableConditionalExpression"})
+    public static boolean hookExperimentalMultiVariant(Experiment experiment, String str, boolean org) {
+        if (experiment == null) {
+            Logger.error("experimental is null");
+            return org;
+        }
+
+        if (str == null) {
+            Logger.error("str is null");
+            return org;
+        }
+
+        if (str.length() == 0) {
+            Logger.warning("empty str");
+            return org;
+        }
+
+        switch (experiment) {
+            case CLIPFINITY:
+                switch (str) {
+                    case "control":
+                        return PreferenceManager.INSTANCE.disableClipfinity() ? true : org;
+                    case "active_with_entry_points":
+                        return PreferenceManager.INSTANCE.disableClipfinity() ? false : org;
+                    default:
+                        return org;
+            }
+        }
+
+        return org;
+    }
+
+    public static void tryFixWideEmotesInView(WeakReference<View> viewWeakReference) {
+        if (!PreferenceManager.INSTANCE.fixWideEmotes())
+            return;
+
+        if (viewWeakReference == null)
+            return;
+
+        View view = viewWeakReference.get();
+        if (view == null) {
+            Logger.debug("view is null");
+            return;
+        }
+
+        view.invalidate();
+        view.requestLayout();
+        viewWeakReference.clear();
     }
 }

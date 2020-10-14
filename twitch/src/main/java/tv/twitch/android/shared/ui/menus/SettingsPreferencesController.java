@@ -83,7 +83,8 @@ public interface SettingsPreferencesController {
         RefreshButton(Preferences.PLAYER_REFRESH_BUTTON),
         StatButton(Preferences.PLAYER_STAT_BUTTON),
         HideChatRestriction(Preferences.HIDE_CHAT_RESTRICTION),
-        WideEmotes(Preferences.SHOW_WIDE_EMOTES);
+        WideEmotes(Preferences.SHOW_WIDE_EMOTES),
+        DisableGoogleBilling(Preferences.DISABLE_GOOGLE_BILLING);
 
         private final Preferences mPreference;
 

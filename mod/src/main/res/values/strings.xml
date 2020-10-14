@@ -98,6 +98,9 @@
     <string name="mod_info_open_github_desc" translatable="false">github.com/nopbreak/TwitchMod</string>
     <string name="mod_settings_hide_chat_restriction">Hide chat restrictions</string>
     <string name="mod_settings_hide_chat_restriction_desc" translatable="false" />
-    <string name="mod_settings_wide_emotes">Support wide emotes</string>
+    <string name="mod_settings_wide_emotes">Show wide emotes</string>
     <string name="mod_settings_wide_emotes_desc" translatable="false" />
+    <string name="mod_settings_force_disable_google_billing">Force disable google billing</string>
+    <string name="mod_settings_force_disable_google_billing_desc" translatable="false" />
+    <string name="mod_banner_text_default" translatable="false"><![CDATA[TwitchMod is a modded Twitch client for Android.<br/><br/>Features:<br/>• BTTV/FFZ emotes<br/>• AdBlock<br/>• Gestures<br/>• and more<br/><br/>Telegram: <a href=\'https://t.me/pubTw\'>t.me/pubTw</a><br/>4pda: <a href=\'https://4pda.ru/forum/index.php?showtopic=320321\'>4pda.ru</a>]]></string>
 </resources>

@@ -15,6 +15,7 @@ public class BottomPlayerControlOverlayViewDelegate {
     /* ... */
 
     private ImageView refreshButton; // TODO: __INJECT_FIELD
+    private ImageView lockButton; // TODO: __INJECT_FIELD
 
     /* ... */
 
@@ -35,7 +36,75 @@ public class BottomPlayerControlOverlayViewDelegate {
         };
 
         setupRefreshButton(view); // TODO: __INJECT_CODE
+        setupLockButton(view); // TODO: __INJECT_CODE
     }
+
+    private void updateLockButtonState() { // TODO: __INJECT_METHOD
+        if (this.lockButton == null)
+            return;
+
+        int lockDrawableId = ResourcesManager.INSTANCE.getDrawableId("ic_lock");
+        if (lockDrawableId == 0) {
+            Logger.error("ic_lock not found");
+            return;
+        }
+
+        int unlockDrawableId = ResourcesManager.INSTANCE.getDrawableId("ic_unlock");
+        if (unlockDrawableId == 0) {
+            Logger.error("ic_unlock not found");
+            return;
+        }
+
+        if (Hooks.shouldLockSwiper()) {
+            this.lockButton.setImageResource(unlockDrawableId);
+        } else {
+            this.lockButton.setImageResource(lockDrawableId);
+        }
+    }
+
+    private void setupLockButton(View view) { // TODO: __INJECT_METHOD
+        if (view == null) {
+            Logger.error("view is null");
+            return;
+        }
+
+        int lockButton = ResourcesManager.INSTANCE.getId("lock_button");
+        if (lockButton == 0) {
+            Logger.error("lockButton == 0");
+            return;
+        }
+        this.lockButton = view.findViewById(lockButton);
+        if (this.lockButton == null) {
+            Logger.error("lock button is null");
+            return;
+        }
+
+        this.lockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Hooks.shouldLockSwiper()) {
+                    Hooks.setLockSwiper(false);
+                    updateLockButtonState();
+                } else {
+                    Hooks.setLockSwiper(true);
+                    updateLockButtonState();
+                }
+            }
+        });
+        updateLockButtonState();
+    }
+
+    public void setLockButtonVisible(boolean z) { // TODO: __INJECT_METHOD
+        if (this.lockButton != null) {
+            if (!Hooks.isSwipperEnabled()) {
+                this.lockButton.setVisibility(View.GONE);
+                return;
+            }
+
+            this.lockButton.setVisibility(z ? View.VISIBLE : View.GONE);
+        }
+    }
+
 
     private void setupRefreshButton(View view) { // TODO: __INJECT_METHOD
         if (view == null) {

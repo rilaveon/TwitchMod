@@ -32,11 +32,6 @@ public class LoaderLS extends TwitchApplication {
 
     private static LoaderLS sInstance = null;
 
-
-    public static String getVersion() {
-        return BuildConfig.VERSION_NAME;
-    }
-
     public static String getBuildInfo() {
         StringBuilder builder = new StringBuilder(sBuildInfo);
         if (sBuildNumber != -1) {
@@ -44,6 +39,14 @@ public class LoaderLS extends TwitchApplication {
         }
 
         return builder.toString();
+    }
+
+    public static int getBuildNumber() {
+        return sBuildNumber;
+    }
+
+    public static String getVersionName() {
+        return BuildConfig.VERSION_NAME;
     }
 
     @NonNull

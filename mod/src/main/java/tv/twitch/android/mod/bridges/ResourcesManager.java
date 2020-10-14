@@ -17,7 +17,9 @@ public class ResourcesManager {
     private enum IdType {
         STRING("string"),
         ID("id"),
-        LAYOUT("layout");
+        RAW("raw"),
+        LAYOUT("layout"),
+        DRAWABLE("drawable");
 
         private final String mType;
 
@@ -54,6 +56,22 @@ public class ResourcesManager {
 
     public Integer getId(String name) {
         PubCache cache = mCaches.get(IdType.ID);
+        if (cache != null)
+            return cache.get(name);
+
+        return 0;
+    }
+
+    public Integer getDrawableId(String name) {
+        PubCache cache = mCaches.get(IdType.DRAWABLE);
+        if (cache != null)
+            return cache.get(name);
+
+        return 0;
+    }
+
+    public Integer getRawId(String name) {
+        PubCache cache = mCaches.get(IdType.RAW);
         if (cache != null)
             return cache.get(name);
 
