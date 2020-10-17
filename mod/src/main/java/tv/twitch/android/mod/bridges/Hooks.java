@@ -242,6 +242,10 @@ public class Hooks {
         return PreferenceManager.INSTANCE.shouldShowPlayerRefreshButton();
     }
 
+    public final static boolean shouldShowLockButton() {
+        return PreferenceManager.INSTANCE.shouldShowLockButton();
+    }
+
     public final static boolean isSwipperEnabled() {
         return PreferenceManager.INSTANCE.isVolumeSwiperEnabled() || PreferenceManager.INSTANCE.isBrightnessSwiperEnabled();
     }

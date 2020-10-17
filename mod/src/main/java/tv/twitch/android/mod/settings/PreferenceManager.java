@@ -56,6 +56,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean showWideEmotes;
     private boolean lockSwiper;
     private boolean disableGoogleBilling;
+    private boolean showSwipperLockButton;
 
     private boolean shouldShowBanner;
     private boolean isBannerShown;
@@ -124,6 +125,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         hideChatRestriction = getBoolean(Preferences.HIDE_CHAT_RESTRICTION, false);
         showWideEmotes = getBoolean(Preferences.SHOW_WIDE_EMOTES, false);
         disableGoogleBilling = getBoolean(Preferences.DISABLE_GOOGLE_BILLING, false);
+        showSwipperLockButton = getBoolean(Preferences.SWIPPER_LOCK_BUTTON, false);
 
         userFilterText = getString(Preferences.USER_FILTER_TEXT, null);
 
@@ -412,6 +414,10 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         lockSwiper = z;
     }
 
+    public boolean shouldShowLockButton() {
+        return showSwipperLockButton;
+    }
+
     @Override
     public void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         switch (key) {
@@ -549,6 +555,9 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
                 break;
             case DISABLE_GOOGLE_BILLING:
                 disableGoogleBilling = sharedPreferences.getBoolean(key, disableGoogleBilling);
+                break;
+            case SWIPPER_LOCK_BUTTON:
+                showSwipperLockButton = sharedPreferences.getBoolean(key, showSwipperLockButton);
                 break;
             default:
                 Logger.warning("Check key: " + key);

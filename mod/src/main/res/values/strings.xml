@@ -102,5 +102,7 @@
     <string name="mod_settings_wide_emotes_desc" translatable="false" />
     <string name="mod_settings_force_disable_google_billing">Force disable google billing</string>
     <string name="mod_settings_force_disable_google_billing_desc" translatable="false" />
-    <string name="mod_banner_text_default" translatable="false"><![CDATA[TwitchMod is a modded Twitch client for Android.<br/><br/>Features:<br/>• BTTV/FFZ emotes<br/>• AdBlock<br/>• Gestures<br/>• and more<br/><br/>Telegram: <a href=\'https://t.me/pubTw\'>t.me/pubTw</a><br/>4pda: <a href=\'https://4pda.ru/forum/index.php?showtopic=320321\'>4pda.ru</a>]]></string>
+    <string name="mod_banner_text_default" translatable="false"><![CDATA[TwitchMod is a modded Twitch client for Android.<br/><br/>Features:<br/>• BTTV/FFZ emotes<br/>• AdBlock<br/>• Gestures<br/>• and more<br/><br/>Telegram: <a href=\'https://t.me/pubTw\'>t.me/pubTw</a><br/>KKomrade: <a href=\'https://4pda.ru/forum/index.php?showtopic=320321\'>4pda.ru</a>]]></string>
+    <string name="mod_settings_swipper_lock_button">Show lock button</string>
+    <string name="mod_settings_swipper_lock_button_desc" translatable="false" />
 </resources>

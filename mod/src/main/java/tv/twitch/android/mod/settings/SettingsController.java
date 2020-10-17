@@ -364,6 +364,7 @@ public class SettingsController {
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_settings_swipe")));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.VolumeSwiper, resourcesManager, preferenceManager.isVolumeSwiperEnabled()));
         items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.BrightnessSwiper, resourcesManager, preferenceManager.isBrightnessSwiperEnabled()));
+        items.add(MenuFactory.getToggleMenu(SettingsPreferencesController.SettingsPreference.SwipperLockButton, resourcesManager, preferenceManager.shouldShowLockButton()));
 
         items.add(MenuFactory.getInfoMenu(resourcesManager.getString("mod_category_view")));
 

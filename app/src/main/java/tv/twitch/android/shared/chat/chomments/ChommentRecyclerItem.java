@@ -21,7 +21,7 @@ public class ChommentRecyclerItem {
         }
 
         @Override
-        public TextView getTextView() {
+        public TextView getTextView() { // TODO: __INJECT_METHOD
             return getChommentTextView();
         }
 

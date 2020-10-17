@@ -84,7 +84,8 @@ public interface SettingsPreferencesController {
         StatButton(Preferences.PLAYER_STAT_BUTTON),
         HideChatRestriction(Preferences.HIDE_CHAT_RESTRICTION),
         WideEmotes(Preferences.SHOW_WIDE_EMOTES),
-        DisableGoogleBilling(Preferences.DISABLE_GOOGLE_BILLING);
+        DisableGoogleBilling(Preferences.DISABLE_GOOGLE_BILLING),
+        SwipperLockButton(Preferences.SWIPPER_LOCK_BUTTON);
 
         private final Preferences mPreference;
 
