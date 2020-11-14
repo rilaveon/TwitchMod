@@ -11,7 +11,7 @@ public class LandscapeChatLayoutController {
         /* ... */
 
         // ViewExtensionsKt.setLargestScreenEdgePercentage(this.mLandscapeContainer, experience.shouldShowTabletUI(context) ? 20 : 30);
-        int percent = Hooks.hookChatWidth(30); // TODO: __HOOK_ARG
+        int percent = Hooks.hookChatScreenEdgePercentage(30); // TODO: __HOOK_ARG
 
         /* ... */
     }

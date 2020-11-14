@@ -21,8 +21,8 @@ public class ChatViewPresenter {
 
     /* ... */
 
-    public final void onUserBanStateUpdated(boolean z) { // TODO: __REPLACE_METHOD
-        if (z && Hooks.isBypassChatBanJump()) {
+    public final void onUserBanStateUpdated(boolean z) {
+        if (z && Hooks.isBypassChatBanJump()) { // TODO: __INJECT_CODE
             z = false;
             anonConnect();
         }
@@ -30,10 +30,12 @@ public class ChatViewPresenter {
         /* ... */
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void anonConnect() { // TODO: __INJECT_METHOD
         ChannelInfo backupChannelInfo = this.channel;
 
-        chatConnectionController.viewerId = 0;
+        if (chatConnectionController != null)
+            chatConnectionController.setViewerId(0);
         this.channel = null;
         this.setChannel(backupChannelInfo, playbackSessionID, streamType);
         this.channel = backupChannelInfo;
@@ -44,8 +46,12 @@ public class ChatViewPresenter {
     public final void onChannelStateChanged(ChatConnectionEvents chatConnectionEvents) {
         /* ... */
 
-        if (chatConnectionEvents instanceof ChatConnectionEvents.ChatConnectedEvent) { // TODO: __INJECT_CODE
-            if (channel != null && channel.getId() == chatConnectionEvents.getChannelId())
+        maybeInjectRecentMessages(chatConnectionEvents); // TODO: __INJECT_CODE
+    }
+
+    private void maybeInjectRecentMessages(ChatConnectionEvents chatConnectionEvent) { // TODO: __INJECT_METHOD
+        if (chatConnectionEvent instanceof ChatConnectionEvents.ChatConnectedEvent) {
+            if (channel != null && channel.getId() == chatConnectionEvent.getChannelId())
                 Hooks.injectRecentMessages(liveChatSource, channel);
         }
     }

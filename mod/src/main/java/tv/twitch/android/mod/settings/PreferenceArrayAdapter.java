@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 
 import tv.twitch.android.mod.bridges.ResourcesManager;
+import tv.twitch.android.mod.utils.Logger;
 
 public class PreferenceArrayAdapter extends ArrayAdapter<PreferenceArrayAdapter.AdapterItem> {
     private final String mPrefKey;
@@ -31,6 +32,27 @@ public class PreferenceArrayAdapter extends ArrayAdapter<PreferenceArrayAdapter.
         @Override
         public String toString() {
             return mName;
+        }
+    }
+
+    public void fill(Object[] vals, String[] names) {
+        if (vals == null) {
+            Logger.error("vals is null");
+            return;
+        }
+
+        if (names == null) {
+            Logger.error("names is null");
+            return;
+        }
+
+        if (vals.length != names.length) {
+            Logger.error("diff length: vals=" + vals.length + ", names=" + names.length);
+            return;
+        }
+
+        for (int i = 0; i < vals.length; i++) {
+            add(new AdapterItem(names[i], vals[i]));
         }
     }
 
@@ -77,7 +99,7 @@ public class PreferenceArrayAdapter extends ArrayAdapter<PreferenceArrayAdapter.
 
 
     public PreferenceArrayAdapter(Context context, String prefKey) {
-        super(context, ResourcesManager.INSTANCE.getLayoutId("twitch_spinner_dropdown_item"));
+        super(context, ResourcesManager.getLayoutId("twitch_spinner_dropdown_item"));
         mPrefKey = prefKey;
     }
 

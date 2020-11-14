@@ -17,13 +17,15 @@ public abstract class BaseSettingsPresenter {
 
     protected abstract SettingsPreferencesController getPrefController();
 
-    public final FragmentActivity getActivity() { // TODO: __CHANGE_ACCESS
+    protected final FragmentActivity getActivity() {
         return null;
     }
 
     public abstract void updateSettingModels();
 
-    public final List<MenuModel> getSettingModels() {
+    protected final List<MenuModel> getSettingModels() {
         return null;
     }
+
+    protected void bindSettings() {/* ... */};
 }

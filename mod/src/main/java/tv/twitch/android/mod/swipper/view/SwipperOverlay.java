@@ -1,16 +1,20 @@
 package tv.twitch.android.mod.swipper.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import static tv.twitch.android.mod.swipper.util.DimensionConverter.dipToPix;
 
 public class SwipperOverlay extends RelativeLayout {
+    private final static int ANIMATION_DURATION = 500;
     private final static int MAX_BRIGHTNESS = 100;
     private final static int PROGRESS_TEXT_SIZE = 45;
     private final static float SHADOW_SIZE = 2.0f;
@@ -65,16 +69,72 @@ public class SwipperOverlay extends RelativeLayout {
     }
 
     public void showVolume() {
-        if (volumeProgressBar.getVisibility() != VISIBLE)
-            volumeProgressBar.setVisibility(VISIBLE);
+        volumeProgressBar.animate().cancel();
 
-        if (progress.getVisibility() != VISIBLE)
+        if (volumeProgressBar.getVisibility() != VISIBLE) {
+            volumeProgressBar.setAlpha(1f);
+            volumeProgressBar.setVisibility(VISIBLE);
+        }
+
+        showProgressText();
+    }
+
+    private void showProgressText() {
+        progress.animate().cancel();
+
+        if (progress.getVisibility() != VISIBLE) {
+            progress.setAlpha(1f);
             progress.setVisibility(VISIBLE);
+        }
+    }
+
+    public void showBrightness() {
+        brightnessProgressBar.animate().cancel();
+
+        if (brightnessProgressBar.getVisibility() != VISIBLE) {
+            brightnessProgressBar.setAlpha(1f);
+            brightnessProgressBar.setVisibility(VISIBLE);
+        }
+
+        showProgressText();
+    }
+
+    private void hideProgressText() {
+        progress.animate().cancel();
+        progress.animate()
+                .alpha(0f)
+                .setDuration(ANIMATION_DURATION)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        progress.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        progress.setVisibility(View.GONE);
+                    }
+                });
     }
 
     public void hideVolume() {
-        volumeProgressBar.setVisibility(INVISIBLE);
-        progress.setVisibility(INVISIBLE);
+        volumeProgressBar.animate().cancel();
+        volumeProgressBar.animate()
+                .alpha(0f)
+                .setDuration(ANIMATION_DURATION)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        volumeProgressBar.setVisibility(GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        volumeProgressBar.setVisibility(GONE);
+                    }
+                });
+
+        hideProgressText();
     }
 
     public void setVolume(int index) {
@@ -90,17 +150,24 @@ public class SwipperOverlay extends RelativeLayout {
         return volumeProgressBar.getMax();
     }
 
-    public void showBrightness() {
-        if (brightnessProgressBar.getVisibility() != VISIBLE)
-            brightnessProgressBar.setVisibility(VISIBLE);
-
-        if (progress.getVisibility() != VISIBLE)
-            progress.setVisibility(VISIBLE);
-    }
-
     public void hideBrightness() {
-        brightnessProgressBar.setVisibility(INVISIBLE);
-        progress.setVisibility(INVISIBLE);
+        brightnessProgressBar.animate().cancel();
+        brightnessProgressBar.animate()
+                .alpha(0f)
+                .setDuration(ANIMATION_DURATION)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        brightnessProgressBar.setVisibility(GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+                        brightnessProgressBar.setVisibility(GONE);
+                    }
+                });
+
+        hideProgressText();
     }
 
     public void setBrightness(int index) {

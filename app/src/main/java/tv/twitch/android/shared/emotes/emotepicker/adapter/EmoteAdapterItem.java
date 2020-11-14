@@ -19,7 +19,7 @@ public class EmoteAdapterItem {
         /* ... */
 
         // String url = EmoteUrlUtil.getEmoteUrl(this.context, this.model.getId());
-       String url = Hooks.hookEmoteAdapterItem(context, this.model); // TODO: __HOOK
+       String url = Hooks.hookGetEmoteUrl(context, this.model); // TODO: __HOOK
 
         /* ... */
     }

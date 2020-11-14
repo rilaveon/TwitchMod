@@ -4,6 +4,7 @@ package tv.twitch.android.shared.player.overlay;
 import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.mvp.viewdelegate.BaseViewDelegate;
 
+
 public class PlayerOverlayViewDelegate extends BaseViewDelegate {
     /* ... */
 

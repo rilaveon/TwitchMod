@@ -3,6 +3,7 @@ package tv.twitch.android.shared.player.overlay;
 
 import tv.twitch.android.core.mvp.viewdelegate.BaseViewDelegate;
 
+
 public class OverlayLayoutController {
     private BaseViewDelegate overlayViewDelegate;
 

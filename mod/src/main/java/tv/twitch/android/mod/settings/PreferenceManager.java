@@ -12,12 +12,15 @@ import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.mod.models.preferences.ExoPlayerSpeed;
 import tv.twitch.android.mod.models.preferences.FloatingChatRefreshDelay;
 import tv.twitch.android.mod.models.preferences.FloatingChatSize;
+import tv.twitch.android.mod.models.preferences.FontSize;
 import tv.twitch.android.mod.models.preferences.Gifs;
 import tv.twitch.android.mod.models.preferences.MiniPlayerSize;
 import tv.twitch.android.mod.models.preferences.MsgDelete;
 import tv.twitch.android.mod.models.preferences.PlayerImpl;
+import tv.twitch.android.mod.models.preferences.PlayerSeek;
 import tv.twitch.android.mod.models.preferences.RobottyLimit;
 import tv.twitch.android.mod.models.preferences.UserMessagesFiltering;
+import tv.twitch.android.mod.utils.ChatMesssageFilteringUtil;
 import tv.twitch.android.mod.utils.Logger;
 
 
@@ -57,6 +60,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private boolean lockSwiper;
     private boolean disableGoogleBilling;
     private boolean showSwipperLockButton;
+    private boolean useAutoclicker;
 
     private boolean shouldShowBanner;
     private boolean isBannerShown;
@@ -74,6 +78,9 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
     private @FloatingChatSize int floatingChatSize;
     private @FloatingChatRefreshDelay int floatingChatRefreshRate;
     private @RobottyLimit int robottyLimit;
+    private @PlayerSeek int playerForwardSeek;
+    private @PlayerSeek int playerBackwardSeek;
+    private @PlayerSeek int chatMessageFontSize;
 
     private PreferenceWrapper mWrapper;
 
@@ -126,6 +133,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         showWideEmotes = getBoolean(Preferences.SHOW_WIDE_EMOTES, false);
         disableGoogleBilling = getBoolean(Preferences.DISABLE_GOOGLE_BILLING, false);
         showSwipperLockButton = getBoolean(Preferences.SWIPPER_LOCK_BUTTON, false);
+        useAutoclicker = getBoolean(Preferences.AUTOCLICKER, true);
 
         userFilterText = getString(Preferences.USER_FILTER_TEXT, null);
 
@@ -140,6 +148,9 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         floatingChatSize = getInt(Preferences.FLOAT_CHAT_SIZE, FloatingChatSize.DEFAULT);
         floatingChatRefreshRate = getInt(Preferences.FLOATING_CHAT_REFRESH_RATE, FloatingChatRefreshDelay.DEFAULT);
         robottyLimit = getInt(Preferences.ROBOTTY_LIMIT, RobottyLimit.LIMIT1);
+        playerForwardSeek = getInt(Preferences.PLAYER_FORWARD_SEEK, PlayerSeek.THIRTY);
+        playerBackwardSeek = getInt(Preferences.PLAYER_BACKWARD_SEEK, PlayerSeek.TEN);
+        chatMessageFontSize = getInt(Preferences.CHAT_MESSAGE_FONT_SIZE, FontSize.DEFAULT);
 
         isDarkThemeEnabled = getBoolean(TWITCH_DARK_THEME_KEY, false);
 
@@ -226,7 +237,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return showBttvEmoteInChat;
     }
 
-    public boolean showMentionHighlights() {
+    public boolean highlightMentionMessage() {
         return showMentionHighlightsInChat;
     }
 
@@ -354,6 +365,10 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
         return disableGoogleBilling;
     }
 
+    public boolean isAutoclickerEnabled() {
+        return useAutoclicker;
+    }
+
     public @EmoteSize int getEmoteSize() {
         return emoteSize;
     }
@@ -396,6 +411,18 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
 
     public @RobottyLimit int getMessageHistoryLimit() {
         return robottyLimit;
+    }
+
+    public @PlayerSeek int getPlayerForwardSeek() {
+        return playerForwardSeek;
+    }
+
+    public @FontSize int getChatMessageFontSize() {
+        return chatMessageFontSize;
+    }
+
+    public @PlayerSeek int getPlayerBackwardSeek() {
+        return playerBackwardSeek;
     }
 
     public String getUserFilterText() {
@@ -456,6 +483,7 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
                 break;
             case USER_FILTER_TEXT:
                 userFilterText = sharedPreferences.getString(key, userFilterText);
+                ChatMesssageFilteringUtil.INSTANCE.updateBlocklist(userFilterText);
                 break;
             case PLAYER_IMPELEMTATION:
                 playerImplemetation = sharedPreferences.getInt(key, playerImplemetation);
@@ -558,6 +586,18 @@ public class PreferenceManager implements PreferenceWrapper.PreferenceListener {
                 break;
             case SWIPPER_LOCK_BUTTON:
                 showSwipperLockButton = sharedPreferences.getBoolean(key, showSwipperLockButton);
+                break;
+            case PLAYER_FORWARD_SEEK:
+                playerForwardSeek = sharedPreferences.getInt(key, playerForwardSeek);
+                break;
+            case PLAYER_BACKWARD_SEEK:
+                playerBackwardSeek = sharedPreferences.getInt(key, playerBackwardSeek);
+                break;
+            case CHAT_MESSAGE_FONT_SIZE:
+                chatMessageFontSize = sharedPreferences.getInt(key, chatMessageFontSize);
+                break;
+            case AUTOCLICKER:
+                useAutoclicker = sharedPreferences.getBoolean(key, useAutoclicker);
                 break;
             default:
                 Logger.warning("Check key: " + key);

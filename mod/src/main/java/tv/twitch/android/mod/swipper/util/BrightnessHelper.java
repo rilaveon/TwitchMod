@@ -1,7 +1,9 @@
 package tv.twitch.android.mod.swipper.util;
 
+
 import android.app.Activity;
 import android.view.WindowManager;
+
 
 public class BrightnessHelper {
     public static int getWindowBrightness(Activity context) {

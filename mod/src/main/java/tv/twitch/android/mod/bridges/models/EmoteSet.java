@@ -35,6 +35,6 @@ public enum EmoteSet {
     }
 
     public String getTitle() {
-        return ResourcesManager.INSTANCE.getString(getTitleResId());
+        return ResourcesManager.getString(getTitleResId());
     }
 }

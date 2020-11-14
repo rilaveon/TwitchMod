@@ -15,7 +15,7 @@ public final class ChatUtil {
     public static final class Companion {
         /* ... */
 
-        public final Spanned createDeletedSpanFromChatMessageSpan(Spanned spanned, Context context, PublishSubject<ChatMessageClickedEvents> publishSubject, boolean z) {
+        public final Spanned createDeletedSpanFromChatMessageSpan(Spanned spanned, Context context, PublishSubject<ChatMessageClickedEvents> publishSubject, boolean hasModAccess) {
             return null;
         }
 

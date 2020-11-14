@@ -1,11 +1,27 @@
 package tv.twitch.android.mod.utils;
 
-import android.graphics.Color;
+
 import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewGroup;
 
+import tv.twitch.android.mod.bridges.ResourcesManager;
+
+
 public class ViewUtil {
+    public static View findViewByName(View view, String name) {
+        if (view == null)
+            return null;
+
+        if (name == null || name.length() == 0)
+            return null;
+
+        int id = ResourcesManager.getId(name);
+        if (id == 0)
+            return null;
+
+        return view.findViewById(id);
+    }
 
     public static void setBackground(View view, Integer color) {
         if (view == null) {

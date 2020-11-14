@@ -40,14 +40,18 @@ public enum Preferences {
     PLAYER_FLOATING_CHAT("mod_floating_chat_v2", "mod_settings_floating_chat", "mod_settings_floating_chat_desc", Type.BOOLEAN),
     ROBOTTY_SERVICE("mod_message_history_v2", "mod_settings_message_history", "mod_settings_message_history_desc", Type.BOOLEAN),
     ROBOTTY_LIMIT("mod_robotty_limit_v2", "mod_settings_message_history_limit", "mod_settings_message_history_limit_desc", Type.INTEGER),
-    USER_FILTER_TEXT("mod_filter_text", "mod_settings_blacklist", "mod_settings_blacklist_desc", Type.STRING),
+    USER_FILTER_TEXT("mod_filter_text", "mod_settings_blocklist", "mod_settings_blocklist_desc", Type.STRING),
     COMPACT_PLAYER_FOLLOW_VIEW("mod_compact_follow_view", "mod_settings_compact_follow_view", "mod_settings_compact_follow_view_desc", Type.BOOLEAN),
     PLAYER_REFRESH_BUTTON("mod_player_show_refresh_button", "mod_settings_show_refresh_button", "mod_settings_show_refresh_button_desc", Type.BOOLEAN),
     PLAYER_STAT_BUTTON("mod_player_show_stats_button", "mod_settings_show_stats_button", "mod_settings_show_stats_button_desc", Type.BOOLEAN),
     HIDE_CHAT_RESTRICTION("mod_hide_chat_restriction", "mod_settings_hide_chat_restriction", "mod_settings_hide_chat_restriction_desc", Type.BOOLEAN),
     SHOW_WIDE_EMOTES("mod_wide_emotes", "mod_settings_wide_emotes", "mod_settings_wide_emotes_desc", Type.BOOLEAN),
     DISABLE_GOOGLE_BILLING("mod_disable_google_billing", "mod_settings_force_disable_google_billing", "mod_settings_force_disable_google_billing_desc", Type.BOOLEAN),
-    SWIPPER_LOCK_BUTTON("mod_show_swipper_lock_button", "mod_settings_swipper_lock_button", "mod_settings_swipper_lock_button_desc", Type.BOOLEAN);
+    SWIPPER_LOCK_BUTTON("mod_show_swipper_lock_button", "mod_settings_swipper_lock_button", "mod_settings_swipper_lock_button_desc", Type.BOOLEAN),
+    PLAYER_FORWARD_SEEK("mod_player_forward_seek", "mod_settings_player_forward_seek", "mod_settings_player_forward_seek_desc", Type.INTEGER),
+    PLAYER_BACKWARD_SEEK("mod_player_backward_seek", "mod_settings_player_backward_seek", "mod_settings_player_backward_seek_desc", Type.INTEGER),
+    CHAT_MESSAGE_FONT_SIZE("mod_chat_message_font_size", "mod_settings_chat_message_font_size", "mod_settings_chat_message_font_size_desc", Type.INTEGER),
+    AUTOCLICKER("mod_chat_autoclicker", "mod_settings_autoclicker", "mod_settings_autoclicker_desc", Type.BOOLEAN);
 
     private static Map<String, Preferences> s_Map = new HashMap<>();
 

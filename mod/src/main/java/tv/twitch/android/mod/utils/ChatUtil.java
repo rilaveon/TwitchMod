@@ -7,7 +7,9 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
+import android.text.style.TypefaceSpan;
 import android.util.LruCache;
 
 import java.text.SimpleDateFormat;
@@ -18,7 +20,6 @@ import java.util.List;
 import java.util.Locale;
 
 
-import tv.twitch.android.mod.bridges.ChatFactory;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageFactory;
 import tv.twitch.android.mod.bridges.interfaces.ILiveChatSource;
 import tv.twitch.android.mod.chat.fetchers.RobottyFetcher;
@@ -28,18 +29,22 @@ import tv.twitch.android.mod.models.Emote;
 import tv.twitch.android.mod.models.preferences.EmoteSize;
 import tv.twitch.android.models.channel.ChannelInfo;
 import tv.twitch.android.shared.chat.util.ClickableUsernameSpan;
+import tv.twitch.chat.ChatEmoticonToken;
+import tv.twitch.chat.ChatMentionToken;
 import tv.twitch.chat.ChatMessageToken;
 import tv.twitch.chat.ChatTextToken;
+import tv.twitch.chat.ChatUrlToken;
 
 
 public class ChatUtil {
-    private static final String TIMESTAMP_DATE_FORMAT = "HH:mm ";
+    private static final String TIMESTAMP_DATE_FORMAT = "HH:mm";
+    private static final float TIMESTAMP_SPAN_PROPORTIONAL = 0.75f;
 
-    private static final int MAX_THEME_CACHE_SIZE = 500;
-    private static final float MIN_DARK_CHECK = .3f;
-    private static final float MIN_DARK_CHECK_FIXED = .4f;
-    private static final float MAX_WHITE_CHECK = .9f;
-    private static final float MAX_WHITE_CHECK_FIXED = .8f;
+    private static final int MAX_THEME_CACHE_SIZE = 200;
+    private static final float DARK_THEME_NICKNAME_CHECK = .3f;
+    private static final float DARK_THEME_NICKNAME_FIXED = .4f;
+    private static final float WHITE_THEME_NICKNAME_CHECK = .9f;
+    private static final float WHITE_THEME_NICKNAME_FIXED = .8f;
 
 
     private static final LruCache<Integer, Integer> mDarkThemeCache = new LruCache<Integer, Integer>(MAX_THEME_CACHE_SIZE) {
@@ -47,25 +52,25 @@ public class ChatUtil {
         protected Integer create(Integer color) {
             float[] hsv = new float[3];
             Color.colorToHSV(color, hsv);
-            if (hsv[2] >= MIN_DARK_CHECK) {
+            if (hsv[2] >= DARK_THEME_NICKNAME_CHECK) {
                 return color;
             }
 
-            hsv[2] = MIN_DARK_CHECK_FIXED;
+            hsv[2] = DARK_THEME_NICKNAME_FIXED;
             return Color.HSVToColor(hsv);
         }
     };
 
-    private static final LruCache<Integer, Integer> mWhiteThemeCache = new LruCache<Integer, Integer>(MAX_THEME_CACHE_SIZE) {
+    private static final LruCache<Integer, Integer> mDefaultThemeCache = new LruCache<Integer, Integer>(MAX_THEME_CACHE_SIZE) {
         @Override
         protected Integer create(Integer color) {
             float[] hsv = new float[3];
             Color.colorToHSV(color, hsv);
-            if (hsv[2] <= MAX_WHITE_CHECK) {
+            if (hsv[2] <= WHITE_THEME_NICKNAME_CHECK) {
                 return color;
             }
 
-            hsv[2] = MAX_WHITE_CHECK_FIXED;
+            hsv[2] = WHITE_THEME_NICKNAME_FIXED;
             return Color.HSVToColor(hsv);
         }
     };
@@ -89,7 +94,7 @@ public class ChatUtil {
             return;
         }
 
-        source.addMessage("[ROBOTTY] Fetching recent messages... ( https://recent-messages.robotty.de )");
+        source.addRecentMessage("[ROBOTTY] Fetching recent messages... ( https://recent-messages.robotty.de )");
         RobottyFetcher fetcher = new RobottyFetcher(channelInfo, limit, new RobottyFetcher.Callback() {
             @Override
             public void onMessagesParsed(ChannelInfo channel, List<String> ircMessages) {
@@ -107,12 +112,12 @@ public class ChatUtil {
                 }
 
                 if (messages.size() == 0) {
-                    source.addMessage("[ROBOTTY] No message available");
+                    source.addRecentMessage("[ROBOTTY] No message available");
                     return;
                 }
 
                 for (String msg : messages) {
-                    source.addMessage(msg);
+                    source.addRecentMessage(msg);
                 }
             }
 
@@ -120,7 +125,7 @@ public class ChatUtil {
             public void onError(ChannelInfo info, String text) {
                 if (!TextUtils.isEmpty(text)) {
                     Logger.error(text);
-                    source.addMessage("[ROBOTTY] Error: " + text);
+                    source.addRecentMessage("[ROBOTTY] Error: " + text);
                 }
             }
         });
@@ -191,14 +196,13 @@ public class ChatUtil {
         return new SpannedString(ssb);
     }
 
-    public static SpannedString tryAddEmotes(IChatMessageFactory factory, SpannedString messageSpan, int channelID, boolean isGifsDisabled, @EmoteSize int emoteSize) {
+    public static SpannedString tryAddEmotes(final IChatMessageFactory factory, SpannedString messageSpan, final int channelID, final boolean isGifsDisabled, final @EmoteSize int emoteSize) {
         if (factory == null) {
             Logger.error("factory is null");
             return messageSpan;
         }
 
         if (TextUtils.isEmpty(messageSpan)) {
-            Logger.warning("empty messageSpan");
             return messageSpan;
         }
 
@@ -242,12 +246,30 @@ public class ChatUtil {
         return messageSpan;
     }
 
-    public static Spanned addTimestamp(Spanned message, Date date) {
+    public static Spanned addTimestamp(Spanned message, final Date date) {
         SpannableString timeSpan = SpannableString.valueOf(new SimpleDateFormat(TIMESTAMP_DATE_FORMAT, Locale.UK).format(date));
-        return SpannableString.valueOf(new SpannableStringBuilder(timeSpan).append(new SpannableStringBuilder(message)));
+        timeSpan.setSpan(new TypefaceSpan("monospace"), 0, timeSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        timeSpan.setSpan(new RelativeSizeSpan(TIMESTAMP_SPAN_PROPORTIONAL), 0, timeSpan.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return SpannableString.valueOf(new SpannableStringBuilder(timeSpan).append(" ").append(new SpannableStringBuilder(message)));
     }
 
-    public static Integer fixUsernameColor(int color, boolean isDarkTheme) {
-        return isDarkTheme ? mDarkThemeCache.get(color) : mWhiteThemeCache.get(color);
+    public static Integer fixUsernameColor(int color, final boolean isDarkTheme) {
+        return isDarkTheme ? mDarkThemeCache.get(color) : mDefaultThemeCache.get(color);
+    }
+
+    static String getTextFromToken(ChatMessageToken token) {
+        if (token instanceof ChatUrlToken) {
+            if (!((ChatUrlToken) token).hidden)
+                return ((ChatUrlToken) token).url;
+        } else if (token instanceof ChatTextToken) {
+            return ((ChatTextToken) token).text;
+        } else if (token instanceof ChatMentionToken) {
+            return ((ChatMentionToken) token).text;
+        } else if (token instanceof ChatEmoticonToken) {
+            return ((ChatEmoticonToken) token).emoticonText;
+        }
+
+        return null;
     }
 }

@@ -15,10 +15,10 @@ public final class ChatEmoticonUtils {
                 return url;
         }
 
-        return org(context, chatEmoticon);
+        return getEmoteURLOrg(context, chatEmoticon);
     }
 
-    public static final String org(Context context, ChatEmoticon chatEmoticon) { // TODO: __RENAME__getEmoteURL
+    public static final String getEmoteURLOrg(Context context, ChatEmoticon chatEmoticon) { // TODO: __RENAME__getEmoteURL
         return null;
     }
 }

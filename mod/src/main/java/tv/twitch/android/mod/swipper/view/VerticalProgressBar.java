@@ -1,5 +1,6 @@
 package tv.twitch.android.mod.swipper.view;
 
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
@@ -9,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ProgressBar;
+
 
 public class VerticalProgressBar extends ProgressBar {
     private static final int BACKGROUND_COLOR = Color.WHITE;

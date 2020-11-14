@@ -2,13 +2,16 @@ package tv.twitch.android.mod.bridges;
 
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
+import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.PlaybackParameters;
 
@@ -20,11 +23,22 @@ import java.util.List;
 import io.reactivex.subjects.PublishSubject;
 import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.badges.BadgeManager;
+import tv.twitch.android.mod.bridges.interfaces.IBottomPlayerControlOverlayViewDelegate;
 import tv.twitch.android.mod.bridges.interfaces.IChatConnectionController;
+import tv.twitch.android.mod.bridges.interfaces.ICommunityPointsButtonViewDelegate;
+import tv.twitch.android.mod.bridges.interfaces.IEmotePickerViewDelegate;
 import tv.twitch.android.mod.bridges.interfaces.ILiveChatSource;
+import tv.twitch.android.mod.bridges.interfaces.ISharedPanelWidget;
+import tv.twitch.android.mod.bridges.interfaces.IUrlDrawable;
 import tv.twitch.android.mod.models.Badge;
 import tv.twitch.android.mod.models.preferences.ChatWidthScale;
+import tv.twitch.android.mod.models.preferences.FontSize;
 import tv.twitch.android.mod.models.preferences.MsgDelete;
+import tv.twitch.android.mod.utils.ClipDownloader;
+import tv.twitch.android.mod.utils.ViewUtil;
+import tv.twitch.android.models.chomments.ChommentCommenterModel;
+import tv.twitch.android.models.chomments.ChommentMessageModel;
+import tv.twitch.android.models.chomments.ChommentModel;
 import tv.twitch.android.shared.chat.adapter.item.ChatMessageClickedEvents;
 import tv.twitch.android.shared.chat.events.ChannelSetEvent;
 import tv.twitch.android.shared.chat.ChatMessageInterface;
@@ -46,6 +60,7 @@ import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.channel.ChannelInfo;
+import tv.twitch.android.shared.ui.elements.bottomsheet.InteractiveRowView;
 import tv.twitch.android.util.EmoteUrlUtil;
 import tv.twitch.chat.ChatEmoticonSet;
 import tv.twitch.chat.ChatLiveMessage;
@@ -59,6 +74,8 @@ public class Hooks {
     private final static String VOD_PLAYER_PRESENTER_CLASS = "tv.twitch.android.shared.player.presenters.VodPlayerPresenter";
     private final static String PLAYER_CORE = "playercore";
     private final static String PLAYER_EXO2 = "exoplayer_2";
+
+    private static final int HIGHLIGHT_COLOR = Color.argb(100, 255, 0, 0);
 
 
     public final static String hookSetName(String org, String setId) {
@@ -142,8 +159,8 @@ public class Hooks {
         return PlaybackParameters.DEFAULT;
     }
 
-    public final static boolean isHighlightedMessage(ChatMessageInfo messageInfo, TwitchAccountManager accountManager) {
-        if (!PreferenceManager.INSTANCE.showMentionHighlights())
+    public final static boolean shouldHighlightMessage(ChatMessageInfo messageInfo, TwitchAccountManager accountManager) {
+        if (!PreferenceManager.INSTANCE.highlightMentionMessage())
             return false;
 
         if (accountManager == null) {
@@ -163,7 +180,6 @@ public class Hooks {
 
         String userName = accountManager.getUsername();
         if (TextUtils.isEmpty(userName)) {
-            Logger.error("empty userName");
             return false;
         }
 
@@ -203,17 +219,16 @@ public class Hooks {
         if (!PreferenceManager.INSTANCE.showBttvEmotesInChat())
             return orgSet;
 
-        final int currentChannel = Helper.INSTANCE.getCurrentChannel();
         Collection<Emote> globalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
-        Collection<Emote> bttvEmotes = EmoteManager.INSTANCE.getBttvEmotes(currentChannel);
-        Collection<Emote> ffzEmotes = EmoteManager.INSTANCE.getFfzEmotes(currentChannel);
+        Collection<Emote> bttvEmotes = EmoteManager.INSTANCE.getBttvEmotesForCurrentChannel();
+        Collection<Emote> ffzEmotes = EmoteManager.INSTANCE.getFfzEmotesForCurrentChannel();
 
         ChatEmoticonSet[] newSet = new ChatEmoticonSet[orgSet.length+3];
         System.arraycopy(orgSet, 0, newSet, 0, orgSet.length);
 
-        newSet[newSet.length-1] = ChatFactory.getSet(EmoteSet.BTTV.getId(), bttvEmotes);
-        newSet[newSet.length-2] = ChatFactory.getSet(EmoteSet.FFZ.getId(), ffzEmotes);
-        newSet[newSet.length-3] = ChatFactory.getSet(EmoteSet.GLOBAL.getId(), globalEmotes);
+        newSet[newSet.length-3] = ChatFactory.getSet(EmoteSet.FFZ.getId(), ffzEmotes);
+        newSet[newSet.length-2] = ChatFactory.getSet(EmoteSet.BTTV.getId(), bttvEmotes);
+        newSet[newSet.length-1] = ChatFactory.getSet(EmoteSet.GLOBAL.getId(), globalEmotes);
 
         return newSet;
     }
@@ -310,7 +325,7 @@ public class Hooks {
         if (!PreferenceManager.INSTANCE.isCompactPlayerFollowViewEnabled())
             return org;
 
-        int id = ResourcesManager.INSTANCE.getLayoutId("player_metadata_view_extended_mod");
+        int id = ResourcesManager.getLayoutId("player_metadata_view_extended_mod");
         if (id == 0) {
             Logger.error("layout not found");
             return org;
@@ -336,10 +351,10 @@ public class Hooks {
             return chatLiveMessageArr;
 
         ChatMesssageFilteringUtil filteringUtil = ChatMesssageFilteringUtil.INSTANCE;
-        if (!filteringUtil.isEnabled())
+        if (filteringUtil.isDisabled())
             return chatLiveMessageArr;
 
-        chatLiveMessageArr = filteringUtil.filterByKeywords(chatLiveMessageArr);
+        chatLiveMessageArr = filteringUtil.filterLiveMessages(chatLiveMessageArr);
 
         if (connectionController == null) {
             Logger.error("connectionController is null");
@@ -348,7 +363,7 @@ public class Hooks {
 
         int viewerId = connectionController.getViewerId();
         if (viewerId > 0) {
-            chatLiveMessageArr = filteringUtil.filterByLevel(chatLiveMessageArr, viewerId, PreferenceManager.INSTANCE.getFilterMessageLevel());
+            chatLiveMessageArr = filteringUtil.filterByMessageLevel(chatLiveMessageArr, viewerId, PreferenceManager.INSTANCE.getFilterMessageLevel());
         }
 
         return chatLiveMessageArr;
@@ -370,7 +385,7 @@ public class Hooks {
             return;
         }
 
-        Helper.INSTANCE.setCurrentChannel(channelInfo.getId());
+        EmoteManager.INSTANCE.setCurrentChannel(channelInfo.getId());
     }
 
     public final static boolean isHideDiscoverTab() {
@@ -470,7 +485,7 @@ public class Hooks {
         return badges;
     }
 
-    public static SpannedString hookChatMessage(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString orgMessage, int channelId, TwitchAccountManager accountManager) {
+    public static SpannedString hookChatMessage(IChatMessageFactory factory, ChatMessageInterface chatMessageInterface, SpannedString orgMessage, int channelId) {
         PreferenceManager manager = PreferenceManager.INSTANCE;
 
         if (TextUtils.isEmpty(orgMessage))
@@ -505,30 +520,30 @@ public class Hooks {
         if (!PreferenceManager.INSTANCE.showBttvEmotesInChat())
             return emoteUiSets;
 
-        Collection<Emote> bttvGlobalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
-        if (!bttvGlobalEmotes.isEmpty()) {
-            Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.GLOBAL.getTitleResId());
-            emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvGlobalEmotes, resId));
-        }
-
         if (channelId != null && channelId > 0) {
-            Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
-            if (!bttvChannelEmotes.isEmpty()) {
-                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.BTTV.getTitleResId());
-                emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvChannelEmotes, resId));
-            }
-
             Collection<Emote> ffzChannelEmotes = EmoteManager.INSTANCE.getFfzEmotes(channelId);
             if (!ffzChannelEmotes.isEmpty()) {
-                Integer resId = ResourcesManager.INSTANCE.getStringId(EmoteSet.FFZ.getTitleResId());
+                Integer resId = ResourcesManager.getStringId(EmoteSet.FFZ.getTitleResId());
                 emoteUiSets.add(ChatFactory.getEmoteUiSet(ffzChannelEmotes, resId));
             }
+
+            Collection<Emote> bttvChannelEmotes = EmoteManager.INSTANCE.getBttvEmotes(channelId);
+            if (!bttvChannelEmotes.isEmpty()) {
+                Integer resId = ResourcesManager.getStringId(EmoteSet.BTTV.getTitleResId());
+                emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvChannelEmotes, resId));
+            }
+        }
+
+        Collection<Emote> bttvGlobalEmotes = EmoteManager.INSTANCE.getGlobalEmotes();
+        if (!bttvGlobalEmotes.isEmpty()) {
+            Integer resId = ResourcesManager.getStringId(EmoteSet.GLOBAL.getTitleResId());
+            emoteUiSets.add(ChatFactory.getEmoteUiSet(bttvGlobalEmotes, resId));
         }
 
         return emoteUiSets;
     }
 
-    public static String hookEmoteAdapterItem(Context context, EmoteUiModel emoteUiModel) {
+    public static String hookGetEmoteUrl(Context context, EmoteUiModel emoteUiModel) {
         if (emoteUiModel instanceof EmoteUiModelWithUrl) {
             return ((EmoteUiModelWithUrl) emoteUiModel).getUrl();
         }
@@ -536,7 +551,7 @@ public class Hooks {
         return EmoteUrlUtil.getEmoteUrl(context, emoteUiModel.getId());
     }
 
-    public static int hookChatWidth(int org) {
+    public static int hookChatScreenEdgePercentage(int org) {
         @ChatWidthScale int scale = PreferenceManager.INSTANCE.getLandscapeChatScale();
         if (scale == ChatWidthScale.DEFAULT)
             return org;
@@ -550,6 +565,7 @@ public class Hooks {
 
     public final static void helper() {
         Object o = hookVodPlayerStandaloneMediaClockInit(); // TODO: __HOOK
+        float res = Hooks.hookMediaSpanDpSize(0); // TODO: __HOOK
     }
 
     public static boolean isSupportWideEmotes() {
@@ -558,24 +574,6 @@ public class Hooks {
 
     public static boolean isDisableGoogleBillingJump() {
         return PreferenceManager.INSTANCE.isGoogleBillingDisabled();
-    }
-
-    public static void playVan(View view) {
-        if (view == null) {
-            Logger.error("view is null");
-            return;
-        }
-
-        view.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                try {
-                    AssetFileDescriptor fd = LoaderLS.getInstance().getAssets().openFd("mod/van.wav");
-                    Helper.playSoundFromFd(fd);
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                }
-            }
-        });
     }
 
     @SuppressWarnings({"SwitchStatementWithTooFewBranches", "SimplifiableConditionalExpression"})
@@ -610,11 +608,17 @@ public class Hooks {
         return org;
     }
 
-    public static void tryFixWideEmotesInView(WeakReference<View> viewWeakReference) {
-        if (!PreferenceManager.INSTANCE.fixWideEmotes())
+    public static void maybeInvalidateContainerView(WeakReference<View> viewWeakReference, IUrlDrawable urlDrawable) {
+        if (urlDrawable == null)
             return;
 
         if (viewWeakReference == null)
+            return;
+
+        if (!PreferenceManager.INSTANCE.fixWideEmotes())
+            return;
+
+        if (urlDrawable.isBadge() || urlDrawable.isTwitchEmote())
             return;
 
         View view = viewWeakReference.get();
@@ -626,5 +630,146 @@ public class Hooks {
         view.invalidate();
         view.requestLayout();
         viewWeakReference.clear();
+    }
+
+    public static boolean isMentionHighlightingEnabled() {
+        return PreferenceManager.INSTANCE.highlightMentionMessage();
+    }
+
+    public static void highlightView(View view, boolean isHighlighted) {
+        ViewUtil.setBackground(view, isHighlighted ? HIGHLIGHT_COLOR : null);
+    }
+
+    public static ChommentModel maybeFilterThisChomment(ChommentModel model) {
+        if (model == null)
+            return null;
+
+        ChatMesssageFilteringUtil filteringUtil = ChatMesssageFilteringUtil.INSTANCE;
+        if (filteringUtil.isDisabled())
+            return model;
+
+        ChommentMessageModel messageModel = model.getMessage();
+        if (messageModel == null)
+            return model;
+
+        String body = messageModel.getBody();
+        if (body == null || body.length() == 0)
+            return model;
+
+        ChommentCommenterModel commenterModel = model.getCommenter();
+        if (commenterModel != null) {
+            String username = commenterModel.getUsername();
+            if (!filteringUtil.filterByUsername(username))
+                return null;
+        } else {
+            Logger.warning("commenter is null");
+        }
+
+        if (!filteringUtil.filterByKeywords(body.split(" "))) {
+            return null;
+        }
+
+        return model;
+    }
+
+    public static int getRewindSeek() {
+        return -PreferenceManager.INSTANCE.getPlayerBackwardSeek();
+    }
+
+    public static int getForwardSeek() {
+        return PreferenceManager.INSTANCE.getPlayerForwardSeek();
+    }
+
+    public static void setChatMessageFontSize(TextView textView) {
+        if (textView == null) {
+            Logger.error("textView is null");
+            return;
+        }
+
+        @FontSize int fontSize = PreferenceManager.INSTANCE.getChatMessageFontSize();
+
+        if (fontSize == FontSize.DEFAULT)
+            return;
+
+        textView.setTextSize(fontSize);
+    }
+
+    public static float hookMediaSpanDpSize(float size) {
+        @FontSize int fontSize = PreferenceManager.INSTANCE.getChatMessageFontSize();
+
+        if (fontSize == FontSize.DEFAULT)
+            return size;
+
+        float scale = (float) fontSize / FontSize.DEFAULT;
+
+        return Math.round(size * scale);
+    }
+
+    public static boolean isBttvEmotesEnabled() {
+        return PreferenceManager.INSTANCE.showBttvEmotesInChat();
+    }
+
+    public static void setupClicker(final ICommunityPointsButtonViewDelegate view) {
+        if (!PreferenceManager.INSTANCE.isAutoclickerEnabled())
+            return;
+
+        if (view == null) {
+            Logger.error("view is null");
+            return;
+        }
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                view.maybeClickOnBonus();
+            }
+        }, 5000);
+    }
+
+    public static void setupClipDownloader(InteractiveRowView downloadButton, ISharedPanelWidget panelWidget) {
+        if (downloadButton == null) {
+            Logger.error("downloadButton is null");
+            return;
+        }
+
+        downloadButton.setOnClickListener(new ClipDownloader(panelWidget));
+    }
+
+    public static void setupLockButtonClickListener(View lockButton, final IBottomPlayerControlOverlayViewDelegate bottomPlayerControlOverlayViewDelegate) {
+        lockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Hooks.shouldLockSwiper()) {
+                    Hooks.setLockSwiper(false);
+                    if (bottomPlayerControlOverlayViewDelegate != null)
+                        bottomPlayerControlOverlayViewDelegate.updateLockButtonState();
+                } else {
+                    Hooks.setLockSwiper(true);
+                    if (bottomPlayerControlOverlayViewDelegate != null)
+                        bottomPlayerControlOverlayViewDelegate.updateLockButtonState();
+                }
+            }
+        });
+
+    }
+
+    public static void setupRefreshButtonClickListener(View refreshButton, final IBottomPlayerControlOverlayViewDelegate bottomPlayerControlOverlayViewDelegate) {
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomPlayerControlOverlayViewDelegate != null)
+                    bottomPlayerControlOverlayViewDelegate.clickRefresh();
+            }
+        });
+    }
+
+    public static void setupBttvEmotesButtonClickListener(ImageView bttvEmotesButton, final IEmotePickerViewDelegate emotePickerViewDelegate) {
+        bttvEmotesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (emotePickerViewDelegate != null)
+                    emotePickerViewDelegate.scrollToBttvSection();
+            }
+        });
     }
 }

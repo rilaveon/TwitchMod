@@ -3,6 +3,7 @@ package tv.twitch.android.shared.preferences;
 
 import tv.twitch.android.mod.bridges.Hooks;
 
+
 public class VideoDebugConfig {
     /* ... */
 

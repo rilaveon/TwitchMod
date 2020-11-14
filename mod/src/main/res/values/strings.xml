@@ -1,35 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="mod_category_settings_chat_bttv">BetterTTV/FFZ</string>
     <string name="mod_settings_bttv_emotes">Enable</string>
     <string name="mod_settings_bttv_emotes_desc">Show BetterTTV/FFZ emoticons in chat</string>
-    <string name="mod_settings_bttv_widget">Emote menu</string>
-    <string name="mod_settings_bttv_widget_desc">Adds extra BetterTTV/FFZ emoticons to emote picker</string>
     <string name="mod_settings_gifs">GIFS</string>
     <string name="mod_settings_gifs_desc">Change the mode of how GIF emoticons are showing up</string>
     <string name="mod_settings_emote_size">Source emote size</string>
-    <string name="mod_settings_emote_size_desc" translatable="false" />
+    <string name="mod_settings_emote_size_desc" >Lowering size may increase chat performance</string>
     <string name="mod_category_settings_chat_category">Chat</string>
     <string name="mod_settings_floating_chat">Enable</string>
     <string name="mod_category_settings_floating_chat">Floating chat</string>
     <string name="mod_settings_floating_chat_desc">Enable floating chat over video in landscape mode</string>
     <string name="mod_settings_message_timestamp">Timestamps</string>
-    <string name="mod_settings_message_timestamp_desc" translatable="false">Display timestamps alongside chat messages</string>
+    <string name="mod_settings_message_timestamp_desc">Display timestamps alongside chat messages</string>
     <string name="mod_settings_bypass_chat_ban">Bypass chat ban</string>
-    <string name="mod_settings_bypass_chat_ban_desc" translatable="false">Joins chat anonymously when you are banned. You can\'t send messages</string>
+    <string name="mod_settings_bypass_chat_ban_desc">Joins chat anonymously when you are banned. You can\'t send messages</string>
     <string name="mod_settings_badges">FFZ badges</string>
     <string name="mod_settings_badges_desc">Use ffz badges where available</string>
     <string name="mod_category_settings_player_category">Player</string>
     <string name="mod_settings_adblock">AdBlock</string>
-    <string name="mod_settings_adblock_desc">Block player ads and disable analytics</string>
+    <string name="mod_settings_adblock_desc">Block all non-stream ads in the player and disable analytics</string>
     <string name="mod_settings_disable_autoplay">Turn off autoplay</string>
     <string name="mod_settings_disable_autoplay_desc">Disable autoplay of the next video</string>
     <string name="mod_settings_player_implementation">Player implementation</string>
-    <string name="mod_settings_player_implementation_desc" translatable="false" />
+    <string name="mod_settings_player_implementation_desc"/>
     <string name="mod_settings_miniplayer_size">MiniPlayer size</string>
-    <string name="mod_settings_miniplayer_size_desc" translatable="false" />
+    <string name="mod_settings_miniplayer_size_desc" />
     <string name="mod_settings_exoplayer_speed">ExoPlayer VOD speed</string>
-    <string name="mod_settings_exoplayer_speed_desc" translatable="false" />
+    <string name="mod_settings_exoplayer_speed_desc"/>
     <string name="mod_category_settings_swipe">Swipe controls</string>
     <string name="mod_settings_swipe_volume">Volume swipe</string>
     <string name="mod_settings_swipe_volume_desc">Control volume by swiping</string>
@@ -38,29 +35,27 @@
     <string name="mod_category_chat_filtering">Message Filtering</string>
     <string name="mod_settings_filtering_level">Message user-level filtering</string>
     <string name="mod_settings_filtering_level_desc">Messages will be removed from chat entirely if they aren\'t sent by a user of this level or higher</string>
-    <string name="mod_settings_filtering_ignore_system">Ignore system</string>
-    <string name="mod_settings_filtering_ignore_system_desc" translatable="false">Ignore subs, events and etc.</string>
+    <string name="mod_settings_filtering_ignore_system">Ignore subs</string>
+    <string name="mod_settings_filtering_ignore_system_desc">Disable chat sub and gift notifications</string>
     <string name="mod_category_view">View</string>
     <string name="mod_settings_old_emote_picker">Force old emote picker</string>
-    <string name="mod_settings_old_emote_picker_desc" translatable="false" />
+    <string name="mod_settings_old_emote_picker_desc" />
     <string name="mod_settings_disable_recommendations">Hide «Recommended Streams»</string>
-    <string name="mod_settings_disable_recommendations_desc" translatable="false" />
+    <string name="mod_settings_disable_recommendations_desc" />
     <string name="mod_settings_disable_resume_watching">Hide «Recent Watching»</string>
-    <string name="mod_settings_disable_resume_watching_desc" translatable="false" />
+    <string name="mod_settings_disable_resume_watching_desc" />
     <string name="mod_settings_disable_followed_games">Hide «Followed Games»</string>
-    <string name="mod_settings_disable_followed_games_desc" translatable="false" />
+    <string name="mod_settings_disable_followed_games_desc" />
     <string name="mod_settings_hide_discover">Hide «Discover» tab</string>
-    <string name="mod_settings_hide_discover_desc" translatable="false" />
+    <string name="mod_settings_hide_discover_desc" />
     <string name="mod_settings_hide_esports">Hide «ESports» tab</string>
-    <string name="mod_settings_hide_esports_desc" translatable="false" />
+    <string name="mod_settings_hide_esports_desc" />
     <string name="mod_category_settings_patch">Patches</string>
     <string name="mod_settings_disable_recent_search">Hide recent searches</string>
-    <string name="mod_settings_disable_recent_search_desc" translatable="false" />
+    <string name="mod_settings_disable_recent_search_desc" />
     <string name="mod_settings_interceptor">Enable interceptor</string>
-    <string name="mod_settings_hide_gs_error">Hide \'Google Play Services Error\'</string>
-    <string name="mod_settings_hide_gs_error_desc">for devices without Google Play Services</string>
     <string name="mod_settings_landscape_chat_width">Landscape chat width</string>
-    <string name="mod_settings_landscape_chat_width_desc" translatable="false">% of the screen</string>
+    <string name="mod_settings_landscape_chat_width_desc">% of the screen</string>
     <string name="mod_category_info">Info</string>
     <string name="mod_info_open_telegram">Telegram channel</string>
     <string name="mod_info_open_github">GitHub page</string>
@@ -72,37 +67,50 @@
     <string name="dialog_no">No</string>
     <string name="mod_downloading">Downloading %1$s…</string>
     <string name="mod_settings_floating_refresh">Refresh</string>
-    <string name="mod_settings_floating_refresh_desc" translatable="false"/>
-    <string name="mod_settings_interceptor_desc" translatable="false">Enable for debugging requests</string>
+    <string name="mod_settings_floating_refresh_desc" />
+    <string name="mod_settings_interceptor_desc">Enable for debugging requests</string>
     <string name="mod_settings_chat_red_mention">Highlighting mentions</string>
-    <string name="mod_settings_chat_red_mention_desc" translatable="false" >Highlight messages that mention you</string>
+    <string name="mod_settings_chat_red_mention_desc">Highlight messages that mention you</string>
     <string name="mod_settings_disable_new_clips">Force old clips view</string>
-    <string name="mod_settings_disable_new_clips_desc" translatable="false" />
+    <string name="mod_settings_disable_new_clips_desc" />
     <string name="mod_settings_floating_queue">Queue size</string>
     <string name="mod_settings_msg_delete">Deleted message style</string>
-    <string name="mod_settings_msg_delete_desc" translatable="false" />
-    <string name="mod_settings_floating_queue_desc" translatable="false" />
+    <string name="mod_settings_msg_delete_desc" />
+    <string name="mod_settings_floating_queue_desc" />
     <string name="mod_settings_compact_follow_view">Compact follow view</string>
-    <string name="mod_settings_blacklist">Set blacklist keywords</string>
-    <string name="mod_settings_blacklist_desc" translatable="false" />
+    <string name="mod_settings_blocklist">Set blocklist keywords</string>
+    <string name="mod_settings_blocklist_desc"/>
     <string name="mod_settings_message_history">Load message history on connect</string>
     <string name="mod_settings_message_history_desc" translatable="false">API https://recent-messages.robotty.de</string>
     <string name="mod_settings_message_history_limit">Limit</string>
     <string name="mod_settings_message_history_limit_desc">Limit the number of messages you receive</string>
-    <string name="mod_settings_compact_follow_view_desc" translatable="false"/>
+    <string name="mod_settings_compact_follow_view_desc"/>
     <string name="mod_settings_show_refresh_button">Show refresh button</string>
-    <string name="mod_settings_show_refresh_button_desc" translatable="false"/>
+    <string name="mod_settings_show_refresh_button_desc"/>
     <string name="mod_settings_show_stats_button">Show stats button</string>
-    <string name="mod_settings_show_stats_button_desc" translatable="false"/>
+    <string name="mod_settings_show_stats_button_desc"/>
     <string name="mod_info_open_telegram_desc" translatable="false">t.me/pubTw</string>
     <string name="mod_info_open_github_desc" translatable="false">github.com/nopbreak/TwitchMod</string>
     <string name="mod_settings_hide_chat_restriction">Hide chat restrictions</string>
-    <string name="mod_settings_hide_chat_restriction_desc" translatable="false" />
+    <string name="mod_settings_hide_chat_restriction_desc"/>
     <string name="mod_settings_wide_emotes">Show wide emotes</string>
-    <string name="mod_settings_wide_emotes_desc" translatable="false" />
+    <string name="mod_settings_wide_emotes_desc"/>
     <string name="mod_settings_force_disable_google_billing">Force disable google billing</string>
-    <string name="mod_settings_force_disable_google_billing_desc" translatable="false" />
-    <string name="mod_banner_text_default" translatable="false"><![CDATA[TwitchMod is a modded Twitch client for Android.<br/><br/>Features:<br/>• BTTV/FFZ emotes<br/>• AdBlock<br/>• Gestures<br/>• and more<br/><br/>Telegram: <a href=\'https://t.me/pubTw\'>t.me/pubTw</a><br/>KKomrade: <a href=\'https://4pda.ru/forum/index.php?showtopic=320321\'>4pda.ru</a>]]></string>
+    <string name="mod_settings_force_disable_google_billing_desc"/>
+    <string name="mod_banner_text_default"><![CDATA[TwitchMod is a modded version of Twitch Android Client.<br/><br/>Features:<br/><b>•</b> BetterTTV and FrankerFaceZ emotes<br/><b>•</b> AdBlock<br/><b>•</b> Autoclicker for Channel Points<br/><b>•</b> Gestures to control Brightness & Volume<br/><b>•</b> and more<br/><br/>Telegram: <a href=\'https://t.me/pubTw\'>t.me/pubTw</a><br/><br/>KKomrade: <a href=\'https://4pda.ru/forum/index.php?showtopic=320321\'>4pda.ru</a>]]></string>
     <string name="mod_settings_swipper_lock_button">Show lock button</string>
-    <string name="mod_settings_swipper_lock_button_desc" translatable="false" />
+    <string name="mod_settings_swipper_lock_button_desc" />
+    <string name="mod_settings_player_forward_seek">Forward jump</string>
+    <string name="mod_settings_player_backward_seek">Backward jump</string>
+    <string name="mod_settings_player_forward_seek_desc"/>
+    <string name="mod_settings_player_backward_seek_desc"/>
+    <string name="mod_settings_chat_message_font_size">Font size</string>
+    <string name="mod_settings_chat_message_font_size_desc"/>
+    <string name="mod_settings_action_back">Back</string>
+    <string name="mod_settings_about_service">About the service</string>
+    <string name="mod_settings_visit_website">Visit website</string>
+    <string name="mod_settings_recent_messages_service_category">Recent-messages service</string>
+    <string name="mod_category_settings_adblock_category">Adblock</string>
+    <string name="mod_settings_autoclicker">Autoclicker</string>
+    <string name="mod_settings_autoclicker_desc">Auto click the bonus channel points button when it appears (delay ~5 seconds)</string>
 </resources>

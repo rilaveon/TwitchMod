@@ -1,5 +1,6 @@
 package tv.twitch.chat;
 
+
 public enum ChatMessageTokenType {
     Text,
     Emoticon,

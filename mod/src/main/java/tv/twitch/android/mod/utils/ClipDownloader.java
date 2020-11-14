@@ -105,9 +105,9 @@ public class ClipDownloader implements View.OnClickListener {
             final ClipItem item = getItem(position);
 
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(ResourcesManager.INSTANCE.getLayoutId("mod_download_item"), parent, false);
-                final TextView clipQualityView = convertView.findViewById(ResourcesManager.INSTANCE.getId("clip_quality"));
-                final TextView clipSizeView = convertView.findViewById(ResourcesManager.INSTANCE.getId("clip_size"));
+                convertView = LayoutInflater.from(getContext()).inflate(ResourcesManager.getLayoutId("mod_download_item"), parent, false);
+                final TextView clipQualityView = convertView.findViewById(ResourcesManager.getId("clip_quality"));
+                final TextView clipSizeView = convertView.findViewById(ResourcesManager.getId("clip_size"));
 
                 clipQualityView.setText(item.getFormattedQuality());
                 clipSizeView.setText(item.getSize());
@@ -142,7 +142,7 @@ public class ClipDownloader implements View.OnClickListener {
         }
 
         public ClipsAdapter(@NonNull Context context) {
-            super(context, ResourcesManager.INSTANCE.getLayoutId("twitch_spinner_dropdown_item"));
+            super(context, ResourcesManager.getLayoutId("twitch_spinner_dropdown_item"));
         }
     }
 

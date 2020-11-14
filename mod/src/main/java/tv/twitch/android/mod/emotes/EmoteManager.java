@@ -28,6 +28,8 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
 
     public static final EmoteManager INSTANCE = new EmoteManager();
 
+    private int currentChannel;
+
     private EmoteManager() {
         mBttvGlobalFetcher = new BttvGlobalFetcher(this);
     }
@@ -67,7 +69,7 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
     }
 
     public void fetchGlobalEmotes() {
-        if (mBttvGlobalSet == null && !isGlobalSetRequested) {
+        if ((mBttvGlobalSet == null || mBttvGlobalSet.isEmpty()) && !isGlobalSetRequested) {
             synchronized (lock) {
                 if (mBttvGlobalSet == null || mBttvGlobalSet.isEmpty()) {
                     mBttvGlobalFetcher.fetch();
@@ -95,6 +97,10 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
         return mRoomCache.get(channelId).getBttvEmotes();
     }
 
+    public Collection<Emote> getBttvEmotesForCurrentChannel() {
+        return getBttvEmotes(getCurrentChannel());
+    }
+
     @NonNull
     public Collection<Emote> getFfzEmotes(int channelId) {
         if (channelId <= 0) {
@@ -103,6 +109,10 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
         }
 
         return mRoomCache.get(channelId).getFfzEmotes();
+    }
+
+    public Collection<Emote> getFfzEmotesForCurrentChannel() {
+        return getFfzEmotes(getCurrentChannel());
     }
 
     public Emote findEmote(String code, int channelId) {
@@ -119,5 +129,17 @@ public class EmoteManager implements BttvGlobalFetcher.Callback {
             return mBttvGlobalSet.getEmote(code);
 
         return null;
+    }
+
+    public void setCurrentChannel(int channelId) {
+        if (channelId < 0) {
+            channelId = 0;
+        }
+
+        currentChannel = channelId;
+    }
+
+    public int getCurrentChannel() {
+        return currentChannel;
     }
 }

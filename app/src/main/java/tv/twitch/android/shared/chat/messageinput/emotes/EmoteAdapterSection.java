@@ -1,8 +1,6 @@
 package tv.twitch.android.shared.chat.messageinput.emotes;
 
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import tv.twitch.android.mod.bridges.Hooks;
 
 
@@ -11,17 +9,12 @@ public class EmoteAdapterSection {
 
     /* ... */
 
-    private final String constructHeaderFromEmotes() {
-        return null;
-    }
-
-    public void bindToHeaderViewHolder(RecyclerView.ViewHolder viewHolder) {
-        /* ... */
-
-        String str = constructHeaderFromEmotes();
-        str = Hooks.hookSetName(str, this.emoteSetId); // TODO: __HOOK
+    private String constructHeaderFromEmotes() {
+        String res = null;
 
         /* ... */
+
+        return Hooks.hookSetName(res, this.emoteSetId); // TODO: __INJECT_CODE
     }
 
     /* ... */

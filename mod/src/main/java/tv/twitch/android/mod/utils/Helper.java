@@ -8,13 +8,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Process;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,9 +25,12 @@ import androidx.core.text.HtmlCompat;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Random;
 
 import tv.twitch.android.api.parsers.PlayableModelParser;
+import tv.twitch.android.core.adapters.RecyclerAdapterSection;
+import tv.twitch.android.core.adapters.TwitchSectionAdapter;
 import tv.twitch.android.core.user.TwitchAccountManager;
 import tv.twitch.android.mod.bridges.LoaderLS;
 import tv.twitch.android.mod.bridges.ResourcesManager;
@@ -34,17 +38,11 @@ import tv.twitch.android.mod.settings.PreferenceManager;
 import tv.twitch.android.models.Playable;
 import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.settings.SettingsActivity;
+import tv.twitch.android.shared.emotes.emotepicker.adapter.EmotePickerAdapterSection;
+import tv.twitch.android.shared.emotes.emotepicker.models.EmotePickerSection;
 
 
 public class Helper {
-    public static final Helper INSTANCE = new Helper();
-    private MediaPlayer mediaPlayer;
-
-    private int mCurrentChannel = 0;
-
-    private Helper() {}
-
-
     public static void openUrl(String url) {
         if (TextUtils.isEmpty(url)) {
             Logger.error("Empty url");
@@ -61,7 +59,7 @@ public class Helper {
     }
 
     public static void showRestartDialog(Context context, String message) {
-        new AlertDialog.Builder(context).setMessage(message).setPositiveButton(ResourcesManager.INSTANCE.getString("dialog_yes"), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(context).setMessage(message).setPositiveButton(ResourcesManager.getString("dialog_yes"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent settingsIntent = new Intent(LoaderLS.getInstance(), SettingsActivity.class);
@@ -70,7 +68,7 @@ public class Helper {
                 Process.killProcess(Process.myPid());
 
             }
-        }).setNegativeButton(ResourcesManager.INSTANCE.getString("dialog_no"), new DialogInterface.OnClickListener() {
+        }).setNegativeButton(ResourcesManager.getString("dialog_no"), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -132,7 +130,7 @@ public class Helper {
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,"/twitch/" + fixedFilename + ".mp4");
 
                 downloadManager.enqueue(request);
-                Helper.showToast(String.format(ResourcesManager.INSTANCE.getString("mod_downloading"), fixedFilename));
+                Helper.showToast(String.format(ResourcesManager.getString("mod_downloading"), fixedFilename));
             }
 
             @Override
@@ -194,81 +192,43 @@ public class Helper {
         return false;
     }
 
-    public int getCurrentChannel() {
-        return this.mCurrentChannel;
-    }
-
-    public void setCurrentChannel(int channelID) {
-        if (channelID < 0)
-            channelID = 0;
-
-        this.mCurrentChannel = channelID;
-    }
-
     public static void showPartnerBanner(Context context) {}
 
-    public static void maybeShowBanner(final Context context, final TwitchAccountManager accountManager) {
+    public static void maybeShowModInfoBanner(final Context context, final TwitchAccountManager accountManager) {
         if (!PreferenceManager.INSTANCE.shouldShowBanner())
             return;
 
         if (PreferenceManager.INSTANCE.isBannerShown())
             return;
 
-        String text = ResourcesManager.INSTANCE.getString("mod_banner_text_default");
+        String text = ResourcesManager.getString("mod_banner_text_default");
 
         StringBuilder titleBuilder = new StringBuilder("TwitchMod ").append(LoaderLS.getVersionName());
 
         AlertDialog dialog = new AlertDialog.Builder(context)
-                .setTitle(titleBuilder)
-                .setMessage(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY))
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-                PreferenceManager.INSTANCE.setBannerShown(true);
-                PreferenceManager.INSTANCE.setShouldShowBanner(false);
-                if (accountManager.isPartner())
-                    showPartnerBanner(context);
-            }
-        }).setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                dialog.cancel();
-                PreferenceManager.INSTANCE.setBannerShown(true);
-            }
-        }).create();
+                    .setTitle(titleBuilder)
+                    .setMessage(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            PreferenceManager.INSTANCE.setBannerShown(true);
+                            PreferenceManager.INSTANCE.setShouldShowBanner(false);
+                            if (accountManager.isPartner())
+                                showPartnerBanner(context);
+                        }
+                    }).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            dialog.cancel();
+                            PreferenceManager.INSTANCE.setBannerShown(true);
+                        }
+                    }).create();
         dialog.show();
         TextView textView = dialog.findViewById(android.R.id.message);
         if (textView != null) {
             textView.setClickable(true);
             textView.setMovementMethod(LinkMovementMethod.getInstance());
-        } else {
-            Logger.error("textView is null");
-        }
-    }
-
-    public static void playSoundFromFd(AssetFileDescriptor fd) {
-        if (fd == null) {
-            Logger.error("fd is null");
-            return;
-        }
-
-        final MediaPlayer player = new MediaPlayer();
-
-        try {
-            player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-            player.prepare();
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    if (mp != null) {
-                        mp.release();
-                    }
-                }
-            });
-            player.start();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
         }
     }
 
@@ -294,5 +254,28 @@ public class Helper {
                 conn.disconnect();
             }
         }
+    }
+
+    public static int calcBttvPos(TwitchSectionAdapter adapter) {
+        if (adapter == null) {
+            Logger.error("adapter is null");
+            return 0;
+        }
+
+        List<RecyclerAdapterSection> sections = adapter.getSections();
+        if (sections == null || sections.size() == 0)
+            return 0;
+
+        int sizeWithHeader = 0;
+        for (RecyclerAdapterSection t : sections) {
+            EmotePickerAdapterSection section = (EmotePickerAdapterSection) t;
+
+            if (section.getEmotePickerSection() == EmotePickerSection.BTTV)
+                return sizeWithHeader;
+
+            sizeWithHeader += section.sizeWithHeader();
+        }
+
+        return 0;
     }
 }

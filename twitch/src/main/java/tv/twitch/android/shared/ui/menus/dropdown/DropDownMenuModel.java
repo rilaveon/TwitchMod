@@ -1,5 +1,6 @@
 package tv.twitch.android.shared.ui.menus.dropdown;
 
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -7,7 +8,7 @@ import tv.twitch.android.shared.ui.menus.core.MenuModel;
 
 
 public final class DropDownMenuModel<T> extends MenuModel {
-    private int selectedOption;
+    private int selectedOption; // TODO: __REMOVE_FINAL
 
     /* ... */
 

@@ -13,26 +13,25 @@ import tv.twitch.android.mod.utils.Logger;
 
 public class GlideChatImageTarget {
     private UrlDrawable mUrlDrawable;
-    private WeakReference<View> mView; // TODO: __INJECT_FIELD
+    private WeakReference<View> mContainerView; // TODO: __INJECT_FIELD
 
     public GlideChatImageTarget(Context context, UrlDrawable urlDrawable, int i) {}
 
 
     private float calcMin(float f1, float f2) { // TODO: __INJECT_METHOD
-        if (mUrlDrawable.isWideEmote()) {
-            return f1;
-        } else {
+        if (mUrlDrawable.isTwitchEmote() || !mUrlDrawable.shouldWide())
             return Math.min(f1, f2);
-        }
+
+        return f1;
     }
 
-    public void setView(View view) { // TODO: __INJECT_METHOD
+    public void setContainerView(View view) { // TODO: __INJECT_METHOD
         if (view == null) {
             Logger.debug("view is null");
             return;
         }
 
-        mView = new WeakReference<>(view);
+        mContainerView = new WeakReference<>(view);
     }
 
     private Point scaleSquared(float f, float f2, float f3) {
@@ -51,13 +50,6 @@ public class GlideChatImageTarget {
     public void onResourceReady(Object drawable, Object transition) {
         /* ... */
 
-        maybeFixWideEmotes(); // TODO: __INJECT_CODE
-    }
-
-    private void maybeFixWideEmotes() {
-        if (mUrlDrawable.isBadge() || !mUrlDrawable.isWideEmote())
-            return;
-
-        Hooks.tryFixWideEmotesInView(mView);
+        Hooks.maybeInvalidateContainerView(mContainerView, mUrlDrawable); // TODO: __INJECT_CODE
     }
 }

@@ -46,48 +46,12 @@ public final class EmotePickerPresenter {
         /* ... */
 
         if (updateEvent instanceof UpdateEvent.EmoteSectionSelected) {
-            /* ... */
-
-            int i = 0;
-            int i2 = 4;
-
-            if (i2 == 4) {
-                i = calcBttvPos();
-            }
-            i++;
-
-
-                /* ... */
+           /* ... */
         }
 
         /* ... */
 
         return null;
-    }
-
-    private int calcBttvPos() {
-        if (this.adapterBinder == null)
-            return 0;
-
-        TwitchSectionAdapter adapter = this.adapterBinder.getAdapter();
-        if (adapter == null)
-            return 0;
-
-        List<RecyclerAdapterSection> sections = adapter.getSections();
-        if (sections == null || sections.size() == 0)
-            return 0;
-
-        int sizeWithHeader = 0;
-        for (RecyclerAdapterSection t : sections) {
-            EmotePickerAdapterSection section = (EmotePickerAdapterSection) t;
-
-            if (section.getEmotePickerSection() == EmotePickerSection.BTTV)
-                return sizeWithHeader;
-
-            sizeWithHeader += section.sizeWithHeader();
-        }
-
-        return 0;
     }
 
     public static abstract class ClickedEmote {

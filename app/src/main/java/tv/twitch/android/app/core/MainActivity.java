@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
     private FragmentManager.OnBackStackChangedListener mBackStackListener = new FragmentManager.OnBackStackChangedListener() { // TODO: __REPLACE_FIELD
         @Override
         public void onBackStackChanged() {
-            Helper.maybeShowBanner(MainActivity.this, mAccountManager);
+            Helper.maybeShowModInfoBanner(MainActivity.this, mAccountManager);
         }
     };
 

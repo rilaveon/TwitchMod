@@ -7,8 +7,8 @@ android {
         minSdkVersion 21
         //noinspection OldTargetApi
         targetSdkVersion 29
-        versionCode 908000
-        versionName "9.8.0"
+        versionCode 909020
+        versionName "9.9.2"
     }
 
     buildToolsVersion = '29.0.3'

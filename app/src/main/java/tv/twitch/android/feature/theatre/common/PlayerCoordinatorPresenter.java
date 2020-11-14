@@ -12,7 +12,9 @@ public abstract class PlayerCoordinatorPresenter {
 
     /* ... */
 
-    protected final OverlayLayoutController getOverlayLayoutController() {return null;}
+    protected final OverlayLayoutController getOverlayLayoutController() {
+        return null;
+    }
 
     private final void playWithCurrentModeAndQuality() {/* ... */}
 

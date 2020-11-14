@@ -31,7 +31,7 @@ public class BadgeManager implements FfzBadgesFetcher.Callback {
         sCustomBadges.clear();
     }
 
-    public void setUserBadges(int userId, Collection<Badge> badges) {
+    public void setUserCustomBadges(int userId, Collection<Badge> badges) {
         if (userId <= 0) {
             Logger.error("Bad ID: " + userId);
             return;

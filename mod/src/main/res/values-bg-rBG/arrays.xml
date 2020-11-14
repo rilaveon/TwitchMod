@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="chat_scale_choices">
+        <item>Default</item>
+        <item>10%</item>
+        <item>15%</item>
+        <item>20%</item>
+        <item>25%</item>
+        <item>30%</item>
+        <item>35%</item>
+        <item>40%</item>
+    </string-array>
+    <string-array name="exoplayer_speed_choices">
+        <item>Default</item>
+        <item>1.25x</item>
+        <item>1.5x</item>
+        <item>1.75x</item>
+        <item>2x</item>
+    </string-array>
+    <string-array name="miniplayer_scale_choices">
+        <item>Default</item>
+        <item>1.25x</item>
+        <item>1.5x</item>
+        <item>1.75x</item>
+        <item>2x</item>
+    </string-array>
+    <string-array name="player_backward_choices">
+        <item>5</item>
+        <item>10 (default)</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="player_forward_choices">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30 (default)</item>
+        <item>60</item>
+    </string-array>
+    <string-array name="player_impl_choices">
+        <item>Default</item>
+        <item>TwitchCore</item>
+        <item>ExoPlayer V2</item>
+    </string-array>
+    <string-array name="floating_chat_rate_choices">
+        <item>Default</item>
+        <item>1.25x</item>
+        <item>1.5x</item>
+        <item>1.75x</item>
+        <item>2x</item>
+    </string-array>
+    <string-array name="floating_chat_queue_choices">
+        <item>3 (default)</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
+    <string-array name="filter_level_choices">
+        <item>Disabled</item>
+        <item>Subs</item>
+        <item>Mods</item>
+        <item>Broadcaster</item>
+    </string-array>
+    <string-array name="font_size_choices">
+        <item>8sp</item>
+        <item>9sp</item>
+        <item>10sp</item>
+        <item>11sp</item>
+        <item>12sp</item>
+        <item>13sp (default)</item>
+        <item>14sp</item>
+        <item>16sp</item>
+        <item>18sp</item>
+        <item>20sp</item>
+    </string-array>
+    <string-array name="msg_del_choices">
+        <item>Default</item>
+        <item>Legacy</item>
+        <item>Strikethrough</item>
+    </string-array>
+    <string-array name="gifs_choices">
+        <item>Disabled</item>
+        <item>Static</item>
+        <item>Animated</item>
+    </string-array>
+    <string-array name="source_emote_size_choices">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </string-array>
+</resources>

@@ -1,5 +1,6 @@
 package tv.twitch.android.shared.ui.menus.infomenu;
 
+
 import android.graphics.drawable.Drawable;
 import android.view.View;
 

@@ -7,9 +7,9 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 
 import tv.twitch.android.app.core.ViewExtensionsKt;
+import tv.twitch.android.mod.bridges.Hooks;
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.bridges.interfaces.ISharedPanelWidget;
-import tv.twitch.android.mod.utils.ClipDownloader;
 import tv.twitch.android.models.clips.ClipModel;
 import tv.twitch.android.models.videos.VodModel;
 import tv.twitch.android.shared.player.presenters.PlayerPresenter;
@@ -40,22 +40,22 @@ public class SharePanelWidget extends FrameLayout implements ISharedPanelWidget 
         super(context);
     }
 
-    private void initModels() { // TODO: __INJECT_METHOD
-        int downloadButtonId = ResourcesManager.INSTANCE.getId("download_model");
+    private void setupDownloadButton() { // TODO: __INJECT_METHOD
+        int downloadButtonId = ResourcesManager.getId("download_model");
         if (downloadButtonId != 0) {
             this.mDownloadButton = findViewById(downloadButtonId);
             if (this.mDownloadButton != null) {
                 ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
-                mDownloadButton.setOnClickListener(new ClipDownloader(this));
+                Hooks.setupClipDownloader(mDownloadButton, this);
             }
         }
     }
 
     private void init() {
-        initModels(); // TODO: __INJECT_CODE
+        setupDownloadButton(); // TODO: __INJECT_CODE
     }
 
-    private void updateModButtonsVisibility() {
+    private void updateModButtonsVisibility() { // TODO: __INJECT_METHOD
         if (this.mDownloadButton != null) {
             ViewExtensionsKt.visibilityForBoolean(this.mDownloadButton, mClipModel != null);
         }

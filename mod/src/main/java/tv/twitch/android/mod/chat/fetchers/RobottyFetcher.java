@@ -1,5 +1,6 @@
 package tv.twitch.android.mod.chat.fetchers;
 
+
 import android.text.TextUtils;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.models.channel.ChannelInfo;
 
 import static tv.twitch.android.mod.net.ServiceFactory.getRobottyApi;
+
 
 public final class RobottyFetcher implements Callback<RobottyResponse> {
     private final static int MAX_RETRY_ATTEMPTS = 2;
@@ -80,8 +82,9 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
             return;
         }
 
+        List<String> messages = robottyResponse.getMessages();
         String errorCode = robottyResponse.getErrorCode();
-        if (!TextUtils.isEmpty(errorCode)) {
+        if (!TextUtils.isEmpty(errorCode) && (messages == null || messages.isEmpty())) {
             if (errorCode.equals("channel_not_joined")) {
                 if (mRetryCount++ < MAX_RETRY_ATTEMPTS) {
                     retry(call);
@@ -94,7 +97,7 @@ public final class RobottyFetcher implements Callback<RobottyResponse> {
             return;
         }
 
-        mCallback.onMessagesParsed(mChannel, robottyResponse.getMessages());
+        mCallback.onMessagesParsed(mChannel, messages);
     }
 
     public void fetch() {

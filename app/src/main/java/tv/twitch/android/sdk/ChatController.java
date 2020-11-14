@@ -11,12 +11,11 @@ public class ChatController {
     /* ... */
 
     public ChatEmoticonSet[] getEmoticonSets() { // TODO: __REPLACE_METHOD
-        return hookSets();
+        return Hooks.hookChatEmoticonSet(this.mEmoticonSets);
     }
 
-    // TODO: __REPLACE_DIRECT_CALL
-    public ChatEmoticonSet[] hookSets() { // TODO: __INJECT_METHOD
-        return Hooks.hookChatEmoticonSet(this.mEmoticonSets);
+    public static /* synthetic */ ChatEmoticonSet[]access$000(ChatController chatController) { // TODO: __REPLACE_METHOD
+        return Hooks.hookChatEmoticonSet(chatController.mEmoticonSets);
     }
 
     /* ... */

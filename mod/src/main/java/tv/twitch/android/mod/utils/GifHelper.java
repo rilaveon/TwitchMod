@@ -12,7 +12,7 @@ import java.util.List;
 
 import tv.twitch.android.core.adapters.RecyclerAdapterItem;
 import tv.twitch.android.shared.ui.elements.span.CenteredImageSpan;
-import tv.twitch.android.mod.bridges.interfaces.IDrawable;
+import tv.twitch.android.mod.bridges.interfaces.IUrlDrawable;
 import tv.twitch.android.mod.bridges.interfaces.IChatMessageItem;
 
 
@@ -22,7 +22,7 @@ public class GifHelper {
             return;
 
         for (Object o : items)
-            recycleObject(o, true);
+            recycleObject(o, false);
     }
 
     public static void recycleObject(Object item, boolean clear) {
@@ -67,10 +67,10 @@ public class GifHelper {
                 continue;
 
             Drawable drawable = image.getImageDrawable();
-            if (!(drawable instanceof IDrawable))
+            if (!(drawable instanceof IUrlDrawable))
                 continue;
 
-            IDrawable drawableContainer = (IDrawable) drawable;
+            IUrlDrawable drawableContainer = (IUrlDrawable) drawable;
 
             Drawable gifDrawable = drawableContainer.getDrawable();
             if (gifDrawable instanceof GifDrawable) {

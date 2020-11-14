@@ -1,5 +1,6 @@
 package tv.twitch.android.shared.ui.menus;
 
+
 import tv.twitch.android.mod.models.Preferences;
 import tv.twitch.android.shared.ui.menus.checkable.CheckableGroupModel;
 import tv.twitch.android.shared.ui.menus.togglemenu.ToggleMenuModel;
@@ -85,7 +86,11 @@ public interface SettingsPreferencesController {
         HideChatRestriction(Preferences.HIDE_CHAT_RESTRICTION),
         WideEmotes(Preferences.SHOW_WIDE_EMOTES),
         DisableGoogleBilling(Preferences.DISABLE_GOOGLE_BILLING),
-        SwipperLockButton(Preferences.SWIPPER_LOCK_BUTTON);
+        SwipperLockButton(Preferences.SWIPPER_LOCK_BUTTON),
+        PlayerForwardSeek(Preferences.PLAYER_FORWARD_SEEK),
+        PlayerBackwardSeek(Preferences.PLAYER_BACKWARD_SEEK),
+        ChatMessageFontSize(Preferences.CHAT_MESSAGE_FONT_SIZE),
+        ChatAutoclicker(Preferences.AUTOCLICKER);
 
         private final Preferences mPreference;
 

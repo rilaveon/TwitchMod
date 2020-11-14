@@ -6,6 +6,7 @@ import android.view.View;
 
 import tv.twitch.android.mod.bridges.ResourcesManager;
 import tv.twitch.android.mod.models.Preferences;
+import tv.twitch.android.mod.utils.Helper;
 import tv.twitch.android.shared.ui.menus.SettingsPreferencesController;
 import tv.twitch.android.shared.ui.menus.core.MenuModel;
 import tv.twitch.android.shared.ui.menus.dropdown.DropDownMenuModel;
@@ -19,13 +20,26 @@ public class MenuFactory {
         return new InfoMenuModel(title, desc, null, null, null, null, listener);
     }
 
+    public static MenuModel getClickableUrlInfoMenu(String title, String desc, final String url) {
+        return new InfoMenuModel(title, desc, null, null, null, null, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Helper.openUrl(url);
+            }
+        });
+    }
+
     public static MenuModel getInfoMenu(String title) {
         return new InfoMenuModel(title, null, null, null, null, null, null);
     }
 
-    public static MenuModel getToggleMenu(SettingsPreferencesController.SettingsPreference controller, ResourcesManager resourcesManager, boolean state) {
+    public static MenuModel getInfoMenu(String title, String desc) {
+        return new InfoMenuModel(title, desc, null, null, null, null, null);
+    }
+
+    public static MenuModel getToggleMenu(SettingsPreferencesController.SettingsPreference controller, boolean state) {
         Preferences preference = controller.getPreference();
-        return new ToggleMenuModel(resourcesManager.getString(preference.getTitle()), resourcesManager.getString(preference.getDescription()), null, state, true, null, null, false, null, null, null, controller, null);
+        return new ToggleMenuModel(ResourcesManager.getString(preference.getTitle()), ResourcesManager.getString(preference.getDescription()), null, state, true, null, null, false, null, null, null, controller, null);
     }
 
     public static MenuModel getMessage(String text) {
@@ -36,7 +50,7 @@ public class MenuFactory {
         return new MenuMessageModel(text, 17, 0, true);
     }
 
-    public static MenuModel getDropDownMenu(SettingsPreferencesController.SettingsPreference controller, ResourcesManager resourcesManager, PreferenceArrayAdapter adapter, Object state) {
-        return new DropDownMenuModel<>(adapter, adapter.findItemPos(state), resourcesManager.getString(controller.getPreference().getTitle()), resourcesManager.getString(controller.getPreference().getDescription()), null, null, new SettingsController.onMenuItemSelected(adapter));
+    public static MenuModel getDropDownMenu(SettingsPreferencesController.SettingsPreference controller, PreferenceArrayAdapter adapter, Object state) {
+        return new DropDownMenuModel<>(adapter, adapter.findItemPos(state), ResourcesManager.getString(controller.getPreference().getTitle()), ResourcesManager.getString(controller.getPreference().getDescription()), null, null, new SettingsController.onMenuItemSelected(adapter));
     }
 }

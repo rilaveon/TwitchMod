@@ -7,6 +7,9 @@ import android.util.LruCache;
 
 import java.util.HashMap;
 
+import tv.twitch.android.mod.R;
+import tv.twitch.android.mod.utils.Logger;
+
 
 public class ResourcesManager {
     public static final ResourcesManager INSTANCE = new ResourcesManager();
@@ -54,52 +57,68 @@ public class ResourcesManager {
         }
     }
 
-    public Integer getId(String name) {
-        PubCache cache = mCaches.get(IdType.ID);
+    public static Integer getId(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.ID);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
-    public Integer getDrawableId(String name) {
-        PubCache cache = mCaches.get(IdType.DRAWABLE);
+    public static Integer getDrawableId(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.DRAWABLE);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
-    public Integer getRawId(String name) {
-        PubCache cache = mCaches.get(IdType.RAW);
+    public static Integer getRawId(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.RAW);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
-    public Integer getLayoutId(String name) {
-        PubCache cache = mCaches.get(IdType.LAYOUT);
+    public static Integer getLayoutId(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.LAYOUT);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
-    public Integer getStringId(String name) {
-        PubCache cache = mCaches.get(IdType.STRING);
+    public static Integer getStringId(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.STRING);
         if (cache != null)
             return cache.get(name);
 
         return 0;
     }
 
-    public String getStringById(Integer id) {
+    public static String getStringById(Integer id) {
         return LoaderLS.getInstance().getResources().getString(id);
     }
 
-    public String getString(String name) {
-        PubCache cache = mCaches.get(IdType.STRING);
+    public static String[] getStringArray(String name) {
+        int resId = LoaderLS.getInstance().getResources().getIdentifier(name, "array", LoaderLS.getInstance().getPackageName());
+        if (resId == -1) {
+            Logger.error("resId == -1, name=" + name);
+            return new String[0];
+        }
+
+        try {
+            return LoaderLS.getInstance().getResources().getStringArray(resId);
+        } catch (Resources.NotFoundException ex) {
+            ex.printStackTrace();
+        }
+
+        return new String[0];
+    }
+
+    public static String getString(String name) {
+        PubCache cache = INSTANCE.mCaches.get(IdType.STRING);
 
         int resId = cache != null ? cache.get(name) : 0;
         if (resId == 0) {

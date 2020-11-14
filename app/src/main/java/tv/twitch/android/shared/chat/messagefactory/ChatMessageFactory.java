@@ -45,28 +45,24 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
 
         MessageRecyclerItem ret = null;
 
-        ret.setHighlighted(Hooks.isHighlightedMessage(chatMessageInfo, accountManager)); // TODO: __INJECT_CODE
+        /* ... */
+
+        ret.setShouldHighlightBackground(Hooks.shouldHighlightMessage(chatMessageInfo, accountManager)); // TODO: __INJECT_CODE
 
         return ret;
     }
 
     private final ChatMessageSpanGroup createChatMessageSpanGroup(ChatMessageInterface chatMessageInterface, boolean z, boolean z2, boolean z3, int userId, int channelId, IClickableUsernameSpanListener iClickableUsernameSpanListener, TwitchUrlSpanClickListener twitchUrlSpanClickListener, WebViewSource webViewSource, String str, boolean z4, ChatFiltersSettings chatFiltersSettings, Integer num, EventDispatcher<ChatItemClickEvent> eventDispatcher) {
-        try {
-            /* ... */
+        /* ... */
 
-            SpannedString parseChatMessageTokens$default = new SpannedString("KEKW");
-            SpannedString generateBadges = new SpannedString("LULW");
-            parseChatMessageTokens$default = Hooks.hookChatMessage(this, chatMessageInterface, parseChatMessageTokens$default, channelId, accountManager); // TODO: __HOOK
-            generateBadges = Hooks.hookBadges(this, chatMessageInterface, generateBadges); // TODO: __HOOK
+        SpannedString parseChatMessageTokens$default = new SpannedString("KEKW");
+        SpannedString generateBadges = new SpannedString("LULW");
+        parseChatMessageTokens$default = Hooks.hookChatMessage(this, chatMessageInterface, parseChatMessageTokens$default, channelId); // TODO: __HOOK
+        generateBadges = Hooks.hookBadges(this, chatMessageInterface, generateBadges); // TODO: __HOOK
 
-            /* ... */
+        /* ... */
 
-            return null;
-        } catch (Throwable th) {
-            th.printStackTrace();
-
-            return ChatMessageSpanGroup.Companion.getBLANK();
-        }
+        return null;
     }
 
     /* ... */
@@ -74,9 +70,8 @@ public class ChatMessageFactory implements IChatMessageFactory { // TODO: __IMPL
     @Override
     public CharSequence getSpannedEmote(String url, String emoteText) { // TODO: __INJECT_METHOD
         UrlDrawable urlDrawable = new UrlDrawable(url, MediaSpan$Type.Emote);
-        if (Hooks.isSupportWideEmotes()) {
-            urlDrawable.setIsWideEmote(true);
-        }
+        urlDrawable.setIsTwitchEmote(false);
+        urlDrawable.setShouldWide(Hooks.isSupportWideEmotes());
 
         SpannableString spannableString = new SpannableString(emoteText);
         spannableString.setSpan(new CenteredImageSpan(urlDrawable, null), 0, emoteText.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);

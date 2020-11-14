@@ -15,6 +15,7 @@ import tv.twitch.android.mod.utils.Logger;
 
 import static tv.twitch.android.mod.net.ServiceFactory.getBttvApi;
 
+
 public class BttvGlobalFetcher extends ApiCallback<List<BttvEmoteResponse>> {
     private final Callback mCallback;
 

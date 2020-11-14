@@ -1,6 +1,8 @@
 package tv.twitch.android.shared.player.parsers.extm3u.raw;
 
+
 import java.util.ArrayList;
+
 
 public class StreamInfo {
     public ArrayList<Attribute> Attributes;
@@ -12,4 +14,6 @@ public class StreamInfo {
     public String Subtitles;
     public String Uri = "";
     public String Video;
+
+    /* ... */
 }

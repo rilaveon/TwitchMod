@@ -5,6 +5,7 @@ import android.content.Context;
 
 import tv.twitch.android.mod.bridges.Hooks;
 
+
 public class GooglePlaySubscriptionPurchaser {
     /* ... */
 

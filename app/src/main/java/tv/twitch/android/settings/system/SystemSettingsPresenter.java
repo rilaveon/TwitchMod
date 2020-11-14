@@ -1,17 +1,19 @@
 package tv.twitch.android.settings.system;
 
 
+import android.content.Context;
+
 import java.util.List;
 
+import tv.twitch.android.mod.bridges.interfaces.ISettingsPresenter;
 import tv.twitch.android.mod.settings.SettingsController;
-import tv.twitch.android.mod.utils.Logger;
 import tv.twitch.android.settings.base.BaseSettingsPresenter;
 import tv.twitch.android.settings.base.SettingsNavigationController;
 import tv.twitch.android.shared.ui.menus.SettingsPreferencesController;
 import tv.twitch.android.shared.ui.menus.core.MenuModel;
 
 
-public class SystemSettingsPresenter extends BaseSettingsPresenter {
+public class SystemSettingsPresenter extends BaseSettingsPresenter implements ISettingsPresenter { // TODO: __IMPLEMENT
     /* ... */
 
     @Override
@@ -31,13 +33,20 @@ public class SystemSettingsPresenter extends BaseSettingsPresenter {
 
     @Override
     public void updateSettingModels() { // TODO: __REPLACE_METHOD
-        List<MenuModel> models = getSettingModels();
-        if (models == null) {
-            Logger.error("models is null");
-            return;
-        }
+        SettingsController.initialize(this);
+    }
 
-        SettingsController.initialize(getActivity(), models);
+    public List<MenuModel> xGetSettingModels() { // TODO: __INJECT_METHOD
+        return this.getSettingModels();
+    }
+
+    public void xBindSettings() { // TODO: __INJECT_METHOD
+        this.bindSettings();
+    }
+
+    @Override
+    public Context xGetContext() { // TODO: __INJECT_METHOD
+        return this.getActivity();
     }
 
     /* ... */

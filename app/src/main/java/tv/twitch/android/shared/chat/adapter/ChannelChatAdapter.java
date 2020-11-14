@@ -22,7 +22,7 @@ public class ChannelChatAdapter extends TwitchAdapter {
 
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) { // TODO: __INJECT_METHOD
         super.onViewRecycled(holder);
-        GifHelper.recycleObject(holder, true);
+        GifHelper.recycleObject(holder, false);
     }
 
     @Override

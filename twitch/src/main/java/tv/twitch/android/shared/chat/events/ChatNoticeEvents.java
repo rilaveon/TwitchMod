@@ -8,5 +8,7 @@ public abstract class ChatNoticeEvents {
 
     public static final class SubscriptionNoticeEvent extends ChatNoticeEvents {/* ... */}
 
+    public static final class RewardGiftNoticeEvent extends ChatNoticeEvents {/* ... */}
+
     /* ... */
 }

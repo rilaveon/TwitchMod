@@ -1,6 +1,8 @@
 package tv.twitch.android.shared.player.parsers.extm3u.raw;
 
+
 import java.util.ArrayList;
+
 
 public class Media {
     public ArrayList<Attribute> Attributes;
@@ -14,4 +16,6 @@ public class Media {
     public ArrayList<StreamInfo> StreamInfos;
     public String Type;
     public String Uri;
+
+    /* ... */
 }

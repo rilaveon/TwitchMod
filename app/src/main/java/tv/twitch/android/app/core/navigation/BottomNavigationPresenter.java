@@ -11,6 +11,8 @@ public class BottomNavigationPresenter {
     private final List<BottomNavigationItem> mBottomNavigationItems;
 
     private enum BottomNavigationItem {
+        /* ... */
+
         DISCOVER,
         ESPORTS
 
@@ -27,7 +29,7 @@ public class BottomNavigationPresenter {
 
     private static List<BottomNavigationItem> filterNavItems(ArrayList<BottomNavigationItem> items) { // TODO: __INJECT_METHOD
         if (items == null || items.isEmpty()) {
-            return null;
+            return items;
         }
 
         if (Hooks.isHideDiscoverTab()) {

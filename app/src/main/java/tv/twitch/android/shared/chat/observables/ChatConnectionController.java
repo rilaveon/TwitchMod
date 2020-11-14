@@ -7,7 +7,7 @@ import tv.twitch.android.models.channel.ChannelInfo;
 
 
 public class ChatConnectionController implements IChatConnectionController { // TODO: __IMPLEMENTATION
-    public int viewerId; // TODO: __CHANGE_FIELD_ACCESS
+    private int viewerId;
 
     /* ... */
 
@@ -20,6 +20,11 @@ public class ChatConnectionController implements IChatConnectionController { // 
     @Override
     public int getViewerId() { // TODO: __INJECT_METHOD
         return viewerId;
+    }
+
+    @Override
+    public void setViewerId(int id) { // TODO: __INJECT_METHOD
+        viewerId = id;
     }
 
     /* ... */

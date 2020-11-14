@@ -3,14 +3,8 @@ package tv.twitch.android.mod.bridges;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
-
-import org.acra.ACRA;
-import org.acra.config.CoreConfigurationBuilder;
-import org.acra.config.MailSenderConfigurationBuilder;
-import org.acra.data.StringFormat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +26,6 @@ import tv.twitch.android.mod.utils.Logger;
 public class LoaderLS extends TwitchApplication {
     private static final String APK_BUILD_INFO_TEMPLATE = "BUILD ";
     private static final String CUSTOM_BADGES_ASSETS_PATH = "mod/badges/custom";
-    private static final String REPORT_EMAIL = "twmodrk@gmail.com";
 
     private static String sBuildInfo = "TEST BUILD";
     private static int sBuildNumber = -1;
@@ -75,7 +68,7 @@ public class LoaderLS extends TwitchApplication {
         initLoader();
         super.onCreate();
         fetchBttv();
-        setFilterBlacklist();
+        setFilterBlocklist();
         setCustomBadges();
     }
 
@@ -93,8 +86,8 @@ public class LoaderLS extends TwitchApplication {
         return null;
     }
 
-    private void setFilterBlacklist() {
-        ChatMesssageFilteringUtil.INSTANCE.updateBlacklist(PreferenceManager.INSTANCE.getUserFilterText());
+    private void setFilterBlocklist() {
+        ChatMesssageFilteringUtil.INSTANCE.updateBlocklist(PreferenceManager.INSTANCE.getUserFilterText());
     }
 
     private void setCustomBadges() {
@@ -130,7 +123,7 @@ public class LoaderLS extends TwitchApplication {
                     }
 
                     if (badges.size() > 0) {
-                        BadgeManager.INSTANCE.setUserBadges(userId, badges);
+                        BadgeManager.INSTANCE.setUserCustomBadges(userId, badges);
                     }
                 } catch (NumberFormatException ex) {
                     Logger.warning("Bad userID: " + entry);

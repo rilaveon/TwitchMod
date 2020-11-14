@@ -1,6 +1,9 @@
 package tv.twitch.android.feature.theatre.common;
 
 
+import tv.twitch.android.shared.player.overlay.OverlayLayoutController;
+
+
 public class PlayerCoordinatorPresenter$landscapeChatCallback$1 {
     final PlayerCoordinatorPresenter this$0 = null;
 
@@ -9,8 +12,17 @@ public class PlayerCoordinatorPresenter$landscapeChatCallback$1 {
     public void onLandscapeChatAvailabilityChanged(boolean z) {
         /* ... */
 
-        this.this$0.getOverlayLayoutController().setLockButtonVisible(z); // TODO: __INJECT_CODE
+        setLockButtonVisibility(z); // TODO: __INJECT_CODE
 
         /* ... */
+    }
+
+    private void setLockButtonVisibility(boolean visibility) { // TODO: __INJECT_METHOD
+        if (this.this$0 != null) {
+            OverlayLayoutController controller = this.this$0.getOverlayLayoutController();
+            if (controller != null) {
+                controller.setLockButtonVisible(visibility);
+            }
+        }
     }
 }
